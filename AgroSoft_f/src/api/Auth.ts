@@ -18,3 +18,14 @@ export const login = async ({ email, password }: { email: string; password: stri
   }
 };
 
+export const getUser = async (token: string) => {
+  try {
+    const response = await apiClient.get("usuarios/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error("Error obteniendo usuario:", error.response?.status, error.response?.data);
+    throw error; // Lanzar el error para manejarlo en `AuthProvider`
+  }
+}; 
