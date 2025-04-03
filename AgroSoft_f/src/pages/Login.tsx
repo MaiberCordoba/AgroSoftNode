@@ -13,23 +13,30 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (data: Record<string, any>) => {
-    setErrorMessage(""); // Limpiar errores previos
+    setErrorMessage("");
     try {
+      // 1. Iniciar sesión
       const response = await login({ email: data.email, password: data.password });
+      const token = response.token || response.data?.token;
+      console.log(response)
+      if (!token) throw new Error("Formato de respuesta inesperado");
   
-      // Obtener los datos del usuario
-      const userData = await getUser(response.access);
-      
-      // Guardar usuario y token en localStorage
-      localStorage.setItem("token", response.access);
-      localStorage.setItem("user", JSON.stringify(userData));
+      // 2. Guardar token
+      localStorage.setItem("token", token);
   
-      authLogin(response.access); // Autenticar
-      navigate("/home"); // Redirigir a Home
+      // 3. Obtener datos del usuario (opcional, si es necesario)
+      const userData = await getUser(token);
+      localStorage.setItem("user", JSON.stringify(userData || {}));
   
+      // 4. Autenticar y redirigir
+      authLogin(token);
+      navigate("/home");
     } catch (error) {
-      console.error("Error de autenticación:", error);
-      setErrorMessage("Correo o contraseña incorrectos. Inténtalo de nuevo.");
+      console.error("Error completo:", error);
+      setErrorMessage(
+        error.response?.data?.message ||
+        "Error al iniciar sesión. Verifica tus credenciales."
+      );
     }
   };
 

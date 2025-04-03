@@ -113,3 +113,44 @@ export async function update(req,res){
         res.status(500).json({msg:"Internal server error"});
     }
 }
+
+export const getCurrentUser = async (req, res) => {
+    try {
+        // Verificamos que el middleware haya adjuntado los datos del usuario
+        if (!req.user) {
+            return res.status(401).json({ msg: "Datos de usuario no disponibles" });
+        }
+
+        // Extraemos los campos del token (ajusta según tu estructura JWT)
+        const { identificacion, nombre, correoElectronico, admin } = req.user;
+
+        // Validamos campos esenciales
+        if (!identificacion || !correoElectronico) {
+            return res.status(400).json({ 
+                msg: "Token incompleto",
+                missingFields: {
+                    identificacion: !identificacion,
+                    correoElectronico: !correoElectronico
+                }
+            });
+        }
+
+        // Respondemos con los datos del usuario
+        res.status(200).json({
+            success: true,
+            user: {
+                id: identificacion,
+                nombre: nombre || "No especificado",
+                email: correoElectronico,
+                isAdmin: Boolean(admin) || false
+            }
+        });
+
+    } catch (error) {
+        console.error("Error en getCurrentUser:", error);
+        res.status(500).json({ 
+            msg: "Error al obtener datos del usuario",
+            error: error.message 
+        });
+    }
+};

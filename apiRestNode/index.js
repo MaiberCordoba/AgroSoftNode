@@ -1,11 +1,34 @@
 //Importaciones
 import express from "express";
+import cors from 'cors';
 import dotenv from "dotenv";
 dotenv.config();
 
 
 //Inicializaciones
 const app = express();
+// Opciones de CORS (personaliza según tus necesidades)
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Frontend Vite (React)
+    'http://127.0.0.1:5173',
+    'https://tudominio.com'  // En producción
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Métodos permitidos
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept'
+  ],
+  credentials: true, // Permite cookies/tokens
+  preflightContinue: false,
+  optionsSuccessStatus: 204
+};
+
+// Middlewares clave
+app.use(cors(corsOptions)); // Habilita CORS con las opciones
+app.options('*', cors(corsOptions)); // Habilita preflight para TODAS las rutas
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: false }));
 app.set('view engine', 'ejs');
