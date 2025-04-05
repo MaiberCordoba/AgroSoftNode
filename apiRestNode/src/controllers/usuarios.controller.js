@@ -154,3 +154,17 @@ export const getCurrentUser = async (req, res) => {
         });
     }
 };
+
+export const getTotalUsers = async (req,res) => {
+    try {
+        const sql = `SELECT 
+            COUNT(identificacion) AS total_usuarios,
+            SUM(CASE WHEN estado = 'activo' THEN 1 ELSE 0 END) AS usuarios_activos,
+            SUM(CASE WHEN estado = 'inactivo' THEN 1 ELSE 0 END) AS usuarios_inactivos
+            FROM usuarios;`
+        const [result] = await pool.query(sql)
+        res.status(200).json(result)
+    } catch (error) {
+        
+    }
+}
