@@ -19,11 +19,11 @@ export async function getAll(req,res){
 
 export async function create(req,res){
     try{
-        const { identificacion, nombre, apellidos, fechaNacimiento, telefono, correoElectronico, password } = req.body;
+        const { identificacion, nombre, apellidos, fechaNacimiento, telefono, correoElectronico, password,admin,estado } = req.body;
         
-        const sql = 'INSERT INTO Usuarios VALUES (?,?,?,?,?,?,?,?)';
+        const sql = 'INSERT INTO Usuarios VALUES (?,?,?,?,?,?,?,?,?)';
         const passwordHash = await bcrypt.hash(password,10);
-        const [result] = await pool.query(sql,[identificacion,nombre,apellidos,fechaNacimiento,telefono,correoElectronico,passwordHash,0]);
+        const [result] = await pool.query(sql,[identificacion,nombre,apellidos,fechaNacimiento,telefono,correoElectronico,passwordHash,admin,estado]);
         if(result.affectedRows > 0){
             return res.status(201).json({msg:"Usuario created successfully"});
         }
