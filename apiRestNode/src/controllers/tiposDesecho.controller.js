@@ -2,7 +2,7 @@ import pool from "../db.js"
 
 export const getAllTiposDesecho = async (req,res) => {
     try{
-        const sql = `SELECT * FROM tiposDesechos`
+        const sql = `SELECT * FROM tiposdesecho`
         const [rows] = await pool.query(sql)
         if (rows.length > 0){
             return res.status(200).json(rows)

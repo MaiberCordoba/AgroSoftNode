@@ -3,8 +3,8 @@ import { createTiposDesecho, getAllTiposDesecho, updateTiposDesecho } from "../c
 import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
 const tiposDesecho = Router()
-tiposDesecho.get("/tiposDesecho",verifyJWT,getAllTiposDesecho)
-tiposDesecho.post("/tiposDesecho",verifyJWT,createTiposDesecho)
-tiposDesecho.put("/tiposDesecho/:id",verifyJWT,updateTiposDesecho)
+tiposDesecho.get("/tipos-desechos",verifyJWT,getAllTiposDesecho)
+tiposDesecho.post("/tipos-desechos/",verifyJWT,createTiposDesecho)
+tiposDesecho.put("/tipos-desechos/:id",verifyJWT,updateTiposDesecho)
 
 export default tiposDesecho;

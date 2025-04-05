@@ -11,10 +11,10 @@ import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
 const rutaPlagas = Router();
 
-rutaPlagas.get("/plagas",verifyJWT, listarPlagas);
-rutaPlagas.post("/plagas",verifyJWT, registrarPlagas);
-rutaPlagas.put("/plagas/:id",verifyJWT, actualizarPlagas);
-rutaPlagas.delete("/plagas/:id",verifyJWT, eliminarPlagas);
-rutaPlagas.get("/plagas/:id",verifyJWT, buscarPlaga);
+rutaPlagas.get("/plaga",verifyJWT, listarPlagas);
+rutaPlagas.post("/plaga",verifyJWT, registrarPlagas);
+rutaPlagas.put("/plaga/:id",verifyJWT, actualizarPlagas);
+rutaPlagas.delete("/plaga/:id",verifyJWT, eliminarPlagas);
+rutaPlagas.get("/plaga/:id",verifyJWT, buscarPlaga);
 
 export default rutaPlagas;
