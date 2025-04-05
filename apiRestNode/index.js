@@ -65,6 +65,7 @@ import usosHerramientas from './src/routers/usosHerramientas.router.js';
 import usosProductos from './src/routers/usosProductos.js';
 import actividades from './src/routers/actividades.router.js';
 import sensores from './src/routers/sensores.router.js'
+import umbral from './src/routers/umbral.router.js'
 
 
 app.use(docs);
@@ -95,6 +96,7 @@ app.use(rutaControles);
 app.use(rutaProductosControl);
 app.use(rutaUsoProductoControl);
 app.use(sensores)
+app.use(umbral)
 
 //404
 app.use((req, res) => {
