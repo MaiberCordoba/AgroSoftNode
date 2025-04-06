@@ -15,6 +15,7 @@ interface UserFormState {
   telefono: string;
   correoElectronico: string;
   password: string;
+  estado:string;
   admin: boolean;
 }
 
@@ -27,7 +28,9 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
     telefono: "",
     correoElectronico: "",
     password: "",
+    estado:"",
     admin: false
+    
   });
 
   const { mutate, isPending } = usePostUsers();
@@ -66,6 +69,7 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           telefono: "",
           correoElectronico: "",
           password: "",
+          estado: "",
           admin: false
         });
       }
