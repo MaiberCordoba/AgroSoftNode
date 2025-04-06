@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input} from "@heroui/react";
+import { Button, Input, addToast } from "@heroui/react";
 import {
   WiStrongWind,
   WiThermometer,
@@ -11,7 +11,10 @@ import {
 } from "react-icons/wi";
 import SensorCard from "../components/SensorCard";
 import { SensorLista } from "../components/sensor/SensorListar";
-
+import { UmbralLista } from "../components/umbral/UmbralListar";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Umbral } from "../types/sensorTypes";
 
 export default function IoTPages() {
   const navigate = useNavigate();
@@ -27,36 +30,79 @@ export default function IoTPages() {
 
   const [searchId, setSearchId] = useState("");
 
+  const { data: umbrales = [] } = useQuery<Umbral[]>({
+    queryKey: ["umbrales"],
+    queryFn: async () => {
+      const res = await axios.get("http://localhost:3000/umbral");
+      return res.data;
+    },
+  });
+
+  const normalizar = (str: string) => str.toLowerCase().replace(/\s/g, "");
+
+  const mostrarAlerta = (mensaje: string) => {
+    addToast({
+      title: "🚨 Alerta de Sensor",
+      description: mensaje,
+      variant: "flat",
+      color: "danger",
+    });
+  };
+
   useEffect(() => {
+    if (umbrales.length === 0) return;
+
     const sensores = ["viento", "temperatura", "luzSolar", "humedad", "humedadAmbiente", "lluvia"];
     const websockets = new Map<string, WebSocket>();
 
     sensores.forEach((sensor) => {
-      const url = `ws://localhost:8080`;
-      const ws = new WebSocket(url);
-
+      const ws = new WebSocket(`ws://localhost:8080/${sensor}`); // Asegúrate de que el endpoint sea correcto
       ws.onopen = () => console.log(`✅ Conectado al WebSocket de ${sensor}`);
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          const valor = parseFloat(data.valor);
+
           setSensoresData((prevData) => ({
             ...prevData,
             [sensor]: data.valor || "-",
           }));
+
+          const umbral = umbrales.find((u) => {
+            if (u.tipo_sensor) {
+              return normalizar(u.tipo_sensor) === normalizar(sensor);
+            }
+            return false;
+          });
+
+          if (umbral) {
+            if (valor < umbral.valor_minimo || valor > umbral.valor_maximo) {
+              mostrarAlerta(
+                `${sensor.toUpperCase()} fuera de umbral.\nValor actual: ${valor}\nRango permitido: ${umbral.valor_minimo} - ${umbral.valor_maximo}`
+              );
+            }
+          }
         } catch (error) {
           console.error(`❌ Error en ${sensor}:`, error);
         }
       };
 
-      ws.onclose = () => console.warn(`⚠️ WebSocket cerrado en ${sensor}`);
+      ws.onerror = (error) => {
+        console.error(`❌ WebSocket error en ${sensor}:`, error);
+      };
+
+      ws.onclose = () => {
+        console.warn(`⚠️ WebSocket cerrado en ${sensor}`);
+      };
+
       websockets.set(sensor, ws);
     });
 
     return () => {
       websockets.forEach((ws) => ws.close());
     };
-  }, []);
+  }, [umbrales]);
 
   const sensoresList = [
     { id: "viento", title: "Viento", icon: <WiStrongWind size={32} /> },
@@ -67,14 +113,13 @@ export default function IoTPages() {
     { id: "lluvia", title: "Lluvia", icon: <WiRain size={32} /> },
   ];
 
-  // 🔍 Filtrar sensores según la búsqueda
   const sensoresFiltrados = sensoresList.filter((sensor) =>
     sensor.title.toLowerCase().includes(searchId.toLowerCase())
   );
 
   return (
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
-<div className="flex gap-2 w-full max-w-md">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
+      <div className="flex gap-2 w-full max-w-md">
         <Input
           placeholder="Filtrar Sensores..."
           type="text"
@@ -82,8 +127,7 @@ export default function IoTPages() {
           onChange={(e) => setSearchId(e.target.value)}
         />
       </div>
-
-      <br /><br />
+      <br /><br /><br />
       <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto">
         {sensoresFiltrados.length > 0 ? (
           sensoresFiltrados.map((sensor) => (
@@ -99,10 +143,17 @@ export default function IoTPages() {
           <p className="text-gray-500">No se encontraron sensores</p>
         )}
       </div>
-      <br />
-      <div>
-      <SensorLista/>
+      <br /><br /><br />
+      <div className="w-full max-w-6xl mx-auto text-center mt-12">
+      <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
+        <SensorLista />
       </div>
+
+      <br />
+      <div className="w-full max-w-6xl mx-auto text-center mt-12">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-4">Umbrales de los sensores</h2>
+        <UmbralLista />
+    </div>
 
     </div>
   );
