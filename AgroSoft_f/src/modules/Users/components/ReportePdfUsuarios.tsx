@@ -70,6 +70,7 @@ export const ReportePdfUsuarios = ({ data }: { data: any }) => (
         segun se requiera.
       </Text>
 
+      {/* tabla  */} 
       <View style={styles.table}>
         {/* Encabezados */}
         <View style={styles.tableRow}>
