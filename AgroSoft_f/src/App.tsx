@@ -44,6 +44,7 @@ import { Usuarios } from "./modules/Users/pages/pageUsers";
 
 //testeo
 import Testeo  from "./pages/testeo";
+import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
 
 
 const queryClient = new QueryClient();
@@ -73,6 +74,7 @@ function App() {
 
             {/* Usuarios */}
             <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/usuarios/reporte" element={<TotalUsersPage />} />
 
             {/* Finanzas */}
             <Route path="/tipos-de-desechos" element={<TiposDesechos />} />
