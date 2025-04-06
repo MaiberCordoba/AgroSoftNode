@@ -40,7 +40,7 @@ wss.on('connection', (ws) => {
     }
   };
 
-  const interval = setInterval(sendSensorData, 5000);
+  const interval = setInterval(sendSensorData, 1000);
 
   ws.on('close', () => {
     clearInterval(interval);
