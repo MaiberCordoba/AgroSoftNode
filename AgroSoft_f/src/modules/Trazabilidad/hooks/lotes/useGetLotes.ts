@@ -4,7 +4,7 @@ import { Lotes } from "../../types";
 
 export const useGetLotes = () => {
   return useQuery<Lotes[], Error>({
-    queryKey: ["Lotes"], 
+    queryKey: ["lotes"], 
     queryFn: getLotes, 
   });
 };

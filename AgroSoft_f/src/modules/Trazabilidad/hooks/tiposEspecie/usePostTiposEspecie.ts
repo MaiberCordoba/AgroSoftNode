@@ -13,7 +13,7 @@ export const usePostTiposEspecie = () => {
       console.log("Afección creada con éxito:", data);
 
       // Invalida la query para que se refresquen los datos
-      queryClient.invalidateQueries({ queryKey: ['TiposEspecie'] });
+      queryClient.invalidateQueries({ queryKey: ['tiposEspecie'] });
 
       addToast({
         title: 'Creacion exitosa',

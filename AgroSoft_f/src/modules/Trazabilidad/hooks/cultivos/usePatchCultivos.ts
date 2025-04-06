@@ -10,7 +10,7 @@ export const usePatchCultivos = () => {
     mutationFn: ({ id, data }) => patchCultivos(id, data),
     onSuccess: (updatedCultivos, variables) => {
       // Actualiza la caché después de una mutación exitosa
-      queryClient.setQueryData<Cultivos[]>(['Cultivos'], (oldData) => {
+      queryClient.setQueryData<Cultivos[]>(['cultivos'], (oldData) => {
         if (!oldData) return oldData;
         return oldData.map((Cultivos) =>
             Cultivos.id === variables.id ? { ...Cultivos, ...updatedCultivos } : Cultivos

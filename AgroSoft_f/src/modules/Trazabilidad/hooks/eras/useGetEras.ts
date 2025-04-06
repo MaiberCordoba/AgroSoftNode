@@ -4,7 +4,7 @@ import { Eras } from "../../types";
 
 export const useGetEras = () => {
   return useQuery<Eras[], Error>({
-    queryKey: ["Eras"], 
+    queryKey: ["eras"], 
     queryFn: getEras, 
   });
 };

@@ -13,7 +13,7 @@ export const usePostEras = () => {
       console.log("era creada con éxito:", data);
 
       // Invalida la query para que se refresquen los datos
-      queryClient.invalidateQueries({ queryKey: ['Eras'] });
+      queryClient.invalidateQueries({ queryKey: ['eras'] });
 
       addToast({
         title: 'Creacion exitosa',

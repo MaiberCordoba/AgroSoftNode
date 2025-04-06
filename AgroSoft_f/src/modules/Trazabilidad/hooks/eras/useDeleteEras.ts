@@ -9,9 +9,9 @@ export const useDeleteEras = () => {
     return useMutation<Eras, Error, { id: number }, { previousEras?: Eras[] }>({
         mutationFn: ({ id }) => deleteEras(id),
         onMutate: async (variables) => {
-            await queryClient.cancelQueries({ queryKey: ['Eras'] });
-            const previousEras = queryClient.getQueryData<Eras[]>(['Eras']);
-            queryClient.setQueryData<Eras[]>(['Eras'], (old) => 
+            await queryClient.cancelQueries({ queryKey: ["eras"] });
+            const previousEras = queryClient.getQueryData<Eras[]>(["eras"]);
+            queryClient.setQueryData<Eras[]>(["eras"], (old) => 
                 old?.filter(Eras => Eras.id !== variables.id) || []
             );
             return { previousEras };
@@ -25,11 +25,11 @@ export const useDeleteEras = () => {
             
             if (context?.previousEras) {
                 console.error(error)
-                queryClient.setQueryData(['Eras'], context.previousEras);
+                queryClient.setQueryData(["eras"], context.previousEras);
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['Eras'] });
+            queryClient.invalidateQueries({ queryKey: ["eras"] });
             
             addToast({
                 title: "Operación exitosa",
