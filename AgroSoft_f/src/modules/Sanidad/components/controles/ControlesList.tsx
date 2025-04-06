@@ -11,6 +11,10 @@ import EditarControlModal from "./EditarControlesModal";
 import { CrearControlModal } from "./CrearControlesModal";
 import EliminarControlModal from "./EliminaControles";
 import { Controles } from "../../types";
+import { Chip } from "@heroui/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfControles } from "./ReportePdfControles";
+import { Download } from "lucide-react";
 
 export function ControlesList() {
   const { data, isLoading, error } = useGetControles();
@@ -61,9 +65,8 @@ export function ControlesList() {
           const afeccion = afecciones?.find(a => a.id === item.fk_Afeccion);
           return <span>{afeccion ? afeccion.nombre : "No definido"}</span>;
         
-        case "fk_TipoControl":
-          const tipo = tiposControl?.find(t => t.id === item.fk_TipoControl);
-          return <span>{tipo ? tipo.id : "No definido"}</span>;
+          case "fk_TipoControl":
+            return <span>{item.fk_TipoControl?.nombre || "No definido"}</span>;
         
       case "acciones":
         return (
@@ -90,8 +93,41 @@ export function ControlesList() {
         placeholderBusqueda="Buscar por descripción"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
-      />
 
+        renderReporteAction={(data) => {
+          const datosPDF = data.map((item: Controles) => {
+            const afeccion = afecciones?.find(a => a.id === item.fk_Afeccion)?.nombre || "No definido";
+            const tipoControl = item.fk_TipoControl?.nombre || "No definido";
+        
+            return {
+              fechaControl: item.fechaControl,
+              descripcion: item.descripcion,
+              afeccion,
+              tipoControl,
+            };
+          });
+        
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfControles data={datosPDF} />}
+              fileName="reporte_controles.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-green-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
+      />
       {/* Modales */}
       {isEditModalOpen && controlEditado && (
         <EditarControlModal
