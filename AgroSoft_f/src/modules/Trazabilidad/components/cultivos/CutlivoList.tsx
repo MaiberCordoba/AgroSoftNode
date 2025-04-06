@@ -8,32 +8,41 @@ import EditarCultivoModal from "./EditarCultivosModal";
 import { CrearCultivoModal } from "./CrearCultivosModal";
 import EliminarCultivoModal from "./EliminarCultivo";
 import { Cultivos } from "../../types";
+import { useGetEspecies } from "../../hooks/especies/useGetEpecies";
 
 export function CultivosList() {
   const { data, isLoading, error } = useGetCultivos();
+  const { data: especies } = useGetEspecies();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    CultivosEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    CultivosEditada,
+    handleEditar,
   } = useEditarCultivos();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearCultivos();
 
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     CultivosEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarCultivos();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, nombre: "", fk_Especie: 0, unidades: 0, fechaSiembra: "", activo: true });
+    handleCrear({
+      id: 0,
+      nombre: "",
+      fk_Especies: 0,
+      unidades: 0,
+      fechaSiembra: "",
+      activo: true,
+    });
   };
 
   const columnas = [
@@ -53,11 +62,12 @@ export function CultivosList() {
       case "nombre":
         return <span>{item.nombre}</span>;
       case "fk_especie":
-        return <span>{item.fk_Especie}</span>;
+        const especie = especies?.find((e) => e.id === item.fk_Especies);
+        return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;
       case "fechasiembra":
-        return <span>{item.fechaSiembra}</span>;
+        return <span>{item.fechaSiembra?.slice(0, 10)}</span>;
       case "activo":
         return <span>{item.activo ? "Sí" : "No"}</span>;
       case "acciones":
@@ -86,7 +96,6 @@ export function CultivosList() {
         onCrearNuevo={handleCrearNuevo}
       />
 
-      {/* Modales */}
       {isEditModalOpen && CultivosEditada && (
         <EditarCultivoModal
           cultivo={CultivosEditada}
@@ -94,11 +103,7 @@ export function CultivosList() {
         />
       )}
 
-      {isCreateModalOpen && (
-        <CrearCultivoModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearCultivoModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && CultivosEliminada && (
         <EliminarCultivoModal

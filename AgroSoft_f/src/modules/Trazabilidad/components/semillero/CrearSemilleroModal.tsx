@@ -10,20 +10,20 @@ interface CrearSemilleroModalProps {
 
 export const CrearSemilleroModal = ({ onClose }: CrearSemilleroModalProps) => {
   const [unidades, setUnidades] = useState<number | "">("");
-  const [fechasiembra, setFechaSiembra] = useState<string>("");
-  const [fechaestimada, setFechaEstimada] = useState<string>("");
-  const [fk_especie, setFk_Especie] = useState<number | null>(null);
+  const [fechaSiembra, setFechaSiembra] = useState<string>("");
+  const [fechaEstimada, setFechaEstimada] = useState<string>("");
+  const [fk_Especies, setFk_Especie] = useState<number | null>(null);
 
   const { mutate, isPending } = usePostSemilleros();
   const { data: especies, isLoading: isLoadingEspecies } = useGetEspecies();
 
   const handleSubmit = () => {
-    if (!unidades || !fechasiembra || !fechaestimada || !fk_especie) {
+    if (!unidades || !fechaSiembra || !fechaEstimada || !fk_Especies) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
     mutate(
-      { unidades: Number(unidades), fechasiembra, fechaestimada, fk_especie },
+      { unidades: Number(unidades), fechaSiembra, fechaEstimada, fk_Especies },
       {
         onSuccess: () => {
           onClose();
@@ -61,7 +61,7 @@ export const CrearSemilleroModal = ({ onClose }: CrearSemilleroModalProps) => {
       <Input
         label="Fecha de Siembra"
         type="date"
-        value={fechasiembra}
+        value={fechaSiembra}
         onChange={(e) => setFechaSiembra(e.target.value)}
         required
       />
@@ -69,7 +69,7 @@ export const CrearSemilleroModal = ({ onClose }: CrearSemilleroModalProps) => {
       <Input
         label="Fecha Estimada"
         type="date"
-        value={fechaestimada}
+        value={fechaEstimada}
         onChange={(e) => setFechaEstimada(e.target.value)}
         required
       />
@@ -80,7 +80,7 @@ export const CrearSemilleroModal = ({ onClose }: CrearSemilleroModalProps) => {
         <Select
           label="Especie"
           placeholder="Selecciona una especie"
-          selectedKeys={fk_especie ? [fk_especie.toString()] : []}
+          selectedKeys={fk_Especies ? [fk_Especies.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Especie(Number(selectedKey));
