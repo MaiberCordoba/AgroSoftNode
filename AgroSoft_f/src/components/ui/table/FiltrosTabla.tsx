@@ -50,7 +50,7 @@ export const FiltrosTabla: React.FC<FiltrosTablaProps> = ({
               size="sm"
               className="hidden sm:flex"
             >
-              Status
+              Estado
             </Button>
           </DropdownTrigger>
           <DropdownMenu
