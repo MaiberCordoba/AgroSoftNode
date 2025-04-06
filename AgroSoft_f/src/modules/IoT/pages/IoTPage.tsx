@@ -52,12 +52,22 @@ export default function IoTPages() {
   useEffect(() => {
     if (umbrales.length === 0) return;
 
-    const sensores = ["viento", "temperatura", "luzSolar", "humedad", "humedadAmbiente", "lluvia"];
+    const sensores = [
+      "viento",
+      "temperatura",
+      "luzSolar",
+      "humedad",
+      "humedadAmbiente",
+      "lluvia",
+    ];
     const websockets = new Map<string, WebSocket>();
 
     sensores.forEach((sensor) => {
-      const ws = new WebSocket(`ws://localhost:8080/${sensor}`); // Asegúrate de que el endpoint sea correcto
-      ws.onopen = () => console.log(`✅ Conectado al WebSocket de ${sensor}`);
+      const ws = new WebSocket(`ws://localhost:8080/${sensor}`);
+
+      ws.onopen = () => {
+        console.log(`✅ Conectado al WebSocket de ${sensor}`);
+      };
 
       ws.onmessage = (event) => {
         try {
@@ -66,15 +76,12 @@ export default function IoTPages() {
 
           setSensoresData((prevData) => ({
             ...prevData,
-            [sensor]: data.valor || "-",
+            [sensor]: valor.toFixed(2),
           }));
 
-          const umbral = umbrales.find((u) => {
-            if (u.tipo_sensor) {
-              return normalizar(u.tipo_sensor) === normalizar(sensor);
-            }
-            return false;
-          });
+          const umbral = umbrales.find((u) =>
+            u.tipo_sensor && normalizar(u.tipo_sensor) === normalizar(sensor)
+          );
 
           if (umbral) {
             if (valor < umbral.valor_minimo || valor > umbral.valor_maximo) {
@@ -127,7 +134,7 @@ export default function IoTPages() {
           onChange={(e) => setSearchId(e.target.value)}
         />
       </div>
-      <br /><br /><br />
+      <br /><br />
       <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto">
         {sensoresFiltrados.length > 0 ? (
           sensoresFiltrados.map((sensor) => (
@@ -140,21 +147,19 @@ export default function IoTPages() {
             />
           ))
         ) : (
-          <p className="text-gray-500">No se encontraron sensores</p>
+          <p className="text-gray-500 col-span-full">No se encontraron sensores</p>
         )}
       </div>
-      <br /><br /><br />
-      <div className="w-full max-w-6xl mx-auto text-center mt-12">
-      <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
+      <br /><br />
+      <div className="mt-12 text-center">
+        <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
         <SensorLista />
       </div>
-
-      <br />
-      <div className="w-full max-w-6xl mx-auto text-center mt-12">
+<br /><br />
+      <div className="mt-12 text-center">
         <h2 className="text-3xl font-semibold text-gray-800 mb-4">Umbrales de los sensores</h2>
         <UmbralLista />
-    </div>
-
+      </div>
     </div>
   );
 }
