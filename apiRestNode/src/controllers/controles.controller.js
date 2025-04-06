@@ -26,7 +26,7 @@ export const listarControles = async (req, resp) => {
       id: control.id_co,
       descripcion: control.descripcion_co,
       fechaControl: control.fechaControl,
-      fk_TipoContro: {
+      fk_TipoControl: {
         id: control.id_tpC,
         nombre: control.nombre_tpC,
         descripcion: control.descripcion_tpC,
