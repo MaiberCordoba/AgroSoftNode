@@ -150,7 +150,7 @@ export default function IoTPages() {
           <p className="text-gray-500 col-span-full">No se encontraron sensores</p>
         )}
       </div>
-      <br /><br />
+      <br /><br /><br />
       <div className="mt-12 text-center">
         <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
         <SensorLista />
