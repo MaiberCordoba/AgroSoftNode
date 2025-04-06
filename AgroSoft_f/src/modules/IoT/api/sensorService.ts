@@ -1,9 +1,10 @@
-const SOCKET_URL = "ws://localhost:8080"; 
+export const connectWebSocket = (
+  sensorTipo: string,
+  onMessage: (data: any) => void
+) => {
+  const socket = new WebSocket(`ws://localhost:8080/${sensorTipo}`);
 
-export const connectWebSocket = (onMessage: (data: any) => void) => {
-  const socket = new WebSocket(SOCKET_URL);
-
-  socket.onopen = () => console.log("✅ WebSocket conectado a Node.js");
+  socket.onopen = () => console.log(`✅ WebSocket conectado a ${sensorTipo}`);
 
   socket.onmessage = (event) => {
     try {
@@ -15,12 +16,12 @@ export const connectWebSocket = (onMessage: (data: any) => void) => {
   };
 
   socket.onerror = (error) => {
-    console.error("❌ Error en WebSocket:", error);
+    console.error(`❌ Error en WebSocket de ${sensorTipo}:`, error);
   };
 
   socket.onclose = () => {
-    console.warn("⚠️ WebSocket cerrado, reintentando en 5 segundos...");
-    setTimeout(() => connectWebSocket(onMessage), 5000);
+    console.warn(`⚠️ WebSocket de ${sensorTipo} cerrado, reintentando...`);
+    setTimeout(() => connectWebSocket(sensorTipo, onMessage), 5000);
   };
 
   return socket;
