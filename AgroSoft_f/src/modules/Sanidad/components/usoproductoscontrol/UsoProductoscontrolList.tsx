@@ -3,6 +3,9 @@ import { useEditarUsoProductosControl } from "../../hooks/useProductosControl/us
 import { useCrearUsoProductosControl } from "../../hooks/useProductosControl/useCrearUseProductosControl";
 import { useEliminarUsoProductosControl } from "../../hooks/useProductosControl/useEliminarUseProductosControl";
 
+import { useGetProductosControl } from "../../hooks/productosControl/useGetProductosControl";
+import { useGetControles } from "../../hooks/controles/useGetControless";
+
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 
@@ -13,31 +16,50 @@ import EliminarUsoProductosControlModal from "./EliminarUsoProductoscontrolModal
 import { UsoProductosControl } from "../../types";
 
 export function UsoProductosControlList() {
-  const { data, isLoading, error } = usegetUsoProductosControl();
-  
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    usoproductosControlEditado, 
-    handleEditar 
+  const { data: rawData, isLoading, error } = usegetUsoProductosControl();
+
+const data = rawData?.map((item) => ({
+  id: item.id_usoProductoControl,
+  fk_ProductoControl: item.fk_ProductosControl?.id_productoControl,
+  fk_Control: item.fk_Controles?.id,
+  cantidadProducto: item.cantidad_producto_usada,
+})) ?? [];
+
+
+
+  // Datos relacionados
+  const { data: productosControl } = useGetProductosControl();
+  const { data: controles } = useGetControles();
+
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    usoproductosControlEditado,
+    handleEditar,
   } = useEditarUsoProductosControl();
-  
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearUsoProductosControl();
-  
+
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     usoproductosControlEliminado,
-    handleEliminar
+    handleEliminar,
   } = useEliminarUsoProductosControl();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_ProductoControl:0, fk_Control: 0, cantidadProducto: 0 });
+    handleCrear({
+      id: 0,
+      fk_ProductoControl: 0,
+      fk_Control: 0,
+      cantidadProducto: 0,
+    });
   };
+
 
   // Definición de columnas
   const columnas = [
@@ -50,8 +72,19 @@ export function UsoProductosControlList() {
   // Función de renderizado
   const renderCell = (item: UsoProductosControl, columnKey: React.Key) => {
     switch (columnKey) {
+      case "productoControl":
+        const producto = productosControl?.find(
+          (p) => p.id === item.fk_ProductoControl
+        );
+        return <span>{producto ? producto.nombre : "Desconocido"}</span>;
+
+      case "control":
+        const control = controles?.find((c) => c.id === item.fk_Control);
+        return <span>{control ? control.descripcion : "Desconocido"}</span>;
+
       case "cantidadProducto":
         return <span>{item.cantidadProducto}</span>;
+
       case "acciones":
         return (
           <AccionesTabla
@@ -59,17 +92,20 @@ export function UsoProductosControlList() {
             onEliminar={() => handleEliminar(item)}
           />
         );
+
       default:
-        return <span>{String(item[columnKey as keyof UsoProductosControl])}</span>;
+        return (
+          <span>{String(item[columnKey as keyof UsoProductosControl])}</span>
+        );
     }
   };
 
-  if (isLoading) return <p>Cargando...</p>;
+  if (isLoading || !productosControl || !controles)
+    return <p>Cargando datos...</p>;
   if (error) return <p>Error al cargar los datos</p>;
 
   return (
     <div className="p-4">
-      {/* Tabla reutilizable */}
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -78,6 +114,8 @@ export function UsoProductosControlList() {
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
       />
+    
+      
 
       {/* Modales */}
       {isEditModalOpen && usoproductosControlEditado && (

@@ -2,6 +2,9 @@ import { useGetControles } from "../../hooks/controles/useGetControless";
 import { useEditarControl } from "../../hooks/controles/useEditarControles";
 import { useCrearControl } from "../../hooks/controles/useCrearControles";
 import { useEliminarControl } from "../../hooks/controles/useEliminarControles";
+import { useGetAfecciones } from "../../hooks/afecciones/useGetAfecciones";
+import { useGetTipoControl } from "../../hooks/tipoControl/useGetTipoControl";
+
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarControlModal from "./EditarControlesModal";
@@ -11,6 +14,8 @@ import { Controles } from "../../types";
 
 export function ControlesList() {
   const { data, isLoading, error } = useGetControles();
+  const { data: afecciones } = useGetAfecciones();
+  const { data: tiposControl } = useGetTipoControl();
   
   const { 
     isOpen: isEditModalOpen, 
@@ -33,7 +38,7 @@ export function ControlesList() {
   } = useEliminarControl();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Afeccion: 0, fk_TipoControl: 0, fecha: "", descripcion: "" });
+    handleCrear({ id: 0, fk_Afeccion:0, fk_TipoControl: 0, fechaControl: "", descripcion: "" });
   };
 
   // Definición de columnas
@@ -49,13 +54,17 @@ export function ControlesList() {
   const renderCell = (item: Controles, columnKey: React.Key) => {
     switch (columnKey) {
       case "fecha":
-        return <span>{item.fecha}</span>;
+        return <span>{item.fechaControl}</span>;
       case "descripcion":
         return <span>{item.descripcion}</span>;
-      case "fk_Afeccion":
-        return <span>{item.fk_Afeccion || "No definido"}</span>;
-      case "fk_TipoControl":
-        return <span>{item.fk_TipoControl || "No definido"}</span>;
+        case "fk_Afeccion":
+          const afeccion = afecciones?.find(a => a.id === item.fk_Afeccion);
+          return <span>{afeccion ? afeccion.nombre : "No definido"}</span>;
+        
+        case "fk_TipoControl":
+          const tipo = tiposControl?.find(t => t.id === item.fk_TipoControl);
+          return <span>{tipo ? tipo.id : "No definido"}</span>;
+        
       case "acciones":
         return (
           <AccionesTabla
