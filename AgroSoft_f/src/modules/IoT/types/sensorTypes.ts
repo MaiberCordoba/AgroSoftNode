@@ -1,17 +1,20 @@
-export interface SensorData {
-  id: number;
-  fk_lote: number | null;
-  fk_eras: number | null;
-  fecha: string; 
-  tipo: "TEM" | "LUM" | "HUM_A" | "VIE" | "HUM_T" | "PH";
-  valor: number; 
+export interface Sensor {
+  id: number;  
+  tipo_sensor: string;         
+  datos_sensor: number;        
+  fecha: string;               
+  lote_id: number | null;
+  era_id: number | null;        
 }
 
-export const SENSOR_TYPES = [
-  { key: "TEM", label: "Temperatura" },
-  { key: "LUM", label: "Iluminación" },
-  { key: "HUM_A", label: "Humedad Ambiental" },
-  { key: "VIE", label: "Velocidad del Viento" },
-  { key: "HUM_T", label: "Humedad del Terreno" },
-  { key: "PH", label: "Nivel de PH" },
-];
+export interface SensorConExtras extends Sensor {
+  unidad: string;              
+  alerta: boolean;              
+}
+
+export interface Umbral {
+  id: number;                  
+  sensor_id: number;            
+  valor_minimo: number;         
+  valor_maximo: number;         
+}
