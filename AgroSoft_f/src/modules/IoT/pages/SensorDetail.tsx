@@ -27,32 +27,30 @@ interface SensorData {
 export default function SensorDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:8080");
+    if (!id) return;
+
+    const ws = new WebSocket(`ws://localhost:8080/${id}`);
 
     ws.onopen = () => {
-      console.log(`✅ Conectado al WebSocket (detalle sensor: ${id})`);
+      console.log(`✅ Conectado al WebSocket del sensor: ${id}`);
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
+        const timestamp = new Date().toLocaleTimeString();
 
-        if (data.tipo_sensor.toLowerCase() === id?.toLowerCase()) {
-          const timestamp = new Date().toLocaleTimeString();
+        const newEntry: SensorData = {
+          valor: parseFloat(data.valor),
+          timestamp,
+        };
 
-          const newEntry: SensorData = {
-            valor: data.valor,
-            timestamp: timestamp
-          };
-
-          setSensorData((prev) => [...prev.slice(-9), newEntry]);
-        }
+        setSensorData((prev) => [...prev.slice(-9), newEntry]);
       } catch (error) {
-        console.error(`❌ Error al procesar mensaje del WebSocket (${id}):`, error);
+        console.error(`❌ Error en mensaje WebSocket (${id}):`, error);
       }
     };
 
@@ -89,7 +87,7 @@ export default function SensorDetail() {
       </div>
 
       <div className="bg-white p-4 shadow-md rounded-lg">
-        <h2 className="text-lg font-semibold mb-2"> Datos recientes</h2>
+        <h2 className="text-lg font-semibold mb-2">Datos recientes</h2>
         <Table aria-label="Datos del sensor" selectionMode="single">
           <TableHeader>
             <TableColumn>Tiempo</TableColumn>
