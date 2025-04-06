@@ -8,9 +8,15 @@ import EditarSemilleroModal from "./EditarSemilleroModal";
 import { CrearSemilleroModal } from "./CrearSemilleroModal";
 import EliminarSemilleroModal from "./EliminarSemillero";
 import { Semilleros } from "../../types";
+import { useGetEspecies } from "../../hooks/especies/useGetEpecies"; // <--- nuevo
+
+function formatDate(fecha: string) {
+  return new Date(fecha).toISOString().split("T")[0]; // Devuelve 'YYYY-MM-DD'
+}
 
 export function SemilleroList() {
   const { data, isLoading, error } = useGetSemilleros();
+  const { data: especies } = useGetEspecies(); // <--- nuevo
 
   const { 
     isOpen: isEditModalOpen, 
@@ -33,7 +39,7 @@ export function SemilleroList() {
   } = useEliminarSemilleros();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_especie: 0, unidades: 0, fechasiembra: "", fechaestimada: "" });
+    handleCrear({ id: 0, fk_Especies: 0, unidades: 0, fechaSiembra: "", fechaEstimada: "" });
   };
 
   const columnas = [
@@ -50,13 +56,14 @@ export function SemilleroList() {
       case "id":
         return <span>{item.id}</span>;
       case "fk_Especie":
-        return <span>{item.fk_especie}</span>;
+        const especie = especies?.find(e => e.id === item.fk_Especies);
+        return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;
       case "fechaSiembra":
-        return <span>{item.fechasiembra}</span>;
+        return <span>{formatDate(item.fechaSiembra)}</span>;
       case "fechaEstimada":
-        return <span>{item.fechaestimada}</span>;
+        return <span>{formatDate(item.fechaEstimada)}</span>;
       case "acciones":
         return (
           <AccionesTabla
@@ -92,9 +99,7 @@ export function SemilleroList() {
       )}
 
       {isCreateModalOpen && (
-        <CrearSemilleroModal
-          onClose={closeCreateModal}
-        />
+        <CrearSemilleroModal onClose={closeCreateModal} />
       )}
 
       {isDeleteModalOpen && SemillerosEliminada && (

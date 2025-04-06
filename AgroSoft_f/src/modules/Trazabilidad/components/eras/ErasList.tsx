@@ -2,6 +2,8 @@ import { useGetEras } from "../../hooks/eras/useGetEras";
 import { useEditarEras } from "../../hooks/eras/useEditarEras";
 import { useCrearEras } from "../../hooks/eras/useCrearEras";
 import { useEliminarEras } from "../../hooks/eras/useEliminarEras";
+import { useGetLotes } from "../../hooks/lotes/useGetLotes";
+
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarEraModal from "./EditarErasModal";
@@ -11,18 +13,19 @@ import { Eras } from "../../types";
 
 export function EraList() {
   const { data, isLoading, error } = useGetEras();
+  const { data: lotes } = useGetLotes();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    ErasEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    ErasEditada,
+    handleEditar
   } = useEditarEras();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear
   } = useCrearEras();
 
   const {
@@ -33,13 +36,21 @@ export function EraList() {
   } = useEliminarEras();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_lote_id: 0, tamX: 0, tamY: 0, posX: 0, posY: 0, tipo: "" });
+    handleCrear({
+      id: 0,
+      fk_Lotes: 0,
+      estado: true,
+      tamX: 0,
+      tamY: 0,
+      posX: 0,
+      posY: 0
+    });
   };
 
   const columnas = [
     { name: "ID", uid: "id", sortable: true },
-    { name: "Lote", uid: "fk_lote_id", sortable: true },
-    { name: "Tipo", uid: "tipo" },
+    { name: "Lote", uid: "fk_Lote", sortable: true },
+    { name: "Estado", uid: "estado" },
     { name: "Tamaño X", uid: "tamX" },
     { name: "Tamaño Y", uid: "tamY" },
     { name: "Posición X", uid: "posX" },
@@ -51,10 +62,11 @@ export function EraList() {
     switch (columnKey) {
       case "id":
         return <span>{item.id}</span>;
-      case "fk_lote_id":
-        return <span>{item.fk_lote?.nombre ?? "Sin asignar"}</span>; // 🔥 CORREGIDO AQUÍ
-      case "tipo":
-        return <span>{item.tipo}</span>;
+      case "fk_Lote":
+        const lote = lotes?.find(l => l.id === item.fk_Lotes);
+        return <span>{lote ? lote.nombre : "Sin asignar"}</span>;
+      case "estado":
+        return <span>{item.estado ? "Disponible" : "Ocupado"}</span>;
       case "tamX":
         return <span>{item.tamX}</span>;
       case "tamY":
@@ -91,16 +103,11 @@ export function EraList() {
 
       {/* Modales */}
       {isEditModalOpen && ErasEditada && (
-        <EditarEraModal
-          era={ErasEditada}
-          onClose={closeEditModal}
-        />
+        <EditarEraModal era={ErasEditada} onClose={closeEditModal} />
       )}
 
       {isCreateModalOpen && (
-        <CrearEraModal
-          onClose={closeCreateModal}
-        />
+        <CrearEraModal onClose={closeCreateModal} />
       )}
 
       {isDeleteModalOpen && ErasEliminada && (

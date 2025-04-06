@@ -12,27 +12,27 @@ export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [img, setImg] = useState("");
-  const [tiempocrecimiento, settiempocrecimiento] = useState<number | "">("");
-  const [fk_TiposEspecie, setFk_TiposEspecie] = useState<number | null>(null);
+  const [tiempoCrecimiento, settiempoCrecimiento] = useState<number | "">("");
+  const [fk_TiposEspecie, setfk_TiposEspecie] = useState<number | null>(null);
 
   const { mutate, isPending } = usePostEspecies();
-  const { data: tiposEspecie, isLoading: isLoadingTiposEspecie } = useGetTiposEspecie();
+  const { data: TiposEspecies, isLoading: isLoadingTiposEspecie } = useGetTiposEspecie();
 
   const handleSubmit = () => {
-    if (!nombre || !descripcion || !img || !tiempocrecimiento || !fk_TiposEspecie) {
+    if (!nombre || !descripcion || !img || !tiempoCrecimiento || !fk_TiposEspecie) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
     mutate(
-      { nombre, descripcion, img, tiempocrecimiento: Number(tiempocrecimiento), fk_TiposEspecie },
+      { nombre, descripcion, img, tiempoCrecimiento: Number(tiempoCrecimiento), fk_TiposEspecie },
       {
         onSuccess: () => {
           onClose();
           setNombre("");
           setDescripcion("");
           setImg("");
-          settiempocrecimiento("");
-          setFk_TiposEspecie(null);
+          settiempoCrecimiento("");
+          setfk_TiposEspecie(null);
         },
       }
     );
@@ -79,8 +79,8 @@ export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
       <Input
         label="Tiempo de Crecimiento"
         type="number"
-        value={tiempocrecimiento.toString()} // Convierte el número a string
-        onChange={(e) => settiempocrecimiento(Number(e.target.value))} // Convierte de vuelta a número
+        value={tiempoCrecimiento.toString()} // Convierte el número a string
+        onChange={(e) => settiempoCrecimiento(Number(e.target.value))} // Convierte de vuelta a número
       />
 
 
@@ -93,10 +93,10 @@ export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
           selectedKeys={fk_TiposEspecie ? [fk_TiposEspecie.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
-            setFk_TiposEspecie(Number(selectedKey));
+            setfk_TiposEspecie(Number(selectedKey));
           }}
         >
-          {(tiposEspecie || []).map((tipo) => (
+          {(TiposEspecies || []).map((tipo) => (
             <SelectItem key={tipo.id.toString()}>{tipo.nombre}</SelectItem>
           ))}
         </Select>
