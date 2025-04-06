@@ -25,7 +25,7 @@ interface SensorData {
 }
 
 export default function SensorDetail() {
-  const { id } = useParams(); // El tipo_sensor que viene desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
@@ -76,20 +76,20 @@ export default function SensorDetail() {
       </h1>
 
       <div className="bg-white p-4 shadow-md rounded-lg mb-6">
-        <h2 className="text-lg font-semibold mb-2">📈 Gráfica en tiempo real</h2>
+        <h2 className="text-lg font-semibold mb-2">Gráfica en tiempo real</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={sensorData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="timestamp" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="valor" stroke="#38bdf8" strokeWidth={2} />
+            <Line type="monotone" dataKey="valor" stroke="green" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <div className="bg-white p-4 shadow-md rounded-lg">
-        <h2 className="text-lg font-semibold mb-2">📋 Datos recientes</h2>
+        <h2 className="text-lg font-semibold mb-2"> Datos recientes</h2>
         <Table aria-label="Datos del sensor" selectionMode="single">
           <TableHeader>
             <TableColumn>Tiempo</TableColumn>
