@@ -13,8 +13,9 @@ export interface SensorConExtras extends Sensor {
 }
 
 export interface Umbral {
-  id: number;                  
-  sensor_id: number;            
-  valor_minimo: number;         
-  valor_maximo: number;         
+  id: number;
+  sensor_id: number;
+  valor_minimo: number;
+  valor_maximo: number;
+  tipo_sensor?: string; 
 }
