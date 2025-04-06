@@ -2,19 +2,17 @@ import pool from "../db.js";
 
 export const listarTiposControl = async (req, resp) => {
   try {
-    const [result] = await pool.query("SELECT * FROM tiposcontrol");
-    if (result.length > 0) {
-      return resp.status(200).json(result);
-    } else {
-      return resp
-        .status(404)
-        .json({ message: "Tipos de control no encontrados" });
-    }
+    const sql = `SELECT * FROM tiposcontrol`;
+    const [rows] = await pool.query(sql);
+
+    // Aunque esté vacío, devolvemos 200 con un array
+    return resp.status(200).json(rows);
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
+
 
 export const registrarTipoControl = async (req, resp) => {
   try {

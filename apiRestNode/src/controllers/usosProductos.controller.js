@@ -18,22 +18,20 @@ export const createUsosProductos = async(req,res) => {
     }
 }
 
-export const getAllUsosProductos = async(req,res) => {
-    try{
-        const sql = "SELECT * FROM usosproductos"
-        const [rows] = await pool.query(sql)
-        if (rows.length > 0){
-            return res.status(200).json({rows})
-        }
-        else{
-            return res.status(404).json({msg : "No se encontraron usos de productos registrados"})
-        }
+export const getAllUsosProductos = async (req, res) => {
+    try {
+      const sql = "SELECT * FROM usosproductos";
+      const [rows] = await pool.query(sql);
+  
+      // Siempre devolvemos status 200 con el array (vacío o con datos)
+      return res.status(200).json(rows);
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ msg: "Internal server error" });
     }
-    catch(error){
-        console.error(error)
-        res.status(500).json({msg : "Internal server error"})
-    }
-}
+  };
+  
 export const updateUsosProductos = async(req,res) => {
     try{
         const id = req.params.id;
