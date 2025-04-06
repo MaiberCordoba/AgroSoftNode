@@ -32,7 +32,7 @@ export default function IoTPages() {
     const websockets = new Map<string, WebSocket>();
 
     sensores.forEach((sensor) => {
-      const url = `ws://localhost:8000/ws/sensor/${sensor}/`;
+      const url = `ws://localhost:8080`;
       const ws = new WebSocket(url);
 
       ws.onopen = () => console.log(`✅ Conectado al WebSocket de ${sensor}`);
@@ -73,7 +73,7 @@ export default function IoTPages() {
   );
 
   return (
-<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
 <div className="flex gap-2 w-full max-w-md">
         <Input
           placeholder="Filtrar Sensores..."
@@ -84,7 +84,7 @@ export default function IoTPages() {
       </div>
 
       <br /><br />
-      <div className="grid grid-cols-3 gap-10 justify-center items-center w-full max-w-6xl mx-auto">
+      <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto">
         {sensoresFiltrados.length > 0 ? (
           sensoresFiltrados.map((sensor) => (
             <SensorCard
