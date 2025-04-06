@@ -1,54 +1,35 @@
-import React from "react";
-import { Button, Pagination } from "@heroui/react";
+import { Pagination } from "@heroui/react";
 
 interface PaginacionTablaProps {
   paginaActual: number;
   totalPaginas: number;
-  onCambiarPagina: (pagina: number) => void;
+  onCambiarPagina: (page: number) => void;
 }
 
-export const PaginacionTabla: React.FC<PaginacionTablaProps> = ({
+/**
+ * Componente de paginación mejorado para tablas
+ * @param paginaActual Página actual
+ * @param totalPaginas Total de páginas disponibles
+ * @param onCambiarPagina Callback al cambiar de página
+ */
+export const PaginacionTabla = ({
   paginaActual,
   totalPaginas,
   onCambiarPagina,
-}) => {
+}: PaginacionTablaProps) => {
   return (
-    <div className="py-4 px-4 flex justify-between items-center bg-white shadow-sm rounded-lg">
-      <span className="w-[30%] text-small text-gray-500">
-        {`Página ${paginaActual} de ${totalPaginas}`}
+    <div className="flex justify-between items-center mt-2">
+      <span className="text-sm text-gray-500">
+        Página {paginaActual} de {totalPaginas}
       </span>
-
       <Pagination
-        isCompact
+        size="sm"
         showControls
-        showShadow
-        color="primary"
-        page={paginaActual}
         total={totalPaginas}
+        page={paginaActual}
         onChange={onCambiarPagina}
-        className="mx-4"
+        className="gap-1"
       />
-
-      <div className="hidden sm:flex w-[30%] justify-end gap-2">
-        <Button
-          isDisabled={paginaActual === 1}
-          size="sm"
-          variant="flat"
-          onPress={() => onCambiarPagina(paginaActual - 1)}
-          className="bg-white shadow-sm"
-        >
-          Anterior
-        </Button>
-        <Button
-          isDisabled={paginaActual === totalPaginas}
-          size="sm"
-          variant="flat"
-          onPress={() => onCambiarPagina(paginaActual + 1)}
-          className="bg-white shadow-sm"
-        >
-          Siguiente
-        </Button>
-      </div>
     </div>
   );
 };
