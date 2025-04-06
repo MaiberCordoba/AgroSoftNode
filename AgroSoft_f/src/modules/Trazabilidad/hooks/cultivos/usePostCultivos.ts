@@ -13,7 +13,7 @@ export const usePostCultivos = () => {
       console.log("Cultivo creada con éxito:", data);
 
       // Invalida la query para que se refresquen los datos
-      queryClient.invalidateQueries({ queryKey: ['Cultivos'] });
+      queryClient.invalidateQueries({ queryKey: ['cultivos'] });
 
       addToast({
         title: 'Creacion exitosa',
