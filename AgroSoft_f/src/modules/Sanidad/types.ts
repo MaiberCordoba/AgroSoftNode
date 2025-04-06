@@ -45,8 +45,12 @@ export interface Controles {
     fechaControl: string;
     descripcion: string;
     fk_Afeccion:  number;
-    fk_TipoControl:  number;
-  }
+    fk_TipoControl: {
+        id: number;
+        nombre: string;
+        // Podés incluir más si querés
+      };
+ }
   
 
 export enum EstadoAfeccion {
