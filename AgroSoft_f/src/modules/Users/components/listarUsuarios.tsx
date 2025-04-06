@@ -18,7 +18,6 @@ export function UserList() {
 
   // Definir columnas de la tabla
   const userColumns: { key: keyof User | "acciones"; label: string }[] = [
-    { key: "id", label: "ID" },
     { key: "identificacion", label: "Identificación" },
     { key: "nombre", label: "Nombre" },
     { key: "apellidos", label: "Apellidos" },
@@ -70,7 +69,6 @@ export function UserList() {
       >
         {selectedUser && (
           <div>
-            <p><strong>ID:</strong> {selectedUser.id}</p>
             <p><strong>Identificación:</strong> {selectedUser.identificacion}</p>
             <p><strong>Nombre:</strong> {selectedUser.nombre} {selectedUser.apellidos}</p>
             <p><strong>Fecha de Nacimiento:</strong> {selectedUser.fechaNacimiento}</p>

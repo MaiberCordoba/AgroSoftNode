@@ -41,7 +41,7 @@ export default function TotalUsers() {
 
       <Table aria-label="Estadísticas de usuarios">
       <TableHeader>
-          <TableColumn>MÉTRICA</TableColumn>
+          <TableColumn>USUARIOS</TableColumn>
           <TableColumn>VALOR</TableColumn>
         </TableHeader>
         <TableBody>

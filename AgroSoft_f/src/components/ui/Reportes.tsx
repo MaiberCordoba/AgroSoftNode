@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    color: '#003366', // Azul institucional SENA
+    color: '#003366', 
   },
   subtitle: {
     fontSize: 10,
@@ -72,7 +72,7 @@ export const PdfReportes = ({
   subtitle = "Sistema de Gestión Agrosoft",
   regional = "Regional Huila",
   centroFormacion = "Centro de Formación Surcolombiano Yamboro",
-  codigoDocumento = "DOC-2025-001",
+
 }: PdfReportesProps) => {
   const getCurrentDate = () => {
     return new Date().toLocaleDateString('es-CO', {
@@ -95,7 +95,6 @@ export const PdfReportes = ({
         
         <View>
           <Text style={{ fontSize: 8 }}>{getCurrentDate()}</Text>
-          <Text style={{ fontSize: 8 }}>{codigoDocumento}</Text>
         </View>
       </View>
 

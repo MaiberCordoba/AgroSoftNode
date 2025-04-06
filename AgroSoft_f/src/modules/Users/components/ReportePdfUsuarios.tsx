@@ -3,48 +3,55 @@ import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer';
 import { PdfReportes } from '@/components/ui/Reportes';
 
 const styles = StyleSheet.create({
-  page: {
-    padding: 30,
-    fontFamily: 'Helvetica'
-  },
-  table: { 
-    display: "table", 
-    width: "auto",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderRightWidth: 0,
-    borderBottomWidth: 0
-  },
-  tableRow: { 
-    margin: "auto", 
-    flexDirection: "row" 
-  },
-  tableColHeader: {
-    width: "50%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    backgroundColor: '#f0f0f0',
-    padding: 5
-  },
-  tableCol: {
-    width: "50%",
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-    padding: 5
-  },
-  tableCellHeader: {
-    margin: "auto",
-    fontSize: 12,
-    fontWeight: 'bold'
-  },
-  tableCell: {
-    margin: "auto",
-    fontSize: 10
-  }
+    paragraph: {
+        fontSize: 10,
+        textAlign: 'justify',
+        lineHeight: 1.5,
+        marginVertical: 15,
+        paddingHorizontal: 10,
+        fontFamily: 'Helvetica'
+      },
+    page: {
+      padding: 30,
+      fontFamily: 'Helvetica'
+    },
+    table: { 
+      width: "auto",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderRightWidth: 0,
+      borderBottomWidth: 0
+    },
+    tableRow: { 
+      margin: "auto", 
+      flexDirection: "row" 
+    },
+    tableColHeader: {
+      width: "50%",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderLeftWidth: 0,
+      borderTopWidth: 0,
+      backgroundColor: '#f0f0f0',
+      padding: 5
+    },
+    tableCol: {
+      width: "50%",
+      borderStyle: "solid",
+      borderWidth: 1,
+      borderLeftWidth: 0,
+      borderTopWidth: 0,
+      padding: 5
+    },
+    tableCellHeader: {
+      margin: "auto",
+      fontSize: 12,
+      fontWeight: 'bold'
+    },
+    tableCell: {
+      margin: "auto",
+      fontSize: 10
+    }
 });
 
 export const ReportePdfUsuarios = ({ data }: { data: any }) => (
@@ -55,11 +62,19 @@ export const ReportePdfUsuarios = ({ data }: { data: any }) => (
         
       />
       
+      <Text style={styles.paragraph}>
+        El presente documento contiene el reporte consolidado de usuarios del sistema Agrosoft, 
+        registrados en el Centro de Formación Agroindustrial del SENA Regional Huila. 
+        Los datos reflejan el estado actual de los usuarios, discriminando entre cuentas 
+        activas e inactivas. Esta información es válida para procesos dentro y fuera del centro de formacion
+        segun se requiera.
+      </Text>
+
       <View style={styles.table}>
         {/* Encabezados */}
         <View style={styles.tableRow}>
           <View style={styles.tableColHeader}>
-            <Text style={styles.tableCellHeader}>MÉTRICA</Text>
+            <Text style={styles.tableCellHeader}>USUARIOS</Text>
           </View>
           <View style={styles.tableColHeader}>
             <Text style={styles.tableCellHeader}>VALOR</Text>
