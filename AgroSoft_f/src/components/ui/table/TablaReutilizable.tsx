@@ -24,9 +24,11 @@ interface TablaReutilizableProps<T extends { [key: string]: any }> {
   onCrearNuevo: () => void;
   placeholderBusqueda?: string;
   initialVisibleColumns?: string[]; // Nueva prop
+  renderReporteAction?: (data: T[]) => React.ReactNode;
 }
 
 export const TablaReutilizable = <T extends { [key: string]: any }>({
+  renderReporteAction,
   datos,
   columnas,
   claveBusqueda,
@@ -99,6 +101,8 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
 
       {/* Grupo derecho: SelectorColumnas + Agregar */}
       <div className="flex gap-3 items-center"> {/* Añadido items-center aquí */}
+      
+
         <SelectorColumnas 
           columnas={columnas}
           visibleColumns={visibleColumns}
@@ -114,6 +118,8 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
         >
           Agregar
         </Button>
+
+        {renderReporteAction && renderReporteAction(datos)}
       </div>
     </div>
 
