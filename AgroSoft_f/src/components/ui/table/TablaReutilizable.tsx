@@ -1,12 +1,11 @@
 import React from "react";
 import { 
   Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, 
-  Button, Chip, ChipProps, SortDescriptor 
+  Button, Chip, SortDescriptor 
 } from "@heroui/react";
 import { useFiltrado } from "../../../hooks/useFiltrado";
 import { useFilasPorPagina } from "../../../hooks/useFilasPorPagina";
 import { usePaginacion } from "../../../hooks/usePaginacion";
-import { useSeleccion } from "../../../hooks/useSeleccion";
 import { useColumnasVisibles } from "../../../hooks/useColumnasVisibles";
 import { FiltrosTabla } from "./FiltrosTabla";
 import { FilasPorPagina } from "./filasPorPagina";
@@ -14,15 +13,7 @@ import { PaginacionTabla } from "./PaginacionTabla";
 import { PlusIcon } from "lucide-react";
 import { SelectorColumnas } from "./SelectorDeColumnas";
 
-// Mapeo de colores para los estados (puedes personalizarlo)
-const statusColorMap: Record<string, ChipProps["color"]> = {
-  active: "success",
-  inactive: "danger",
-  pending: "warning",
-  aprobado: "success",
-  rechazado: "danger",
-  en_revision: "warning",
-};
+
 
 interface TablaReutilizableProps<T extends { [key: string]: any }> {
   datos: T[];
@@ -59,7 +50,6 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
     usePaginacion(datosFiltrados, filasPorPagina);
 
   // Nuevos hooks
-  const { selectedKeys, setSelectedKeys } = useSeleccion();
   const { visibleColumns, setVisibleColumns } = useColumnasVisibles(initialVisibleColumns);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: "id", // Columna por defecto para ordenar
@@ -87,49 +77,50 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
 
   return (
     <div className="flex flex-col gap-3 max-w-4xl mx-auto p-4 bg-white rounded-lg shadow">
-      {/* Barra superior de controles */}
-      <div className="flex flex-col sm:flex-row justify-between gap-3">
-        <div className="flex flex-col sm:flex-row gap-2 flex-1">
-          <FiltrosTabla
-            valorFiltro={valorFiltro}
-            onCambiarBusqueda={setValorFiltro}
-            onLimpiarBusqueda={() => setValorFiltro("")}
-            opcionesEstado={opcionesEstado}
-            filtroEstado={filtroEstado}
-            onCambiarFiltroEstado={setFiltroEstado}
-            placeholderBusqueda={placeholderBusqueda}
-          />
-          
-          <FilasPorPagina
-            filasPorPagina={filasPorPagina}
-            onChange={handleChangeFilasPorPagina}
-          />
-          
-          <SelectorColumnas 
-            columnas={columnas}
-            visibleColumns={visibleColumns}
-            setVisibleColumns={setVisibleColumns}
-          />
-        </div>
+    {/* Barra superior de controles - ESTRUCTURA CORREGIDA */}
+    <div className="flex flex-col sm:flex-row justify-between gap-3 items-center"> {/* Cambiado a items-center */}
+      {/* Grupo izquierdo: Búsqueda + Filas por página */}
+      <div className="flex flex-col sm:flex-row gap-3 flex-1 items-center">
+        <FiltrosTabla
+          valorFiltro={valorFiltro}
+          onCambiarBusqueda={setValorFiltro}
+          onLimpiarBusqueda={() => setValorFiltro("")}
+          opcionesEstado={opcionesEstado}
+          filtroEstado={filtroEstado}
+          onCambiarFiltroEstado={setFiltroEstado}
+          placeholderBusqueda={placeholderBusqueda}
+        />
+        
+        <FilasPorPagina
+          filasPorPagina={filasPorPagina}
+          onChange={handleChangeFilasPorPagina}
+        />
+      </div>
 
+      {/* Grupo derecho: SelectorColumnas + Agregar */}
+      <div className="flex gap-3 items-center"> {/* Añadido items-center aquí */}
+        <SelectorColumnas 
+          columnas={columnas}
+          visibleColumns={visibleColumns}
+          setVisibleColumns={setVisibleColumns}
+        />
+        
         <Button
           color="primary"
-          size="sm"
+          size="sm" // Tamaño pequeño
           endContent={<PlusIcon size={16} />}
           onPress={onCrearNuevo}
-          className="shrink-0"
+          className="self-end" // Alineación individual
         >
           Agregar
         </Button>
       </div>
+    </div>
 
       {/* Tabla con nuevas funcionalidades */}
       <div className="overflow-auto">
         <Table
           aria-label="Tabla reutilizable"
-          selectionMode="multiple"
-          selectedKeys={selectedKeys}
-          onSelectionChange={setSelectedKeys}
           sortDescriptor={sortDescriptor}
           onSortChange={setSortDescriptor}
           classNames={{
@@ -167,9 +158,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
                   <TableCell className="px-4 py-2">
                     {columnKey === "status" && item.status ? (
                       <Chip 
-                        size="sm" 
-                        color={statusColorMap[item.status] || "default"}
-                        className="capitalize"
+                        
                       >
                         {item.status}
                       </Chip>
