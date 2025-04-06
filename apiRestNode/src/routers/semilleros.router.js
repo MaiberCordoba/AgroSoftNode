@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { createSemilleros, getAllSemilleros, updateSemillero } from "../controllers/semilleros.controller.js";
+import { createSemilleros, getAllSemilleros, patchSemillero, deleteSemillero } from "../controllers/semilleros.controller.js";
 import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
 const semilleros = Router()
 semilleros.get("/semilleros",verifyJWT,getAllSemilleros)
 semilleros.post("/semilleros",verifyJWT,createSemilleros)
-semilleros.put("/semilleros/:id",verifyJWT,updateSemillero)
+semilleros.patch("/semilleros/:id",verifyJWT,patchSemillero)
+semilleros.delete("/semilleros/:id",verifyJWT,deleteSemillero)
 
 export default semilleros;
