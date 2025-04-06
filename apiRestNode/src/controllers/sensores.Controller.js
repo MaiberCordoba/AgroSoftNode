@@ -88,12 +88,31 @@ export const ActualizarSensor = async (req, res) => {
             return res.status(400).json({ message: "Un sensor no puede estar en una era y lote al mismo tiempo." });
         }
 
-        if(tipo_sensor == tipo_sensor){
-            return res.status(500).json({ message: "no existe ese tipo de sensor en tipo de sensor. Para los lotes estan los tipos 'Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia' y para las eras los tipos 'Humedad del Terreno', 'Nivel de PH' " });
+        // Validar que el tipo de sensor sea válido
+        const tiposValidos = [...sensoresLote, ...sensoresEra];
+        if (!tiposValidos.includes(tipo_sensor)) {
+            return res.status(400).json({
+                message: "Tipo de sensor inválido. Para los lotes: 'Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia'. Para las eras: 'Humedad del Terreno', 'Nivel de PH'."
+            });
         }
 
+        // Obtener datos actuales si no se envía datos_sensor
+        const [rows] = await pool.query("SELECT datos_sensor FROM sensores WHERE id = ?", [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: "Sensor no encontrado" });
+        }
+
+        const datosSensorFinal = datos_sensor !== undefined ? datos_sensor : rows[0].datos_sensor;
+
         const sql = `UPDATE sensores SET tipo_sensor = ?, datos_sensor = ?, fecha = ?, era_id = ?, lote_id = ? WHERE id = ?`;
-        const [result] = await pool.query(sql, [tipo_sensor, datos_sensor, fecha, era_id || null, lote_id || null, id]);
+        const [result] = await pool.query(sql, [
+            tipo_sensor,
+            datosSensorFinal,
+            fecha,
+            era_id || null,
+            lote_id || null,
+            id,
+        ]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ message: "Sensor no encontrado" });
@@ -101,10 +120,11 @@ export const ActualizarSensor = async (req, res) => {
 
         return res.status(200).json({ message: "Sensor actualizado correctamente" });
     } catch (error) {
-        console.error(error);
+        console.error("Error al actualizar sensor:", error);
         return res.status(500).json({ message: "Error al actualizar el sensor" });
     }
 }
+
 export const EliminarSensor = async (req, res) => {
     try {
         const { id } = req.params;
