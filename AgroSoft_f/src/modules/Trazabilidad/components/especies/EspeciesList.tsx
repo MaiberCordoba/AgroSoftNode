@@ -64,7 +64,7 @@ export function EspecieList() {
     { name: "Tipo de Especie", uid: "fk_tiposespecie" },
     { name: "Acciones", uid: "acciones" },
   ];
-
+  
   const renderCell = (item: Especies, columnKey: React.Key) => {
     switch (columnKey) {
       case "nombre":
@@ -92,6 +92,9 @@ export function EspecieList() {
         return <span>{String(item[columnKey as keyof Especies])}</span>;
     }
   };
+  
+  
+  
 
   if (isLoading) return <p>Cargando...</p>;
   if (error) return <p>Error al cargar las especies</p>;
