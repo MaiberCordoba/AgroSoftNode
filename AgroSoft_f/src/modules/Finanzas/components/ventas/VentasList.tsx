@@ -7,8 +7,13 @@ import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarVentasModal from "./EditarVentasModal";
 import { CrearVentasModal } from "./CrearVentasModal";
 import EliminarVentaModal from "./EliminarVentas";
-import { Ventas } from "../../types";
+import { ReporteVentas, Ventas } from "../../types";
 import { useGetCosechas } from "../../hooks/cosechas/useGetCosechas";
+import { getReporteVentas } from "../../api/ventasApi";
+import { useQuery } from "@tanstack/react-query";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfVentas } from "./ReportePdfVentas";
+import { Download } from "lucide-react";
 
 export function VentasList() {
   const { data, isLoading, error } = useGetVentas();
@@ -20,6 +25,10 @@ export function VentasList() {
     handleEditar 
   } = useEditarVenta();
   
+const { data: ventasData } = useQuery<ReporteVentas[]>({
+  queryKey: ['reporteVentas'],
+  queryFn: getReporteVentas
+});
   const { 
     isOpen: isCreateModalOpen, 
     closeModal: closeCreateModal, 
@@ -77,6 +86,23 @@ export function VentasList() {
         placeholderBusqueda="Buscar por fecha de venta"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+
+        renderReporteAction={() => (
+  <PDFDownloadLink
+  document={<ReportePdfVentas data={ventasData || []} />}
+    fileName="reporte_ventas.pdf"
+  >
+    {({ loading }) => (
+      <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+        {loading ? (
+          <Download className="h-4 w-4 animate-spin text-blue-500" />
+        ) : (
+          <Download className="h-5 w-5 text-green-600" />
+        )}
+      </button>
+    )}
+  </PDFDownloadLink>
+)}
       />
 
       {isEditModalOpen && ventaEditada && (
