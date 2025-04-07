@@ -11,9 +11,8 @@ import { CrearEraModal } from "./CrearEraModal";
 import EliminarEraModal from "./EliminarEras";
 import { Eras } from "../../types";
 
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { Button } from "@heroui/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfEras } from "./ReportePdfEras";
 import { Download } from "lucide-react";
 
 export function EraList() {
@@ -50,28 +49,6 @@ export function EraList() {
       posX: 0,
       posY: 0,
     });
-  };
-
-  const exportarPDF = () => {
-    const doc = new jsPDF();
-    doc.text("Listado de Eras", 14, 20);
-    autoTable(doc, {
-      head: [[
-        "ID", "Lote", "Estado", "Tamaño X", "Tamaño Y", "Posición X", "Posición Y"
-      ]],
-      body: (data || []).map((item) => [
-        item.id,
-        lotes?.find((l) => l.id === item.fk_Lotes)?.nombre || "Sin asignar",
-        item.estado ? "Disponible" : "Ocupado",
-        item.tamX,
-        item.tamY,
-        item.posX,
-        item.posY,
-      ]),
-      startY: 30,
-      headStyles: { fillColor: [46, 204, 113] },
-    });
-    doc.save("eras.pdf");
   };
 
   const columnas = [
@@ -119,32 +96,49 @@ export function EraList() {
 
   return (
     <div className="p-4 space-y-4">
-      <div className="flex justify-between">
-        <Button
-          onClick={exportarPDF}
-          className="bg-green-500/80 hover:bg-green-600 text-white"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Exportar PDF
-        </Button>
-      </div>
-
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
         claveBusqueda="id"
-        placeholderBusqueda="Buscar por ID"
+        placeholderBusqueda="Buscar por Numero"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        renderReporteAction={(data) => {
+          const dataConNombreLote = data.map((item) => {
+            const lote = lotes?.find((l) => l.id === item.fk_Lotes);
+            return {
+              ...item,
+              nombreLote: lote ? lote.nombre : "Sin asignar",
+            };
+          });
+
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfEras data={dataConNombreLote} />}
+              fileName="reporte_eras.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-red-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
       />
 
       {isEditModalOpen && ErasEditada && (
         <EditarEraModal era={ErasEditada} onClose={closeEditModal} />
       )}
 
-      {isCreateModalOpen && (
-        <CrearEraModal onClose={closeCreateModal} />
-      )}
+      {isCreateModalOpen && <CrearEraModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && ErasEliminada && (
         <EliminarEraModal
