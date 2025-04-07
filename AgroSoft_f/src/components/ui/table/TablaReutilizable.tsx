@@ -27,24 +27,24 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
   onCrearNuevo,
   placeholderBusqueda = "Buscar...",
 }: TablaReutilizableProps<T>) => {
-  // Hooks existentes...
+  const safeDatos = Array.isArray(datos) ? datos : [];
+
   const {
     valorFiltro,
     setValorFiltro,
     filtroEstado,
     setFiltroEstado,
     datosFiltrados,
-  } = useFiltrado(datos, claveBusqueda);
+  } = useFiltrado(safeDatos, claveBusqueda);
 
   const { filasPorPagina, handleChangeFilasPorPagina } = useFilasPorPagina(5);
   const { paginaActual, setPaginaActual, totalPaginas, datosPaginados } =
     usePaginacion(datosFiltrados, filasPorPagina);
 
   return (
-    <div className="flex flex-col gap-2 max-w-4xl mx-auto -mt-4"> {/* Reducido gap-4 a gap-2 */}
-      {/* Contenedor superior compacto */}
-      <div className="flex justify-between items-center gap-2 mb-1"> {/* Reducido gap y añadido mb-1 */}
-        <div className="flex items-center gap-2 flex-1"> {/* Contenedor flexible para alinear filtros */}
+    <div className="flex flex-col gap-2 max-w-4xl mx-auto -mt-4">
+      <div className="flex justify-between items-center gap-2 mb-1">
+        <div className="flex items-center gap-2 flex-1">
           <FiltrosTabla
             valorFiltro={valorFiltro}
             onCambiarBusqueda={setValorFiltro}
@@ -54,25 +54,24 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
             onCambiarFiltroEstado={setFiltroEstado}
             placeholderBusqueda={placeholderBusqueda}
           />
-          
+
           <FilasPorPagina
             filasPorPagina={filasPorPagina}
             onChange={handleChangeFilasPorPagina}
           />
         </div>
 
-        <ButtonGlobal 
-          color="success" 
-          variant="flat" 
+        <ButtonGlobal
+          color="success"
+          variant="flat"
           onPress={onCrearNuevo}
-          className="shrink-0" /* Evita que el botón se encoja */
+          className="shrink-0"
         >
           Agregar
         </ButtonGlobal>
       </div>
 
-      {/* Tabla con margen superior reducido */}
-      <div className="mt-1"> {/* Reducido espacio superior */}
+      <div className="mt-1">
         <Table aria-label="Tabla reutilizable" className="border-separate border-spacing-0">
           <TableHeader columns={columnas}>
             {(column) => (
@@ -80,7 +79,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
                 key={column.uid}
                 align={column.uid === "actions" ? "center" : "start"}
                 allowsSorting={column.sortable}
-                className="py-2" /* Reduce padding en headers */
+                className="py-2"
               >
                 {column.name}
               </TableColumn>
@@ -90,7 +89,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
             {datosPaginados.map((item) => (
               <TableRow key={item.id} className="hover:bg-gray-50">
                 {(columnKey) => (
-                  <TableCell className="py-2"> {/* Reduce padding en celdas */}
+                  <TableCell className="py-2">
                     {renderCell(item, columnKey)}
                   </TableCell>
                 )}
@@ -100,8 +99,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
         </Table>
       </div>
 
-      {/* Paginación con margen superior reducido */}
-      <div className="mt-1"> {/* Reducido espacio superior */}
+      <div className="mt-1">
         <PaginacionTabla
           paginaActual={paginaActual}
           totalPaginas={totalPaginas}
