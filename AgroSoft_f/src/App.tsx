@@ -43,6 +43,7 @@ import { Usuarios } from "./modules/Users/pages/pageUsers";
 
 //testeo
 import Testeo  from "./pages/testeo";
+import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
 
 
 const queryClient = new QueryClient();
@@ -72,6 +73,7 @@ function App() {
 
             {/* Usuarios */}
             <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/usuarios/reporte" element={<TotalUsersPage />} />
 
             {/* Finanzas */}
             <Route path="/tipos-de-desechos" element={<TiposDesechos />} />
@@ -100,7 +102,7 @@ function App() {
             <Route path="/productos-para-el-control" element={<ProductosControl/>}></Route>
             <Route path="/usos-de-productos-para-el-control" element={<UsoProductosControl/>}></Route>
             <Route path="/controles" element={<Controles/>}></Route>
-            <Route path="/afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
+            <Route path="/Afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
 
             {/*test*/}
             <Route path="/testeo" element={<Testeo/>}></Route>

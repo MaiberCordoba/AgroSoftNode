@@ -2,6 +2,9 @@ import { useGetPlantaciones } from "../../hooks/plantaciones/useGetPlantaciones"
 import { useEditarPlantaciones } from "../../hooks/plantaciones/useEditarPlantaciones";
 import { useCrearPlantaciones } from "../../hooks/plantaciones/useCrearPlantaciones";
 import { useEliminarPlantaciones } from "../../hooks/plantaciones/useEliminarPlantaciones";
+import { useGetCultivos } from "../../hooks/cultivos/useGetCultivos";
+import { useGetEras } from "../../hooks/eras/useGetEras";
+
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarPlantacionModal from "./EditarPlantacionesModal";
@@ -10,7 +13,9 @@ import EliminarPlantacionModal from "./EliminarPlantaciones";
 import { Plantaciones } from "../../types";
 
 export function PlantacionesList() {
-  const { data, isLoading, error } = useGetPlantaciones();
+  const { data: plantaciones, isLoading, error } = useGetPlantaciones();
+  const { data: cultivos } = useGetCultivos();
+  const { data: eras } = useGetEras();
 
   const { 
     isOpen: isEditModalOpen, 
@@ -33,7 +38,7 @@ export function PlantacionesList() {
   } = useEliminarPlantaciones();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Cultivo: 0, fk_Era: 0 });
+    handleCrear({ id: 0, fk_Cultivos: 0, fk_Eras: 0 });
   };
 
   const columnas = [
@@ -47,10 +52,17 @@ export function PlantacionesList() {
     switch (columnKey) {
       case "id":
         return <span>{item.id}</span>;
-      case "fk_cultivo":
-        return <span>{item.fk_Cultivo}</span>;
-      case "fk_era":
-        return <span>{item.fk_Era}</span>;
+
+      case "fk_Cultivo": {
+        const cultivo = cultivos?.find(c => c.id === item.fk_Cultivos);
+        return <span>{cultivo ? cultivo.nombre : "Sin asignar"}</span>;
+      }
+
+      case "fk_Era": {
+        const era = eras?.find(e => e.id === item.fk_Eras);
+        return <span>{era ? `Era ${era.id}` : "Sin asignar"}</span>;
+      }
+
       case "acciones":
         return (
           <AccionesTabla
@@ -58,6 +70,7 @@ export function PlantacionesList() {
             onEliminar={() => handleEliminar(item)}
           />
         );
+
       default:
         return <span>{String(item[columnKey as keyof Plantaciones])}</span>;
     }
@@ -69,7 +82,7 @@ export function PlantacionesList() {
   return (
     <div className="p-4">
       <TablaReutilizable
-        datos={data || []}
+        datos={plantaciones || []}
         columnas={columnas}
         claveBusqueda="id"
         placeholderBusqueda="Buscar por ID"

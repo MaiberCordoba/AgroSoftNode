@@ -1,25 +1,30 @@
-import { Router } from "express" 
-import { ListarLotes, 
-        RegistrarLotes, 
-        ActualizarLotes, 
-        EliminarLotes, 
-        BuscarLotes,
-        ListarLotesPorUbicacion,
-        ListarLotesPorEstado,
-        GenerarReporteLotesPorDimensiones,
-        } from "../controllers/lotes.controller.js"
-import verifyJWT from '../middlewares/verifyJWT.middleware.js';
+import { Router } from "express";
+import {
+  getAllLotes,
+  getLoteById,
+  createLote,
+  patchLote,
+  deleteLote,
+  getLotesByUbicacion,
+  getLotesByEstado,
+  getLotesByDimensiones
+} from "../controllers/lotes.controller.js";
+import verifyJWT from "../middlewares/verifyJWT.middleware.js";
 
-const router = Router()
+const lotesRouter = Router();
 
-router.get("/lote",verifyJWT, ListarLotes)
-router.get("/lote/:id",verifyJWT, BuscarLotes)
-router.post("/lote",verifyJWT, RegistrarLotes)
-router.put("/lote/:id",verifyJWT, ActualizarLotes)
-router.delete("/lote/:id",verifyJWT, EliminarLotes)
-router.get("/ubicacion/:posX/:posY",verifyJWT, ListarLotesPorUbicacion)
-router.get("/lote/estado/:estado",verifyJWT, ListarLotesPorEstado)
-router.get("/lote/reporte/:tamX/:tamY",verifyJWT, GenerarReporteLotesPorDimensiones)
+// CRUD principal
+lotesRouter.get("/lotes", verifyJWT, getAllLotes);
+lotesRouter.get("/lotes/:id", verifyJWT, getLoteById);
+lotesRouter.post("/lotes", verifyJWT, createLote);
+lotesRouter.patch("/lotes/:id", verifyJWT, patchLote);
+lotesRouter.delete("/lotes/:id", verifyJWT, deleteLote);
 
+// Búsquedas específicas
+lotesRouter.get("/lotes/ubicacion/:posX/:posY", verifyJWT, getLotesByUbicacion);
+lotesRouter.get("/lotes/estado/:estado", verifyJWT, getLotesByEstado);
 
-export default router
+// Reportes
+lotesRouter.get("/lotes/reporte/dimensiones/:tamX/:tamY", verifyJWT, getLotesByDimensiones);
+
+export default lotesRouter;

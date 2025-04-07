@@ -12,14 +12,14 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
   const [nombre, setNombre] = useState<string>("");
   const [unidades, setUnidades] = useState<number | "">("");
   const [fechaSiembra, setFechaSiembra] = useState<string>("");
-  const [fk_Especie, setFk_Especie] = useState<number | null>(null);
+  const [fk_Especies, setFk_Especie] = useState<number | null>(null);
   const [activo, setActivo] = useState<boolean>(true); // Por defecto activo
 
   const { mutate, isPending } = usePostCultivos();
   const { data: especies, isLoading: isLoadingEspecies } = useGetEspecies();
 
   const handleSubmit = () => {
-    if (!nombre || !unidades || !fechaSiembra || !fk_Especie) {
+    if (!nombre || !unidades || !fechaSiembra || !fk_Especies) {
       console.log("Por favor, completa todos los campos obligatorios.");
       return;
     }
@@ -28,7 +28,7 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
         nombre,
         unidades: Number(unidades),
         fechaSiembra,
-        fk_Especie,
+        fk_Especies,
         activo,
       },
       {
@@ -88,7 +88,7 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
         <Select
           label="Especie"
           placeholder="Selecciona una especie"
-          selectedKeys={fk_Especie ? [fk_Especie.toString()] : []}
+          selectedKeys={fk_Especies ? [fk_Especies.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Especie(Number(selectedKey));

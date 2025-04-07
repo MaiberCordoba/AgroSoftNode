@@ -1,9 +1,22 @@
 import apiClient from "@/api/apiClient";
-import { User } from "../types";
+import { TotalUsers, User } from "../types";
 
 export const getUsers = async (): Promise<User[]> => {
   const response = await apiClient.get("usuarios/");
   return response.data;
+};
+
+export const getTotalUsers = async (): Promise<TotalUsers> => {
+  const response = await apiClient.get('usuarios/reporteUsuarios');
+  
+  // Extrae el primer elemento del array
+  const [userStats] = response.data; // Destructuring del array
+  
+  return {
+    total_usuarios: userStats.total_usuarios,
+    usuarios_activos: userStats.usuarios_activos,
+    usuarios_inactivos: userStats.usuarios_inactivos
+  };
 };
 
 export const registerUser = async (userData: Partial<User>): Promise<User> => {

@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  
   identificacion: number;
   nombre: string;
   apellidos: string;
@@ -8,6 +8,7 @@ export interface User {
   correoElectronico: string;
   admin: boolean;
   password?: string;
+  estado:string;
 }
 
 export interface SensorData {
@@ -16,4 +17,10 @@ export interface SensorData {
   value: number;
   unit: string;
   timestamp: string;
+}
+
+export interface TotalUsers{
+  total_usuarios: number,
+  usuarios_activos: string, 
+  usuarios_inactivos:string,
 }

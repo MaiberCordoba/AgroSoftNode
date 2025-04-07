@@ -8,32 +8,86 @@ import EditarLoteModal from "./EditarLotesModal";
 import { CrearLoteModal } from "./CrearLotesModal";
 import EliminarLoteModal from "./EliminarLotes";
 import { Lotes } from "../../types";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import logo from "../../../../../public/sena.png";
+import { Button } from "@heroui/react";
 
 export function LoteList() {
   const { data, isLoading, error } = useGetLotes();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    LotesEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    LotesEditada,
+    handleEditar,
   } = useEditarLotes();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearLotes();
 
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     LotesEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarLotes();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, nombre: "", descripcion: "", tamX: 0, tamY: 0, estado: false, posX: 0.0, posY: 0.0 });
+    handleCrear({
+      id: 0,
+      nombre: "",
+      descripcion: "",
+      tamX: 0,
+      tamY: 0,
+      estado: false,
+      posX: 0.0,
+      posY: 0.0,
+    });
+  };
+
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    const imgProps = doc.getImageProperties(logo);
+    const logoWidth = 30;
+    const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
+    doc.addImage(logo, "PNG", 10, 10, logoWidth, logoHeight);
+
+    doc.setFontSize(16);
+    doc.text("AgroSoft - SENA", 50, 20);
+    doc.setFontSize(12);
+    doc.text("Reporte de Lotes", 50, 28);
+    doc.setFontSize(10);
+    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 50, 34);
+
+    const rows = (data || []).map((item) => [
+      item.id,
+      item.nombre,
+      item.descripcion,
+      item.tamX,
+      item.tamY,
+      item.estado ? "Disponible" : "Ocupado",
+      item.posX,
+      item.posY,
+    ]);
+
+    autoTable(doc, {
+      startY: 50,
+      head: [["ID", "Nombre", "Descripción", "Tamaño X", "Tamaño Y", "Estado", "Posición X", "Posición Y"]],
+      body: rows,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [46, 204, 113] },
+      theme: "striped",
+    });
+
+    const finalY = (doc as any).lastAutoTable?.finalY || 70;
+    doc.setFontSize(10);
+    doc.text(`Total de registros: ${(data || []).length}`, 14, finalY + 10);
+
+    doc.save("reporte_lotes.pdf");
   };
 
   const columnas = [
@@ -92,19 +146,26 @@ export function LoteList() {
         onCrearNuevo={handleCrearNuevo}
       />
 
+      <br />
+      <Button
+        onClick={handleExportPDF}
+        style={{
+          backgroundColor: "rgba(239, 68, 68, 0.2)",
+          color: "#b91c1c",
+          padding: "0.5rem 1rem",
+          borderRadius: "0.5rem",
+          fontWeight: "500",
+        }}
+      >
+        Exportar PDF
+      </Button>
+
       {/* Modales */}
       {isEditModalOpen && LotesEditada && (
-        <EditarLoteModal
-          lote={LotesEditada}
-          onClose={closeEditModal}
-        />
+        <EditarLoteModal lote={LotesEditada} onClose={closeEditModal} />
       )}
 
-      {isCreateModalOpen && (
-        <CrearLoteModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearLoteModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && LotesEliminada && (
         <EliminarLoteModal
