@@ -19,7 +19,6 @@ import { Desechos } from "./modules/Finanzas/pages/pageDesechos";
 //Electronica
 import IoTPage from "./modules/IoT/pages/IoTPage";
 import SensorDetail from "./modules/IoT/pages/SensorDetail";
-import { SensorFormPage } from "./modules/IoT/pages/FormularioSensor";
 
 //trazabilidad
 import { TiposEspecie } from "./modules/Trazabilidad/pages/tiposEspecies";
@@ -85,7 +84,6 @@ function App() {
           
             {/*Electronica */}
             <Route path="/iot" element={<IoTPage />} />
-            <Route path="/sensores/registrar" element={<SensorFormPage />} />
             <Route path="/sensores/:id" element={<SensorDetail />} />
 
             {/*Trazabilidad*/}

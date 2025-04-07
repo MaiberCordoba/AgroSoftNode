@@ -1,25 +1,25 @@
 import React from "react";
 import ModalComponent from "@/components/Modal";
-import { useDeleteSensor } from "../../hooks/sensor/useDeleteSensor";
-import { Sensor } from "../../types/sensorTypes";
+import { useDeleteUmbral } from "../../hooks/umbral/useDeleteUmbral";
+import { Umbral } from "../../types/sensorTypes";
 import { AlertCircle } from "lucide-react";
 
-interface EliminarSensorModalProps {
-  sensor: Sensor;
+interface EliminarUmbralModalProps {
+  umbral: Umbral;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
-  sensor,
+const EliminarUmbralModal: React.FC<EliminarUmbralModalProps> = ({
+  umbral,
   isOpen,
   onClose,
 }) => {
-  const { mutate, isPending } = useDeleteSensor();
+  const { mutate, isPending } = useDeleteUmbral();
 
   const handleConfirmDelete = () => {
     mutate(
-      { id: sensor.id },
+      { id: umbral.id },
       {
         onSuccess: () => {
           onClose();
@@ -48,11 +48,11 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          ¿Eliminar el sensor "{sensor.tipo_sensor}"?
+          ¿Eliminar el umbral del sensor con ID "{umbral.sensor_id}"?
         </h3>
 
         <p className="text-gray-500 mb-4 max-w-md">
-          Esta acción eliminará permanentemente el sensor del sistema.
+          Esta acción eliminará permanentemente el umbral del sistema.
           ¿Estás segura de continuar?
         </p>
       </div>
@@ -60,4 +60,4 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
   );
 };
 
-export default EliminarSensorModal;
+export default EliminarUmbralModal;

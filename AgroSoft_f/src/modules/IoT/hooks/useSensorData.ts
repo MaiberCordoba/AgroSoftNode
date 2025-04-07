@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
+import { Sensor } from "../types/sensorTypes";
 
-export default function useSensorData(sensorId: string) {
-  const [sensorData, setSensorData] = useState({ valor: 0, alerta: "" });
+export default function useSensorData(sensorTipo: string) {
+  const [sensorData, setSensorData] = useState<Sensor | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/sensor/${sensorId}/`);
+    const ws = new WebSocket(`ws://localhost:8080/${sensorTipo}`);
 
     ws.onmessage = (event) => {
       try {
-        const data = JSON.parse(event.data);
-        setSensorData({ valor: data.valor, alerta: data.alerta || "" });
+        const data: Sensor = JSON.parse(event.data);
+        setSensorData(data);
       } catch (error) {
         console.error("❌ Error al recibir datos:", error);
       }
@@ -19,7 +20,7 @@ export default function useSensorData(sensorId: string) {
     ws.onclose = () => console.warn("⚠️ WebSocket cerrado");
 
     return () => ws.close();
-  }, [sensorId]);
+  }, [sensorTipo]);
 
   return sensorData;
 }
