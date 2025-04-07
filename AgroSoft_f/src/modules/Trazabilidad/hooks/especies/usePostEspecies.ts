@@ -1,33 +1,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postEspecies } from "../../api/especiesApi";
-import { Especies } from "../../types";
-import { addToast } from "@heroui/toast";
+import { NuevaEspecie } from "../../types";
 
 export const usePostEspecies = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<Especies, Error, Especies>({
-    mutationKey: ['crearEspecies'],
-    mutationFn: postEspecies,
-    onSuccess: (data) => {
-      console.log("Especie creada con éxito:", data);
-
-      // Invalida la query para que se refresquen los datos
-      queryClient.invalidateQueries({ queryKey: ['Especies'] });
-
-      addToast({
-        title: 'Creacion exitosa',
-        description: 'Nueva Especies registrada con Exito',
-        color: 'success'
-      })
+  return useMutation({
+    mutationFn: (nuevaEspecie: NuevaEspecie) => postEspecies(nuevaEspecie),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["especies"] });
     },
-    onError: (error) => {
-      console.error("Error al crear la Especie:", error);
-      addToast({
-        title: 'Error al crear la Especies',
-        description: 'No fue posible  registrar nueva Especies',
-        color: 'success'
-      })
+    onError: (err) => {
+      console.error(err);
     },
   });
 };

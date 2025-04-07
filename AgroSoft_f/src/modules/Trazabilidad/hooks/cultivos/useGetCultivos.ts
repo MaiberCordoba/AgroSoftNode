@@ -4,7 +4,7 @@ import { Cultivos } from "../../types";
 
 export const useGetCultivos = () => {
   return useQuery<Cultivos[], Error>({
-    queryKey: ["Cultivos"], 
+    queryKey: ["cultivos"], 
     queryFn: getCultivos, 
   });
 };

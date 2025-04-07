@@ -1,26 +1,25 @@
-import { Router } from "express"
-import { ListarCultivos, 
-        RegistrarCultivos, 
-        ActualizarCultivos, 
-        EliminarCultivos,
-        BuscarCultivo,
-        ListarCultivosPorEspecie,
-        ListarCultivosPorSiembra,
-        ReporteCultivosActivos, } from "../controllers/cultivos.controller.js"
+import { Router } from "express";
+import { 
+    getCultivos, 
+    postCultivo, 
+    patchCultivo, 
+    deleteCultivo,
+    getCultivoPorId,
+    getCultivosPorEspecie,
+    getCultivosPorSiembra,
+    getReporteCultivosActivos,
+} from "../controllers/cultivos.controller.js";
 import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
-const router = Router()
+const router = Router();
 
-router.get("/cultivos",verifyJWT, ListarCultivos)
-router.post("/cultivos",verifyJWT, RegistrarCultivos)
-router.get("/cultivos/:id",verifyJWT, BuscarCultivo)
-router.put("/cultivos/:id",verifyJWT, ActualizarCultivos) 
-router.delete("/cultivos/:id",verifyJWT, EliminarCultivos)
-router.get("/cultivos/especie/:fk_Especies",verifyJWT, ListarCultivosPorEspecie)
-router.get("/cultivos/siembra/:fechaSiembra",verifyJWT, ListarCultivosPorSiembra)
-router.get("/reporte/cultivos/activos",verifyJWT, ReporteCultivosActivos)
+router.get("/cultivos", verifyJWT, getCultivos);
+router.post("/cultivos", verifyJWT, postCultivo);
+router.get("/cultivos/:id", verifyJWT, getCultivoPorId);
+router.patch("/cultivos/:id", verifyJWT, patchCultivo);
+router.delete("/cultivos/:id", verifyJWT, deleteCultivo);
+router.get("/cultivos/especie/:fk_Especies", verifyJWT, getCultivosPorEspecie);
+router.get("/cultivos/siembra/:fechaSiembra", verifyJWT, getCultivosPorSiembra);
+router.get("/reporte/cultivos/activos", verifyJWT, getReporteCultivosActivos);
 
-
-
-
-export default router
+export default router;

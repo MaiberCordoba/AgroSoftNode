@@ -9,9 +9,9 @@ export const useDeleteCultivos = () => {
     return useMutation<Cultivos, Error, { id: number }, { previousCultivos?: Cultivos[] }>({
         mutationFn: ({ id }) => deleteCultivos(id),
         onMutate: async (variables) => {
-            await queryClient.cancelQueries({ queryKey: ['Cultivos'] });
-            const previousCultivos = queryClient.getQueryData<Cultivos[]>(['Cultivos']);
-            queryClient.setQueryData<Cultivos[]>(['Cultivos'], (old) => 
+            await queryClient.cancelQueries({ queryKey: ["cultivos"] });
+            const previousCultivos = queryClient.getQueryData<Cultivos[]>(["cultivos"]);
+            queryClient.setQueryData<Cultivos[]>(["cultivos"], (old) => 
                 old?.filter(Cultivos => Cultivos.id !== variables.id) || []
             );
             return { previousCultivos };
@@ -25,11 +25,11 @@ export const useDeleteCultivos = () => {
             
             if (context?.previousCultivos) {
                 console.error(error)
-                queryClient.setQueryData(['Cultivos'], context.previousCultivos);
+                queryClient.setQueryData(["cultivos"], context.previousCultivos);
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['Cultivos'] });
+            queryClient.invalidateQueries({ queryKey: ["cultivos"] });
             
             addToast({
                 title: "Operación exitosa",

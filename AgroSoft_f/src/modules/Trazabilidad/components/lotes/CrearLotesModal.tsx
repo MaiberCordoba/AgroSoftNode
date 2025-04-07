@@ -1,25 +1,32 @@
 import { useState } from "react";
-import { usePostLotes } from "../../hooks/lotes/usePostLotes"; // Hook para registrar lotes
+import { usePostLotes } from "../../hooks/lotes/usePostLotes";
 import ModalComponent from "@/components/Modal";
 import { Input, Select, SelectItem } from "@heroui/react";
 
 interface CrearLoteModalProps {
   onClose: () => void;
+  onCreated?: () => void; // ✅ Para recargar lista si quieres
 }
 
-export const CrearLoteModal = ({ onClose }: CrearLoteModalProps) => {
+export const CrearLoteModal = ({ onClose, onCreated }: CrearLoteModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [tamX, setTamX] = useState<number | null>(null);
   const [tamY, setTamY] = useState<number | null>(null);
   const [posX, setPosX] = useState<number | null>(null);
   const [posY, setPosY] = useState<number | null>(null);
-  const [estado, setEstado] = useState<string>("di"); // "di" por defecto
+  const [estado, setEstado] = useState<boolean>(true); // ✅
 
   const { mutate, isPending } = usePostLotes();
 
   const handleSubmit = () => {
-    if (!nombre || tamX === null || tamY === null || posX === null || posY === null) {
+    if (
+      !nombre ||
+      tamX === null ||
+      tamY === null ||
+      posX === null ||
+      posY === null
+    ) {
       console.log("Por favor, completa todos los campos obligatorios.");
       return;
     }
@@ -32,18 +39,20 @@ export const CrearLoteModal = ({ onClose }: CrearLoteModalProps) => {
         tamY,
         posX,
         posY,
-        estado: estado === "di", // Convertir "di" a `true` y "oc" a `false`
+        estado,
       },
       {
         onSuccess: () => {
           onClose();
+          onCreated?.(); // ✅ Si quieres recargar lista
+          // Limpiar formulario
           setNombre("");
           setDescripcion("");
           setTamX(null);
           setTamY(null);
           setPosX(null);
           setPosY(null);
-          setEstado("di");
+          setEstado(true);
         },
       }
     );
@@ -113,12 +122,10 @@ export const CrearLoteModal = ({ onClose }: CrearLoteModalProps) => {
       <Select
         label="Estado"
         placeholder="Selecciona un estado"
-        selectedKeys={[estado]}
+        selectedKeys={[estado ? "di" : "oc"]}
         onSelectionChange={(keys) => {
-          const selectedKey = Array.from(keys)[0]?.toString();
-          if (selectedKey) {
-            setEstado(selectedKey);
-          }
+          const selectedKey = Array.from(keys)[0];
+          setEstado(selectedKey === "di");
         }}
       >
         <SelectItem key="di">Disponible</SelectItem>

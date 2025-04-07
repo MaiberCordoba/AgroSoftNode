@@ -9,9 +9,9 @@ export const useDeletePlantaciones = () => {
     return useMutation<Plantaciones, Error, { id: number }, { previousPlantaciones?: Plantaciones[] }>({
         mutationFn: ({ id }) => deletePlantaciones(id),
         onMutate: async (variables) => {
-            await queryClient.cancelQueries({ queryKey: ['Plantaciones'] });
-            const previousPlantaciones = queryClient.getQueryData<Plantaciones[]>(['Plantaciones']);
-            queryClient.setQueryData<Plantaciones[]>(['Plantaciones'], (old) => 
+            await queryClient.cancelQueries({ queryKey: ["plantaciones"] });
+            const previousPlantaciones = queryClient.getQueryData<Plantaciones[]>(["plantaciones"]);
+            queryClient.setQueryData<Plantaciones[]>(["plantaciones"], (old) => 
                 old?.filter(Plantaciones => Plantaciones.id !== variables.id) || []
             );
             return { previousPlantaciones };
@@ -25,11 +25,11 @@ export const useDeletePlantaciones = () => {
             
             if (context?.previousPlantaciones) {
                 console.error(error)
-                queryClient.setQueryData(['Plantaciones'], context.previousPlantaciones);
+                queryClient.setQueryData(["plantaciones"], context.previousPlantaciones);
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['Plantaciones'] });
+            queryClient.invalidateQueries({ queryKey: ["plantaciones"] });
             
             addToast({
                 title: "Operación exitosa",
