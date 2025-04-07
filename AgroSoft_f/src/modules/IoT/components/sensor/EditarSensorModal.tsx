@@ -1,37 +1,104 @@
 import React, { useState } from "react";
 import ModalComponent from "@/components/Modal";
 import { usePatchSensor } from "../../hooks/sensor/usePachtSensor";
-import { SensorData, SENSOR_TYPES } from "../../types/sensorTypes";
+import { Sensor } from "../../types/sensorTypes";
 import { Input, Select, SelectItem } from "@heroui/react";
+import { addToast } from "@heroui/toast";
+
+const SENSOR_TYPES = [
+  { key: "Temperatura", label: "Temperatura (°C)" },
+  { key: "Iluminación", label: "Iluminación (lux)" },
+  { key: "Humedad Ambiental", label: "Humedad Ambiental (%)" },
+  { key: "Viento", label: "Viento (km/h)" },
+  { key: "Lluvia", label: "Lluvia (mm)" },
+  { key: "Humedad del Terreno", label: "Humedad del Terreno (%)" },
+  { key: "Nivel de PH", label: "Nivel de PH (pH)" },
+];
+
+const sensoresLote = ["Temperatura", "Iluminación", "Humedad Ambiental", "Viento", "Lluvia"];
+const sensoresEra = ["Humedad del Terreno", "Nivel de PH"];
+const tiposValidos = [...sensoresLote, ...sensoresEra];
 
 interface EditarSensorModalProps {
-  sensor: SensorData; // Sensor que se está editando
-  onClose: () => void; // Función para cerrar el modal
+  sensor: Sensor;
+  onClose: () => void;
 }
 
 const EditarSensorModal: React.FC<EditarSensorModalProps> = ({ sensor, onClose }) => {
-  const [valor, setValor] = useState<number>(sensor.valor);
-  const [fk_lote, setFkLote] = useState<number | null>(sensor.fk_lote);
-  const [fk_eras, setFkEras] = useState<number | null>(sensor.fk_eras);
-  const [tipo, setTipo] = useState<SensorData["tipo"]>(sensor.tipo); // ✅ Corrección
+  const [tipo_sensor, setTipoSensor] = useState<string>(sensor.tipo_sensor);
   const [fecha, setFecha] = useState<string>(sensor.fecha);
+  const [lote_id, setLoteId] = useState<number | null>(sensor.lote_id);
+  const [era_id, setEraId] = useState<number | null>(sensor.era_id);
 
   const { mutate, isPending } = usePatchSensor();
 
   const handleSubmit = () => {
+    if (!tipo_sensor || !fecha) {
+      addToast({
+        title: "Error",
+        description: "Tipo de sensor y fecha son obligatorios.",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (!tiposValidos.includes(tipo_sensor)) {
+      addToast({
+        title: "Error",
+        description: "Tipo de sensor inválido.",
+        color: "danger",
+      });
+      return;
+    }
+
+    const tieneSoloLote = !!lote_id && !era_id;
+    const tieneSoloEra = !!era_id && !lote_id;
+
+    if (!tieneSoloLote && !tieneSoloEra) {
+      addToast({
+        title: "Error",
+        description: "Debes asignar solo un lote o solo una era (no ambos, no ninguno).",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (sensoresLote.includes(tipo_sensor) && !lote_id) {
+      addToast({
+        title: "Error",
+        description: `El sensor tipo '${tipo_sensor}' debe estar asociado a un lote.`,
+        color: "danger",
+      });
+      return;
+    }
+
+    if (sensoresEra.includes(tipo_sensor) && !era_id) {
+      addToast({
+        title: "Error",
+        description: `El sensor tipo '${tipo_sensor}' debe estar asociado a una era.`,
+        color: "danger",
+      });
+      return;
+    }
+
     mutate(
       {
         id: sensor.id,
         data: {
-          valor,
-          fk_lote,
-          fk_eras,
-          tipo,
+          tipo_sensor,
+          datos_sensor: sensor.datos_sensor,
           fecha,
+          lote_id,
+          era_id,
         },
       },
       {
         onSuccess: () => {
+          addToast({
+            title: "Sensor actualizado",
+            description: "Los datos del sensor fueron actualizados correctamente.",
+            color: "success",
+          });
           onClose();
         },
       }
@@ -52,50 +119,50 @@ const EditarSensorModal: React.FC<EditarSensorModalProps> = ({ sensor, onClose }
         },
       ]}
     >
-      <Input
-        label="Valor del Sensor"
-        type="number"
-        value={valor.toString()}
-        onChange={(e) => setValor(Number(e.target.value))}
-      />
+      <Select
+        label="Tipo de Sensor"
+        placeholder="Selecciona un tipo"
+        selectedKeys={[tipo_sensor]}
+        onSelectionChange={(keys) => {
+          const selected = Array.from(keys)[0];
+          setTipoSensor(selected as string);
+        }}
+      >
+        {SENSOR_TYPES.map((tipo) => (
+          <SelectItem key={tipo.key} value={tipo.key}>
+            {tipo.label}
+          </SelectItem>
+        ))}
+      </Select>
 
       <Input
-        label="ID del Lote"
-        type="number"
-        value={fk_lote !== null ? fk_lote.toString() : ""}
-        onChange={(e) => setFkLote(e.target.value ? Number(e.target.value) : null)}
-      />
-
-      <Input
-        label="ID de las Eras"
-        type="number"
-        value={fk_eras !== null ? fk_eras.toString() : ""}
-        onChange={(e) => setFkEras(e.target.value ? Number(e.target.value) : null)}
-      />
-
-      <Input
-        label="Fecha del Registro"
+        label="Fecha"
         type="date"
         value={fecha}
         onChange={(e) => setFecha(e.target.value)}
       />
 
-      {/* Selector de tipos de sensor con SENSOR_TYPES */}
-      <Select
-        label="Tipo de Sensor"
-        placeholder="Selecciona un tipo de sensor"
-        selectedKeys={[tipo]} // ✅ HeroUI espera un array de strings
-        onSelectionChange={(keys) => {
-          const selectedKey = Array.from(keys)[0] as SensorData["tipo"]; // ✅ Conversión explícita
-          setTipo(selectedKey);
+      <Input
+        label="ID del Lote"
+        type="number"
+        value={lote_id !== null ? lote_id.toString() : ""}
+        onChange={(e) => {
+          const value = e.target.value ? Number(e.target.value) : null;
+          setLoteId(value);
+          if (value !== null) setEraId(null);
         }}
-      >
-        {SENSOR_TYPES.map((sensor) => (
-          <SelectItem key={sensor.key} textValue={sensor.label}>
-            {sensor.label}
-          </SelectItem>
-        ))}
-      </Select>
+      />
+
+      <Input
+        label="ID de la Era"
+        type="number"
+        value={era_id !== null ? era_id.toString() : ""}
+        onChange={(e) => {
+          const value = e.target.value ? Number(e.target.value) : null;
+          setEraId(value);
+          if (value !== null) setLoteId(null);
+        }}
+      />
     </ModalComponent>
   );
 };

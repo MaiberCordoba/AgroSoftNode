@@ -10,7 +10,7 @@ interface CrearControlModalProps {
 }
 
 export const CrearControlModal = ({ onClose }: CrearControlModalProps) => {
-  const [fecha, setFecha] = useState("");
+  const [fechaControl, setFecha] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fk_Afeccion, setFk_Afeccion] = useState<number | null>(null);
   const [fk_TipoControl, setFk_TipoControl] = useState<number | null>(null);
@@ -20,12 +20,12 @@ export const CrearControlModal = ({ onClose }: CrearControlModalProps) => {
   const { mutate, isPending } = postControles();
 
   const handleSubmit = () => {
-    if (!fecha || !descripcion || !fk_Afeccion || !fk_TipoControl) {
+    if (!fechaControl || !descripcion || !fk_Afeccion || !fk_TipoControl) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
     mutate(
-      { fecha, descripcion, fk_Afeccion, fk_TipoControl }, 
+      { fechaControl, descripcion, fk_Afeccion, fk_TipoControl }, 
       {
         onSuccess: () => {
           onClose();
@@ -55,7 +55,7 @@ export const CrearControlModal = ({ onClose }: CrearControlModalProps) => {
       <Input
         label="Fecha"
         type="date"
-        value={fecha}
+        value={fechaControl}
         onChange={(e) => setFecha(e.target.value)}
         required
       />

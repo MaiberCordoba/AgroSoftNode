@@ -5,59 +5,77 @@ import { useEliminarSensor } from "../../hooks/sensor/useEliminarSenosr";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarSensorModal from "./EditarSensorModal";
-import CrearSensorModal from "./CrearSensorModal";
+import { CrearSensorModal } from "./CrearSensorModal";
 import EliminarSensorModal from "./EliminarSensorModal";
-import { SensorData, SENSOR_TYPES } from "../../types/sensorTypes"
+import { Sensor } from "../../types/sensorTypes";
+
+const SENSOR_TYPES = [
+  { key: "TEM", label: "Temperatura" },
+  { key: "HUM", label: "Humedad" },
+  { key: "LUM", label: "Luz Solar" },
+  { key: "HUMA", label: "Humedad Ambiente" },
+  { key: "VIE", label: "Viento" },
+  { key: "LLA", label: "Lluvia" },
+];
 
 export function SensorLista() {
   const { data, isLoading, error } = useGetSensor();
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    sensorEditado, 
-    handleEditar 
+
+  console.log("Sensores:", data); // 🔍 Verifica qué está llegando
+
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    sensorEditado,
+    handleEditar,
   } = useEditarSensor();
-  
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearSensor();
-  
+
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     sensorEliminado,
-    handleEliminar
+    handleEliminar,
   } = useEliminarSensor();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_lote: null, fk_eras: null, fecha: "", tipo: "TEM", valor: 0 });
+    handleCrear({
+      id: 0,
+      tipo_sensor: "TEM",
+      datos_sensor: 0,
+      fecha: new Date().toISOString(),
+      lote_id: null,
+      era_id: null,
+    });
   };
 
-  // Mapea los tipos de sensores a nombres legibles
-  const getSensorLabel = (tipo: string) => {
-    const sensor = SENSOR_TYPES.find(s => s.key === tipo);
-    return sensor ? sensor.label : "Desconocido";
+  const getSensorLabel = (tipo_sensor: string) => {
+    const sensor = SENSOR_TYPES.find(
+      s => s.key.toLowerCase() === tipo_sensor.toLowerCase()
+    );
+    return sensor ? sensor.label : tipo_sensor;
   };
 
-  // Definición de columnas
   const columnas = [
     { name: "Fecha", uid: "fecha", sortable: true },
-    { name: "Tipo de Sensor", uid: "tipo" },
-    { name: "Valor", uid: "valor" },
+    { name: "Tipo de Sensor", uid: "tipo_sensor" },
+    { name: "Valor", uid: "datos_sensor" },
     { name: "Acciones", uid: "acciones" },
   ];
 
-  // Función de renderizado de celdas
-  const renderCell = (item: SensorData, columnKey: React.Key) => {
+  const renderCell = (item: Sensor, columnKey: React.Key) => {
     switch (columnKey) {
       case "fecha":
         return <span>{new Date(item.fecha).toLocaleString()}</span>;
-      case "tipo":
-        return <span>{getSensorLabel(item.tipo)}</span>;
-      case "valor":
-        return <span>{item.valor}</span>;
+      case "tipo_sensor":
+        return <span>{getSensorLabel(item.tipo_sensor)}</span>;
+      case "datos_sensor":
+        return <span>{item.datos_sensor}</span>;
       case "acciones":
         return (
           <AccionesTabla
@@ -66,7 +84,7 @@ export function SensorLista() {
           />
         );
       default:
-        return <span>{String(item[columnKey as keyof SensorData])}</span>;
+        return <span>{String(item[columnKey as keyof Sensor])}</span>;
     }
   };
 
@@ -78,7 +96,7 @@ export function SensorLista() {
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
-        claveBusqueda="tipo"
+        claveBusqueda="tipo_sensor"
         placeholderBusqueda="Buscar por tipo"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
@@ -86,16 +104,11 @@ export function SensorLista() {
 
       {/* Modales */}
       {isEditModalOpen && sensorEditado && (
-        <EditarSensorModal
-          sensor={sensorEditado}
-          onClose={closeEditModal}
-        />
+        <EditarSensorModal sensor={sensorEditado} onClose={closeEditModal} />
       )}
 
       {isCreateModalOpen && (
-        <CrearSensorModal
-          onClose={closeCreateModal}
-        />
+        <CrearSensorModal onClose={closeCreateModal} />
       )}
 
       {isDeleteModalOpen && sensorEliminado && (

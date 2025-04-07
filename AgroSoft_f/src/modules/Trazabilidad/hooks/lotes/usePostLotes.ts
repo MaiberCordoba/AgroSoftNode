@@ -13,7 +13,7 @@ export const usePostLotes = () => {
       console.log("lote creada con éxito:", data);
 
       // Invalida la query para que se refresquen los datos
-      queryClient.invalidateQueries({ queryKey: ['Lotes'] });
+      queryClient.invalidateQueries({ queryKey: ['lotes'] });
 
       addToast({
         title: 'Creacion exitosa',

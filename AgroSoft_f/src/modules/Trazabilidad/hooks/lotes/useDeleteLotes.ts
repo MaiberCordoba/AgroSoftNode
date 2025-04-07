@@ -9,9 +9,9 @@ export const useDeleteLotes = () => {
     return useMutation<Lotes, Error, { id: number }, { previousLotes?: Lotes[] }>({
         mutationFn: ({ id }) => deleteLotes(id),
         onMutate: async (variables) => {
-            await queryClient.cancelQueries({ queryKey: ['Lotes'] });
-            const previousLotes = queryClient.getQueryData<Lotes[]>(['Lotes']);
-            queryClient.setQueryData<Lotes[]>(['Lotes'], (old) => 
+            await queryClient.cancelQueries({ queryKey: ["lotes"] });
+            const previousLotes = queryClient.getQueryData<Lotes[]>(["lotes"]);
+            queryClient.setQueryData<Lotes[]>(["lotes"], (old) => 
                 old?.filter(Lotes => Lotes.id !== variables.id) || []
             );
             return { previousLotes };
@@ -25,11 +25,11 @@ export const useDeleteLotes = () => {
             
             if (context?.previousLotes) {
                 console.error(error)
-                queryClient.setQueryData(['Lotes'], context.previousLotes);
+                queryClient.setQueryData(["lotes"], context.previousLotes);
             }
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['Lotes'] });
+            queryClient.invalidateQueries({ queryKey: ["lotes"] });
             
             addToast({
                 title: "Operación exitosa",

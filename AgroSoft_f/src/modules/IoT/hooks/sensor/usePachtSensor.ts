@@ -1,38 +1,42 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { patch } from "../../api/sensor";
-import { SensorData } from "../../types/sensorTypes";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { put } from "../../api/sensor";
+import { Sensor } from "../../types/sensorTypes";
 import { addToast } from "@heroui/react";
 
 export const usePatchSensor = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<SensorData, Error, { id: number; data: Partial<SensorData> }>({
-    mutationFn: ({ id, data }) => patch(id, data),
+  return useMutation<Sensor, Error, { id: number; data: Partial<Sensor> }>({
+    mutationFn: ({ id, data }) => {
+      if (data.lote_id && data.era_id) {
+        throw new Error("No se puede asignar un sensor a un lote y una era al mismo tiempo.");
+      }
+      if (!data.lote_id && !data.era_id) {
+        throw new Error("El sensor debe estar asignado a un lote o una era.");
+      }
+      return put(id, data);
+    },
     onSuccess: (updatedSensor, variables) => {
-      // Actualiza la caché después de una mutación exitosa
-      queryClient.setQueryData<SensorData[]>(['sensor'], (oldData) => {
+      queryClient.setQueryData<Sensor[]>(["sensor"], (oldData) => {
         if (!oldData) return oldData;
         return oldData.map((sensor) =>
           sensor.id === variables.id ? { ...sensor, ...updatedSensor } : sensor
         );
       });
 
-      // Toast de éxito
       addToast({
         title: "Actualización exitosa",
         description: "El sensor se actualizó correctamente",
         color: "success",
-     
       });
     },
     onError: (error) => {
-      console.error(error)
+      console.error(error);
       addToast({
         title: "Error al actualizar",
-        description: "No se pudo actualizar el sensor",
+        description: error.message || "No se pudo actualizar el sensor",
         color: "danger",
-       
       });
-    }
+    },
   });
 };

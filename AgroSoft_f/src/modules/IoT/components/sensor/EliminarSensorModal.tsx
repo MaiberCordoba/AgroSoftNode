@@ -1,19 +1,19 @@
 import React from "react";
 import ModalComponent from "@/components/Modal";
 import { useDeleteSensor } from "../../hooks/sensor/useDeleteSensor";
-import { SensorData } from "../../types/sensorTypes";
+import { Sensor } from "../../types/sensorTypes";
 import { AlertCircle } from "lucide-react";
 
 interface EliminarSensorModalProps {
-  sensor: SensorData;
+  sensor: Sensor;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({ 
-  sensor, 
-  isOpen, 
-  onClose 
+const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
+  sensor,
+  isOpen,
+  onClose,
 }) => {
   const { mutate, isPending } = useDeleteSensor();
 
@@ -36,7 +36,7 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
       footerButtons={[
         {
           label: isPending ? "Eliminando..." : "Eliminar",
-          color: "success",
+          color: "danger",
           variant: "light",
           onClick: handleConfirmDelete,
         },
@@ -46,14 +46,14 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
         <div className="mb-4 p-3 bg-red-50 rounded-full">
           <AlertCircle className="w-8 h-8 text-red-500" strokeWidth={1.5} />
         </div>
-        
+
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          ¿Eliminar el sensor "{sensor.tipo}"?
+          ¿Eliminar el sensor "{sensor.tipo_sensor}"?
         </h3>
-        
+
         <p className="text-gray-500 mb-4 max-w-md">
-          Esta acción eliminará permanentemente el sensor del sistema. 
-          ¿Estás seguro de continuar?
+          Esta acción eliminará permanentemente el sensor del sistema.
+          ¿Estás segura de continuar?
         </p>
       </div>
     </ModalComponent>

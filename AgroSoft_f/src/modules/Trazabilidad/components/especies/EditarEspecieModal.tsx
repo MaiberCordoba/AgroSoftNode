@@ -14,7 +14,7 @@ const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClos
   const [nombre, setNombre] = useState<string>(especie.nombre);
   const [descripcion, setDescripcion] = useState<string>(especie.descripcion);
   const [img, setImg] = useState("");
-  const [tiempocrecimiento, settiempocrecimiento] = useState(especie.tiempocrecimiento);
+  const [tiempoCrecimiento, settiempocrecimiento] = useState(especie.tiempoCrecimiento);
   const [fk_TiposEspecie, setFk_TiposEspecie] = useState(0);
 
   const { mutate, isPending } = usePatchEspecies();
@@ -28,7 +28,7 @@ const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClos
           nombre,
           descripcion,
           img,
-          tiempocrecimiento,
+          tiempoCrecimiento,
           fk_TiposEspecie,
         },
       },
@@ -74,7 +74,7 @@ const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClos
       <Input
         label="Tiempo de Crecimiento"
         type="number"
-        value={tiempocrecimiento.toString()} // Convierte el número a string
+        value={tiempoCrecimiento.toString()} // Convierte el número a string
         onChange={(e) => settiempocrecimiento(Number(e.target.value))} // Convierte de vuelta a número
       />
 

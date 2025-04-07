@@ -7,11 +7,17 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  RadioGroup,
-  Radio,
   Button
 } from "@heroui/react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer
+} from "recharts";
 
 interface SensorData {
   timestamp: string;
@@ -22,21 +28,39 @@ export default function SensorDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
-  const [selectedColor, setSelectedColor] = useState("default");
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:8000/ws/sensor/${id}/`);
+    if (!id) return;
+
+    const ws = new WebSocket(`ws://localhost:8080/${id}`);
+
+    ws.onopen = () => {
+      console.log(`✅ Conectado al WebSocket del sensor: ${id}`);
+    };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        setSensorData((prev) => [...prev.slice(-9), { timestamp: new Date().toLocaleTimeString(), valor: data.valor }]);
+        const timestamp = new Date().toLocaleTimeString();
+
+        const newEntry: SensorData = {
+          valor: parseFloat(data.valor),
+          timestamp,
+        };
+
+        setSensorData((prev) => [...prev.slice(-9), newEntry]);
       } catch (error) {
-        console.error(`Error en WebSocket (${id}):`, error);
+        console.error(`❌ Error en mensaje WebSocket (${id}):`, error);
       }
     };
 
-    return () => ws.close();
+    ws.onclose = () => {
+      console.warn("⚠️ WebSocket cerrado");
+    };
+
+    return () => {
+      ws.close();
+    };
   }, [id]);
 
   return (
@@ -45,7 +69,9 @@ export default function SensorDetail() {
         Regresar
       </Button>
 
-      <h1 className="text-2xl font-bold text-center mb-4">Detalles del Sensor: {id}</h1>
+      <h1 className="text-2xl font-bold text-center mb-4">
+        Detalles del Sensor: {id}
+      </h1>
 
       <div className="bg-white p-4 shadow-md rounded-lg mb-6">
         <h2 className="text-lg font-semibold mb-2">Gráfica en tiempo real</h2>
@@ -55,7 +81,7 @@ export default function SensorDetail() {
             <XAxis dataKey="timestamp" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="valor" stroke="#8884d8" strokeWidth={2} />
+            <Line type="monotone" dataKey="valor" stroke="green" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>

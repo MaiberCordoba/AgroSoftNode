@@ -10,18 +10,23 @@ export interface Especies{
     nombre: string;
     descripcion: string;
     img?: string;
-    tiempocrecimiento: number;
+    tiempoCrecimiento: number;
     TiposEspecie?: TiposEspecie;
     fk_TiposEspecie?: number;
+    tipo_especie_nombre?: string | null;
 }
+
+// Si usás TypeScript, creá este tipo en tu archivo de tipos:
+export type NuevaEspecie = Omit<Especies, "id">;
+
 
 export interface Semilleros{
   id: number;
   unidades: number;
-  fechasiembra: string;
-  fechaestimada: string;
+  fechaSiembra: string;
+  fechaEstimada: string;
   Especies?: Especies;
-  fk_especie: number;
+  fk_Especies: number;
 }
 
 export interface Cultivos{
@@ -31,7 +36,7 @@ export interface Cultivos{
   activo: boolean;
   fechaSiembra: string;
   Especies?: Especies;
-  fk_Especie: number;
+  fk_Especies: number;
 }
 
 export interface Lotes{
@@ -51,15 +56,15 @@ export interface Eras{
   tamY: number;
   posX: number;
   posY: number;
-  tipo: string;
+  estado: boolean;
   Lotes?: Lotes;
-  fk_lote_id: number; 
+  fk_Lotes: number; 
 }
 
 export interface Plantaciones{
   id: number;
   Cultivos?: Cultivos;
-  fk_Cultivo: number;
+  fk_Cultivos: number;
   Eras?: Eras;
-  fk_Era: number;
+  fk_Eras: number;
 }

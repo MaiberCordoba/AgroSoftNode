@@ -25,7 +25,6 @@ import { Cosechas } from "./modules/Finanzas/pages/pageCosechas";
 //Electronica
 import IoTPage from "./modules/IoT/pages/IoTPage";
 import SensorDetail from "./modules/IoT/pages/SensorDetail";
-import { SensorFormPage } from "./modules/IoT/pages/FormularioSensor";
 
 //trazabilidad
 import { TiposEspecie } from "./modules/Trazabilidad/pages/tiposEspecies";
@@ -50,6 +49,7 @@ import { Usuarios } from "./modules/Users/pages/pageUsers";
 
 //testeo
 import Testeo  from "./pages/testeo";
+import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
 
 
 const queryClient = new QueryClient();
@@ -79,6 +79,7 @@ function App() {
 
             {/* Usuarios */}
             <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/usuarios/reporte" element={<TotalUsersPage />} />
 
             {/* Finanzas */}
             <Route path="/tipos-de-desechos" element={<TiposDesechos />} />
@@ -92,7 +93,6 @@ function App() {
           
             {/*Electronica */}
             <Route path="/iot" element={<IoTPage />} />
-            <Route path="/sensores/registrar" element={<SensorFormPage />} />
             <Route path="/sensores/:id" element={<SensorDetail />} />
 
             {/*Trazabilidad*/}
@@ -111,7 +111,7 @@ function App() {
             <Route path="/productos-para-el-control" element={<ProductosControl/>}></Route>
             <Route path="/usos-de-productos-para-el-control" element={<UsoProductosControl/>}></Route>
             <Route path="/controles" element={<Controles/>}></Route>
-            <Route path="/afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
+            <Route path="/Afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
 
             {/*test*/}
             <Route path="/testeo" element={<Testeo/>}></Route>

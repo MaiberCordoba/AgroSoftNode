@@ -8,30 +8,23 @@ export const usePatchEras = () => {
 
   return useMutation<Eras, Error, { id: number; data: Partial<Eras> }>({
     mutationFn: ({ id, data }) => patchEras(id, data),
-    onSuccess: (updatedEras, variables) => {
-      // Actualiza la caché después de una mutación exitosa
-      queryClient.setQueryData<Eras[]>(['Eras'], (oldData) => {
-        if (!oldData) return oldData;
-        return oldData.map((Eras) =>
-            Eras.id === variables.id ? { ...Eras, ...updatedEras } : Eras
-        );
-      });
+    onSuccess: () => {
+      // 🔁 Invalida la caché de eras para forzar recarga y obtener datos actualizados
+      queryClient.invalidateQueries({ queryKey: ['eras'] });
 
-      // Toast de éxito
+      // ✅ Toast de éxito
       addToast({
         title: "Actualización exitosa",
-        description: "la era se actualizó correctamente",
+        description: "La era se actualizó correctamente",
         color: "success",
-     
       });
     },
     onError: (error) => {
-      console.error(error)
+      console.error(error);
       addToast({
         title: "Error al actualizar",
         description: "No se pudo actualizar la era",
         color: "danger",
-       
       });
     }
   });
