@@ -12,6 +12,7 @@ import {
 import { getTotalUsers } from "../api/usersApi";
 import { ReportePdfUsuarios } from './ReportePdfUsuarios';
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Download } from "lucide-react";
 
 export default function TotalUsers() {
   const { data, isLoading, error } = useQuery({
@@ -31,9 +32,9 @@ export default function TotalUsers() {
             fileName="reporte_usuarios.pdf"
           >
             {({ loading }) => (
-              <Button color="primary">
-                {loading ? 'Preparando PDF...' : 'Descargar PDF'}
-              </Button>
+              <Download >
+               
+              </Download>
             )}
           </PDFDownloadLink>
         )}

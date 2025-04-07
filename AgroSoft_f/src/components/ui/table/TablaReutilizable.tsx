@@ -45,7 +45,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
     filtroEstado,
     setFiltroEstado,
     datosFiltrados,
-  } = useFiltrado(safeDatos, claveBusqueda);
+  } = useFiltrado(datos, claveBusqueda);
 
   const { filasPorPagina, handleChangeFilasPorPagina } = useFilasPorPagina(5);
   const { paginaActual, setPaginaActual, totalPaginas, datosPaginados } =
