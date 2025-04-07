@@ -64,3 +64,28 @@ export async function getHoras(req,res){
         res.status(500).json({msg:"Internal server error"});
     }
 }
+
+export const reportePagoPasantes = async (req,res) => {
+    try{
+        const sql = `SELECT 
+                    us.nombre AS Pasante, 
+                    FLOOR(pa.salarioHora / 60) AS ValorMinuto,
+                    hm.minutos AS MinutosTrabajados, 
+                    FLOOR(pa.salarioHora / 60) * hm.minutos AS PagoTotal
+                    FROM pasantes pa 
+                    JOIN horasmensuales hm ON hm.fk_Pasantes = pa.id 
+                    JOIN usuarios us ON pa.fk_Usuarios = us.identificacion;
+                    `
+        const [rows] = await pool.query(sql)
+        if (rows.length >0){
+            return res.status(200).json(rows)
+        }
+        else{
+            return res.status(404).json({"mgs" : "Sin reportes de pagos"})
+        }
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({msg:"Internal server error"});
+    }
+}

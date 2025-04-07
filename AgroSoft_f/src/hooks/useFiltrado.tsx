@@ -1,19 +1,21 @@
 import { useState, useMemo } from "react";
 
 export const useFiltrado = <T extends { [key: string]: any }>(
-  datos: T[],
+  datos: T[] = [], // fallback por si viene undefined
   claveBusqueda: keyof T,
 ) => {
   const [valorFiltro, setValorFiltro] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<Set<string>>(new Set());
 
   const datosFiltrados = useMemo(() => {
+    if (!Array.isArray(datos)) return [];
+
     let filtrados = [...datos];
 
     // Filtro de búsqueda
     if (valorFiltro) {
       filtrados = filtrados.filter((item) =>
-        String(item[claveBusqueda]).toLowerCase().includes(valorFiltro.toLowerCase()),
+        String(item[claveBusqueda]).toLowerCase().includes(valorFiltro.toLowerCase())
       );
     }
 
