@@ -5,6 +5,6 @@ import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 const desechos = Router()
 desechos.get("/desechos",verifyJWT,getAllDesechos)
 desechos.post("/desechos",verifyJWT,createDesechos)
-desechos.put("/desechos/:id",verifyJWT,updateDesechos)
+desechos.patch("/desechos/:id",verifyJWT,updateDesechos)
 
 export default desechos;

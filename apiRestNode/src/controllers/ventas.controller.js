@@ -54,3 +54,24 @@ export const updateVentas = async (req,res) => {
         return res.status(500).json({msg : "Internal server error"})
     }
 }
+
+export const registroVentas = async (req, res) => {
+    try{
+        const sql = `SELECT es.nombre AS Producto, co.unidades AS Cantidad, v.precioUnitario AS PrecioProducto,(co.unidades*precioUnitario) AS PrecioFinal, v.fecha AS FechaVenta  FROM ventas v
+        JOIN cosechas co ON v.fk_Cosechas = co.id
+        JOIN cultivos cu ON co.fk_Cultivos = cu.id  
+        JOIN especies es ON cu.fk_Especies = es.id`
+
+        const [rows] = await pool.query(sql)
+        if (rows.length > 0){
+            return res.status(200).json(rows)
+        }
+        else{
+            return res.status(404).json({"msg": "No se encontraron resultados"})
+        }
+    }
+    catch(error){
+        console.error(error)
+        return res.status(500).json({msg : "Internal server error"})
+    }
+}
