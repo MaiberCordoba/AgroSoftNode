@@ -88,6 +88,7 @@ function App() {
             <Route path="/cosechas"  element={<Cosechas/>}/>
             <Route path="/actividades"  element={<Actividades/>}/>
             <Route path="/usos-herramientas"  element={<UsosHerramientas/>}/>
+            {/* <Route path="/usos-productos"  element={<UsosProductos/>}/> */}
           
             {/*Electronica */}
             <Route path="/iot" element={<IoTPage />} />
