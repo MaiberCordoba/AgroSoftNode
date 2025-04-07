@@ -104,7 +104,7 @@ function App() {
             <Route path="/productos-para-el-control" element={<ProductosControl/>}></Route>
             <Route path="/usos-de-productos-para-el-control" element={<UsoProductosControl/>}></Route>
             <Route path="/controles" element={<Controles/>}></Route>
-            <Route path="/afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
+            <Route path="/Afectaciones-en-cultivos" element={<AfeccionesCultivo/>}></Route>
 
             {/*test*/}
             <Route path="/testeo" element={<Testeo/>}></Route>
