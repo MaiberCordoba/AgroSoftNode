@@ -50,6 +50,7 @@ import { Usuarios } from "./modules/Users/pages/pageUsers";
 //testeo
 import Testeo  from "./pages/testeo";
 import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
+import MapaEras from "./modules/Trazabilidad/pages/mapaPage";
 
 
 const queryClient = new QueryClient();
@@ -103,6 +104,8 @@ function App() {
             <Route path="/cultivos" element={<CultivoList />} />
             <Route path="/eras" element={<ErasList />} />
             <Route path="/lotes" element={<LotesList />} />
+            <Route path="/mapa" element={<MapaEras />} />
+
 
             {/*Sanidad*/}
             <Route path="/tipos-de-afectaciones" element={<TipoAfecciones/>}></Route>
