@@ -3,7 +3,7 @@ import { Herramientas } from "../types";
 
 export const getHerramientas = async (): Promise<Herramientas[]> => {
   const response = await apiClient.get("herramientas/")
-  return response.data
+  return response.data.rows
 }
 
 export const postHerramienta = async (HerramientasData: Partial<Herramientas>): Promise<Herramientas> => {

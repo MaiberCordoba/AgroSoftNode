@@ -53,7 +53,7 @@ export function UsosHerramientasList() {
         const herramienta = herramientas?.find((c) => c.id === item.fk_Herramientas);
         return <span>{herramienta ? herramienta.nombre : "No definido"}</span>;
       case "actividad":
-        const actividad = actividades?.find((c) => c.id === item.fk_Actividad);
+        const actividad = actividades?.find((c) => c.id === item.fk_Actividades);
         return <span>{actividad ? actividad.titulo : "No definido"}</span>;
       case "acciones":
         return (

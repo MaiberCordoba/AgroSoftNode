@@ -51,7 +51,7 @@ export function HerramientasList() {
   const renderCell = (item: Herramientas, columnKey: React.Key) => {
     switch (columnKey) {
       case "lote":
-        const lote = lotes?.find((c) => c.id === item.fk_Lote);
+        const lote = lotes?.find((c) => c.id === item.fk_Lotes);
         return <span>{lote ? lote.nombre : "No definido"}</span>;
       case "nombre":
         return <span>{item.nombre}</span>;
