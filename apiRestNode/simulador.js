@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws';
-import pool from './src/db.js'; // ✅ corregido aquí
+import pool from './src/db.js'; 
 
 const wss = new WebSocketServer({ port: 8080 });
 
@@ -40,7 +40,7 @@ wss.on('connection', (ws) => {
     }
   };
 
-  const interval = setInterval(sendSensorData, 1000);
+  const interval = setInterval(sendSensorData, 5000);
 
   ws.on('close', () => {
     clearInterval(interval);
