@@ -34,7 +34,7 @@ export function VentasList() {
   } = useEliminarVenta();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Cosecha: 0, precioUnitario: 0, fecha: "" });
+    handleCrear({ id: 0, fk_Cosechas: 0, precioUnitario: 0, fecha: "" });
   };
 
   const columnas = [
@@ -47,7 +47,7 @@ export function VentasList() {
   const renderCell = (item: Ventas, columnKey: React.Key) => {
     switch (columnKey) {
       case "cosecha":
-        const cosecha = cosechas?.find((c) => c.id === item.fk_Cosecha);
+        const cosecha = cosechas?.find((c) => c.id === item.fk_Cosechas);
         return <span>{cosecha ? cosecha.fecha : "No definido"}</span>;
       case "precioUnitario":
         return <span>{item.precioUnitario}</span>;

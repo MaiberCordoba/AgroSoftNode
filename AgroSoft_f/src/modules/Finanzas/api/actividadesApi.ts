@@ -2,12 +2,13 @@ import apiClient from "@/api/apiClient";
 import { Actividades } from "../types";
 
 export const getActividades = async (): Promise<Actividades[]> => {
-  const response = await apiClient.get("actividades/")
-  return response.data
-}
+  const response = await apiClient.get("actividades");
+  // Aquí está el cambio clave: accedemos a response.data.rows
+  return response.data.rows;
+};
 
 export const postActividad = async (actividadesData: Partial<Actividades>): Promise<Actividades> => {
-  const response = await apiClient.post("actividades/", actividadesData);
+  const response = await apiClient.post("actividades", actividadesData);
   return response.data;
 };
 

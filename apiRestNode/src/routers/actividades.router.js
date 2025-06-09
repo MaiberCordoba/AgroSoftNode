@@ -3,9 +3,9 @@ import { createActividad, getAllActividad, graficoActividades, reporteCostoActiv
 import  verifyJWT  from "../middlewares/verifyJWT.middleware.js"
 
 const actividades = Router()
-actividades.get('/actividades',verifyJWT,getAllActividad)
-actividades.post('/actividades',verifyJWT,createActividad)
-actividades.patch('/actividades/:id',verifyJWT,updateActividad)
+actividades.get('/actividades',getAllActividad)
+actividades.post('/actividades',createActividad)
+actividades.patch('/actividades/:id',updateActividad)
 actividades.get('/reporteRentabilidad',reporteRentabilidad)
 actividades.get('/graficoActividades',graficoActividades)
 actividades.get('/reporteCostoActividad',reporteCostoActividad)

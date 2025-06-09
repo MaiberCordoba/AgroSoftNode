@@ -23,7 +23,7 @@ export const CrearVentasModal = ({ onClose }: CrearVentasModalProps) => {
     }
 
     mutate(
-      { fk_Cosecha,precioUnitario, fecha },
+      { fk_Cosechas,precioUnitario, fecha },
       {
         onSuccess: () => {
           onClose();
@@ -52,7 +52,7 @@ export const CrearVentasModal = ({ onClose }: CrearVentasModalProps) => {
       <Input
         label="Precio Unitario"
         type="number"
-        value={precioUnitario}
+        value={precioUnitario.toString()}
         onChange={(e) => setPrecioUnitario(Number(e.target.value))}
         required
       />

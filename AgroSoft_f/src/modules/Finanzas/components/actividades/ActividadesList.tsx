@@ -58,7 +58,7 @@ export function ActividadesList() {
         const cultivos = cultivo?.find((c) => c.id === item.fk_Cultivos);
         return <span>{cultivos ? cultivos.nombre : "No definido"}</span>;
       case "usuario":
-        const usuario = users?.find((c) => c.id === item.fk_Usuarios);
+        const usuario = users?.find((c) => c.identificacion === item.fk_Usuarios);
         return <span>{usuario ? usuario.nombre : "No definido"}</span>;
       case "titulo":
         return <span>{item.titulo}</span>;

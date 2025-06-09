@@ -3,7 +3,7 @@ import { UsosProductos } from "../types";
 
 export const getUsosProductos = async (): Promise<UsosProductos[]> => {
   const response = await apiClient.get("usosProductos/")
-  return response.data
+  return response.data.rows
 }
 
 export const postUsoProducto = async (UsosProductosData: Partial<UsosProductos>): Promise<UsosProductos> => {
