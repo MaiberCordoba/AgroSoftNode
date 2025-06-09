@@ -4,7 +4,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useGetEras } from '../hooks/eras/useGetEras';
 
-// Corrige el ícono por defecto de Leaflet (necesario para React)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -12,10 +11,21 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+
+
 const MapaEras = () => {
   const { data: eras, isLoading, error } = useGetEras();
 
-   const centroMapa = [1.892321, -76.090273]; 
+  const centroMapa = [1.892321, -76.090273]; 
 
   if (isLoading) return <div>Cargando...</div>;
   if (error) return <div>Error al cargar las eras: {error.message}</div>;
@@ -23,7 +33,7 @@ const MapaEras = () => {
   return (
     <MapContainer
       center={centroMapa}
-      zoom={26}
+      zoom={26} // Un zoom un poco más cercano si es posible
       style={{ height: '500px', width: '100%' }}
     >
       <TileLayer
@@ -32,7 +42,11 @@ const MapaEras = () => {
       />
       {eras &&
         eras.map((era) => (
-          <Marker key={era.fk_Lotes} position={[era.posY, era.posX]}>
+          <Marker 
+            key={era.fk_Lotes} 
+            position={[era.posY, era.posX]}
+            icon={redIcon} 
+          >
             <Popup>
               Era: {era.fk_Lotes} <br />
               Lat: {era.posY}, Lon: {era.posX}
