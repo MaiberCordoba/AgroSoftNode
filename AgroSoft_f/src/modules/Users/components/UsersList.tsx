@@ -9,6 +9,12 @@ import { User } from "../types";
 import EditarUserModal from "./EditarUsersModal";
 import { CrearUsersModal } from "./CrearUsersModal";
 import EliminarUserModal from "./EliminarUsersModal";
+import { Chip } from "@heroui/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfUsuarios } from "./ReportePdfUsuarios";
+import { Download } from "lucide-react";
+import { getTotalUsers } from "../api/usersApi";
+import { useQuery } from "@tanstack/react-query";
 
 
 export function UsersList() {
@@ -20,6 +26,11 @@ export function UsersList() {
     handleEditar 
   } = useEditarUsers();
   
+  const { data: totalUsers } = useQuery({
+    queryKey: ['userStats'],
+    queryFn: getTotalUsers
+  });
+
   const { 
     isOpen: isCreateModalOpen, 
     closeModal: closeCreateModal, 
@@ -35,14 +46,14 @@ export function UsersList() {
 
   const handleCrearNuevo = () => {
     handleCrear({ 
-      id: 0, 
       identificacion: 0, 
       nombre: "", 
       apellidos: "", 
       fechaNacimiento: "", 
       telefono: "", 
       correoElectronico: "", 
-      admin: false 
+      admin: false,
+      estado:"",
     });
   };
 
@@ -53,6 +64,7 @@ export function UsersList() {
     { name: "Apellidos", uid: "apellidos" },
     { name: "Email", uid: "correoElectronico" },
     { name: "Rol", uid: "admin" },
+    {name: "estado", uid: "estado"},
     { name: "Acciones", uid: "acciones" },
   ];
 
@@ -71,6 +83,15 @@ export function UsersList() {
             return <span>{item.correoElectronico}</span>;
         case "admin":
             return <span>{item.admin ? "Administrador" : "Usuario"}</span>;
+        case "estado":
+            return <Chip 
+            size="sm" 
+            className="capitalize"
+            variant="flat"
+            color={item.estado === "activo" ? "success" : "danger"} 
+          >
+            {item.estado}
+          </Chip>;
         case "acciones":
             return (
             <AccionesTabla
@@ -95,6 +116,28 @@ export function UsersList() {
         placeholderBusqueda="Buscar por nombre o email"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        opcionesEstado={[
+          { uid: "activo", nombre: "Activo" },
+          { uid: "inactivo", nombre: "Inactivo" }
+        ]}  
+
+        //prompt para descargar reportes
+        renderReporteAction={() => (  // ⚠️ Ya no pasamos "data", porque no la usaremos
+          <PDFDownloadLink
+            document={<ReportePdfUsuarios data={totalUsers || 0} />} // Solo el total
+            fileName="reporte_total_usuarios.pdf"
+          >
+            {({ loading }) => (
+              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                {loading ? (
+                  <Download className="h-4 w-4 animate-spin text-blue-500" />
+                ) : (
+                  <Download className="h-5 w-5 text-red-600" />
+                )}
+              </button>
+            )}
+          </PDFDownloadLink>
+        )}
       />
 
       {/* Modales */}

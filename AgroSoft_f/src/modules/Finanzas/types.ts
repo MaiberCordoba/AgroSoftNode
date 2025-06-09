@@ -77,3 +77,11 @@ export interface TiposDesechos {
     nombre : string,
     descripcion : string
 }
+
+export type ReporteVentas = {
+    Producto: string;
+    Cantidad: number;
+    PrecioProducto: number;
+    PrecioFinal: number;
+    FechaVenta: string;
+  };

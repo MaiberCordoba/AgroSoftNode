@@ -40,13 +40,18 @@ export interface UsoProductosControl {
     cantidadProducto: number;
 }
 
-export interface Controles{
+export interface Controles {
     id: number;
-    fk_Afeccion?: number;
-    fk_TipoControl?: number;
-    fecha: string;
+    fechaControl: string;
     descripcion: string;
-}
+    fk_Afeccion:  number;
+    fk_TipoControl: {
+        id: number;
+        nombre: string;
+        // Podés incluir más si querés
+      };
+ }
+  
 
 export enum EstadoAfeccion {
     Detectado = "Detectado",

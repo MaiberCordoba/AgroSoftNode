@@ -12,9 +12,9 @@ interface EditarSemilleroModalProps {
 
 const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, onClose }) => {
   const [unidades, setUnidades] = useState<number>(semillero.unidades);
-  const [fechasiembra, setFechaSiembra] = useState<string>(semillero.fechasiembra);
-  const [fechaestimada, setFechaEstimada] = useState<string>(semillero.fechaestimada);
-  const [fk_especie, setFk_Especie] = useState<number>(semillero.fk_especie);
+  const [fechaSiembra, setFechaSiembra] = useState<string>(semillero.fechaSiembra.split("T")[0]); // solo YYYY-MM-DD
+  const [fechaEstimada, setFechaEstimada] = useState<string>(semillero.fechaEstimada.split("T")[0]);
+  const [fk_Especies, setFk_Especie] = useState<number>(semillero.fk_Especies);
 
   const { mutate, isPending } = usePatchSemilleros();
   const { data: especies, isLoading: isLoadingEspecies } = useGetEspecies();
@@ -25,14 +25,18 @@ const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, 
         id: semillero.id,
         data: {
           unidades,
-          fechasiembra,
-          fechaestimada,
-          fk_especie,
+          fechaSiembra,
+          fechaEstimada,
+          fk_Especies,
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
+          console.log("Actualizado correctamente:", res);
           onClose();
+        },
+        onError: (err) => {
+          console.error("Error al actualizar:", err);
         },
       }
     );
@@ -58,16 +62,18 @@ const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, 
         type="number"
         onChange={(e) => setUnidades(Number(e.target.value))}
       />
+
       <Input
-        value={fechasiembra}
         label="Fecha de Siembra"
         type="date"
+        value={fechaSiembra}
         onChange={(e) => setFechaSiembra(e.target.value)}
       />
+
       <Input
-        value={fechaestimada}
         label="Fecha Estimada"
         type="date"
+        value={fechaEstimada}
         onChange={(e) => setFechaEstimada(e.target.value)}
       />
 
@@ -77,10 +83,10 @@ const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, 
         <Select
           label="Especie"
           placeholder="Selecciona una especie"
-          selectedKeys={fk_especie ? [fk_especie.toString()] : []}
+          selectedKeys={[fk_Especies.toString()]}
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0];
-            setFk_Especie(Number(selectedKey));
+            const selected = Array.from(keys)[0];
+            setFk_Especie(Number(selected));
           }}
         >
           {(especies || []).map((especie) => (

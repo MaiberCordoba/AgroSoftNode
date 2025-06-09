@@ -9,6 +9,11 @@ import { CrearAfeccionModal } from "./CrearAfeccionModal";
 import EliminarAfeccionModal from "./EliminarAfeccion";
 import { Afecciones } from "../../types";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfAfecciones } from "./ReportePdfAfecciones";
+import { Download } from "lucide-react";
+
+
 export function AfeccionesList() {
   const { data, isLoading, error } = useGetAfecciones();
   const { 
@@ -77,6 +82,34 @@ export function AfeccionesList() {
         placeholderBusqueda="Buscar por nombre"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+
+        renderReporteAction={(afeccionesData) => {
+          const datosPDF = afeccionesData.map((item: Afecciones) => ({
+            nombre: item.nombre,
+            descripcion: item.descripcion,
+            tipo: item.tipoPlaga?.nombre || "No definido",
+          }));
+      
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfAfecciones data={datosPDF} />}
+              fileName="reporte_afecciones.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-green-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
       />
 
       {/* Modales */}

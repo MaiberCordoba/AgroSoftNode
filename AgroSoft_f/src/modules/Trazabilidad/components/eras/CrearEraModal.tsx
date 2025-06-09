@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { usePostEras } from "../../hooks/eras/usePostEras"; // Hook para registrar eras
-import { useGetLotes } from "../../hooks/lotes/useGetLotes"; // Hook para obtener lotes
+import { usePostEras } from "../../hooks/eras/usePostEras";
+import { useGetLotes } from "../../hooks/lotes/useGetLotes";
 import ModalComponent from "@/components/Modal";
 import { Input, Select, SelectItem } from "@heroui/react";
 
@@ -9,29 +9,35 @@ interface CrearEraModalProps {
 }
 
 export const CrearEraModal = ({ onClose }: CrearEraModalProps) => {
-  const [fk_lote_id, setFkLoteId] = useState<number | null>(null);
-  const [tipo, setTipo] = useState<string>("");
+  const [fk_Lotes, setFkLoteId] = useState<number | null>(null);
   const [tamX, setTamX] = useState<number | null>(null);
   const [tamY, setTamY] = useState<number | null>(null);
   const [posX, setPosX] = useState<number | null>(null);
   const [posY, setPosY] = useState<number | null>(null);
+  const [estado, setEstado] = useState<boolean>(true); // Por defecto "Disponible"
 
   const { mutate, isPending } = usePostEras();
   const { data: lotes, isLoading: isLoadingLotes } = useGetLotes();
 
   const handleSubmit = () => {
-    if (fk_lote_id === null || tipo.trim() === "" || tamX === null || tamY === null || posX === null || posY === null) {
+    if (
+      fk_Lotes === null ||
+      tamX === null ||
+      tamY === null ||
+      posX === null ||
+      posY === null
+    ) {
       console.error("⚠️ Error: Todos los campos son obligatorios.");
       return;
     }
 
     const payload = {
-      fk_lote_id,
-      tipo,
+      fk_Lotes,
       tamX,
       tamY,
       posX,
       posY,
+      estado,
     };
 
     console.log("Enviando payload:", payload);
@@ -40,11 +46,11 @@ export const CrearEraModal = ({ onClose }: CrearEraModalProps) => {
       onSuccess: () => {
         onClose();
         setFkLoteId(null);
-        setTipo("");
         setTamX(null);
         setTamY(null);
         setPosX(null);
         setPosY(null);
+        setEstado(true);
       },
     });
   };
@@ -69,7 +75,7 @@ export const CrearEraModal = ({ onClose }: CrearEraModalProps) => {
         <Select
           label="Lote"
           placeholder="Selecciona un lote"
-          selectedKeys={fk_lote_id !== null ? [fk_lote_id.toString()] : []}
+          selectedKeys={fk_Lotes !== null ? [fk_Lotes.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFkLoteId(selectedKey ? Number(selectedKey) : null);
@@ -83,12 +89,17 @@ export const CrearEraModal = ({ onClose }: CrearEraModalProps) => {
         </Select>
       )}
 
-      <Input
-        label="Tipo"
-        value={tipo}
-        onChange={(e) => setTipo(e.target.value)}
-        required
-      />
+      <Select
+        label="Estado"
+        selectedKeys={[estado.toString()]}
+        onSelectionChange={(keys) => {
+          const selectedKey = Array.from(keys)[0];
+          setEstado(selectedKey === "true");
+        }}
+      >
+        <SelectItem key="true">Disponible</SelectItem>
+        <SelectItem key="false">Ocupado</SelectItem>
+      </Select>
 
       <Input
         label="Tamaño X"

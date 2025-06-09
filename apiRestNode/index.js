@@ -48,10 +48,6 @@ import rutaUsoProductoControl from "./src/routers/usoProductoControl.router.js";
 import usuariosRouter from './src/routers/usuarios.router.js';
 import pasantesRouter from './src/routers/pasantes.router.js';
 import evapotranspiraciones from './src/routers/evapotranspiraciones.router.js';
-import temperaturas from './src/routers/temperaturas.router.js';
-import iluminaciones from './src/routers/iluminaciones.router.js';
-import precipitaciones from './src/routers/precipitaciones.router.js';
-import velocidadViento from './src/routers/velocidadViento.router.js';
 import cosechas from './src/routers/cosechas.router.js';
 import desechos from './src/routers/desechos.router.js';
 import especies from './src/routers/especies.router.js';
@@ -61,8 +57,6 @@ import tiposEspecie from './src/routers/tiposEspecie.router.js';
 import ventas from './src/routers/ventas.router.js';
 import eras from './src/routers/eras.router.js'
 import lotes from './src/routers/lotes.router.js'
-import pHs from './src/routers/pHs.router.js'
-import humedadTerreno from './src/routers/humedadTerreno.router.js'
 import cultivos from './src/routers/cultivos.router.js'
 import plantaciones from './src/routers/plantaciones.router.js'
 import herramientas from './src/routers/herramientas.router.js'
@@ -70,7 +64,8 @@ import insumos from './src/routers/insumos.router.js';
 import usosHerramientas from './src/routers/usosHerramientas.router.js';
 import usosProductos from './src/routers/usosProductos.js';
 import actividades from './src/routers/actividades.router.js';
-import humedadAmbiental from "./src/routers/humedadAmbiental.router.js";
+import sensores from './src/routers/sensores.router.js'
+import umbral from './src/routers/umbral.router.js'
 
 
 app.use(docs);
@@ -90,15 +85,9 @@ app.use(usuariosRouter);
 app.use(pasantesRouter);
 app.use(eras)
 app.use(lotes)
-app.use(pHs)
-app.use(humedadTerreno)
 app.use(cultivos)
 app.use(plantaciones)
 app.use(evapotranspiraciones);
-app.use(iluminaciones)
-app.use(precipitaciones)
-app.use(temperaturas)
-app.use(velocidadViento)
 app.use(rutaTipoPlaga);
 app.use(rutaPlagas);
 app.use(rutaAfecciones);
@@ -106,7 +95,8 @@ app.use(rutaTiposControl);
 app.use(rutaControles);
 app.use(rutaProductosControl);
 app.use(rutaUsoProductoControl);
-app.use(humedadAmbiental);
+app.use(sensores)
+app.use(umbral)
 
 //404
 app.use((req, res) => {

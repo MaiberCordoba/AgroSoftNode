@@ -29,10 +29,10 @@ export const listarPlagas = async (req, resp) => {
 
 export const registrarPlagas = async (req, resp) => {
   try {
-    const { fk_TiposPlaga, nombre, descripcion, img } = req.body;
+    const { fk_Tipo, nombre, descripcion, img } = req.body;
     const sql = `insert into plagas (fk_TiposPlaga,nombre,descripcion,img) values (?,?,?,?)`;
     const [rows] = await pool.query(sql, [
-      fk_TiposPlaga,
+      fk_Tipo,
       nombre,
       descripcion,
       img,
