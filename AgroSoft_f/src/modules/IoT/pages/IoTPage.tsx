@@ -15,9 +15,12 @@ import { UmbralLista } from "../components/umbral/UmbralListar";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Umbral } from "../types/sensorTypes";
+import ReporteModal from "../components/sensor/ReporteModal";
+import "./IoTPages.css"; // Archivo CSS adicional
 
 export default function IoTPages() {
   const navigate = useNavigate();
+  const [isReporteModalOpen, setIsReporteModalOpen] = useState(false);
 
   const [sensoresData, setSensoresData] = useState<Record<string, string>>({
     viento: "Cargando...",
@@ -112,12 +115,12 @@ export default function IoTPages() {
   }, [umbrales]);
 
   const sensoresList = [
-    { id: "viento", title: "Viento", icon: <WiStrongWind size={32} /> },
-    { id: "temperatura", title: "Temperatura", icon: <WiThermometer size={32} /> },
-    { id: "luzSolar", title: "Luz Solar", icon: <WiDayCloudy size={32} /> },
-    { id: "humedad", title: "Humedad", icon: <WiRaindrop size={32} /> },
-    { id: "humedadAmbiente", title: "H. Ambiente", icon: <WiHumidity size={32} /> },
-    { id: "lluvia", title: "Lluvia", icon: <WiRain size={32} /> },
+    { id: "viento", title: "Viento", icon: <WiStrongWind size={32} style={{ color: "#5DADE2" }}/> },
+    { id: "temperatura", title: "Temperatura", icon: <WiThermometer size={32} style={{ color: "#E74C3C" }} /> },
+    { id: "luzSolar", title: "Luz Solar", icon: <WiDayCloudy size={32} style={{ color: "#F1C40F" }} /> },
+    { id: "humedad", title: "Humedad", icon: <WiRaindrop size={32} style={{ color: "#3498DB" }} /> },
+    { id: "humedadAmbiente", title: "H. Ambiente", icon: <WiHumidity size={32} style={{ color: "#76D7C4" }} /> },
+    { id: "lluvia", title: "Lluvia", icon: <WiRain size={32} style={{ color: "#2980B9" }} /> },
   ];
 
   const sensoresFiltrados = sensoresList.filter((sensor) =>
@@ -125,41 +128,65 @@ export default function IoTPages() {
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
-      <div className="flex gap-2 w-full max-w-md">
-        <Input
-          placeholder="Filtrar Sensores..."
-          type="text"
-          value={searchId}
-          onChange={(e) => setSearchId(e.target.value)}
-        />
-      </div>
-      <br /><br />
-      <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto">
-        {sensoresFiltrados.length > 0 ? (
-          sensoresFiltrados.map((sensor) => (
-            <SensorCard
-              key={sensor.id}
-              icon={sensor.icon}
-              title={sensor.title}
-              value={sensoresData[sensor.id] ?? "Cargando..."}
-              onClick={() => navigate(`/sensores/${sensor.id}`)}
+    <div className="relative">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
+        <div className="flex gap-4 items-center w-full mb-8">
+          <div className="flex-1 min-w-[200px] max-w-sm"> {/* Mínimo y máximo */}
+            <Input
+              placeholder="Filtrar Sensores..."
+              type="text"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              fullWidth
             />
-          ))
-        ) : (
-          <p className="text-gray-500 col-span-full">No se encontraron sensores</p>
-        )}
+          </div>
+          
+          <Button 
+            onClick={() => setIsReporteModalOpen(true)}
+            color="success" variant="light"
+            className="px-8 py-3 text-lg whitespace-nowrap"
+          >
+            Generar Reporte
+          </Button>
+</div>
+        <div className="h-8" />
+        <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto col-span-full">
+          {sensoresFiltrados.length > 0 ? (
+            sensoresFiltrados.map((sensor) => (
+              <SensorCard
+                key={sensor.id}
+                icon={sensor.icon}
+                title={sensor.title}
+                value={sensoresData[sensor.id] ?? "Cargando..."}
+                onClick={() => navigate(`/sensores/${sensor.id}`)}
+              />
+            ))
+          ) : (
+            <p className="text-gray-500 col-span-full text-center">No se encontraron sensores</p>
+          )}
+        </div>
+        <div className="h-8" />
+        <div className="mt-12 text-center col-span-full">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
+          <SensorLista />
+        </div>
+        <div className="h-8" />
+        <div className="mt-12 text-center col-span-full">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Umbrales de los sensores</h2>
+          <UmbralLista />
+        </div>
       </div>
-      <br /><br /><br />
-      <div className="mt-12 text-center">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
-        <SensorLista />
-      </div>
-<br /><br />
-      <div className="mt-12 text-center">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-4">Umbrales de los sensores</h2>
-        <UmbralLista />
-      </div>
+      
+      {/* Modal personalizado para el reporte */}
+      {isReporteModalOpen && (
+        <div className="reporte-modal-overlay">
+          <div className="reporte-modal-container">
+            <ReporteModal 
+              onClose={() => setIsReporteModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
