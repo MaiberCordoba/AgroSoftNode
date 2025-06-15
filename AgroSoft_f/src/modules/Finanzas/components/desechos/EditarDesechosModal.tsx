@@ -14,8 +14,8 @@ interface EditarDesechoModalProps {
 const EditarDesechoModal: React.FC<EditarDesechoModalProps> = ({ desecho, onClose }) => {
   const [nombre, setNombre] = useState<string>(desecho.nombre);
   const [descripcion, setDescripcion] = useState<string>(desecho.descripcion);
-  const [fk_Cultivos, setFk_Cultivo] = useState<number>(desecho.cultivo.id);  // Estado para el ID del cultivo
-  const [fk_TiposDesecho, setFk_TipoDesecho] = useState<number>(desecho.tipoDesecho.id); // Estado para el ID del tipo de desecho
+  const [fk_Cultivos, setFk_Cultivo] = useState<number>(desecho.fk_Cultivos || 0);  // Estado para el ID del cultivo
+  const [fk_TiposDesecho, setFk_TipoDesecho] = useState<number>(desecho.fk_TiposDesecho || 0); // Estado para el ID del tipo de desecho
 
   const { data: tiposDesechos, isLoading: isLoadingTiposDesechos } = useGetTiposDesechos();  // Obtener los tipos de desechos
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();  // Obtener los cultivos
@@ -82,7 +82,7 @@ const EditarDesechoModal: React.FC<EditarDesechoModalProps> = ({ desecho, onClos
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo.id.toString()}>
+            <SelectItem key={cultivo.id}>
               {cultivo.nombre}
             </SelectItem>
           ))}

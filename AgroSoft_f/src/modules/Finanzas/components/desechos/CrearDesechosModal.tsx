@@ -83,7 +83,7 @@ export const CrearDesechosModal = ({ onClose }: CrearDesechosModalProps) => {
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo.id.toString()}>
+            <SelectItem key={cultivo.id}>
               {cultivo.nombre}
             </SelectItem>
           ))}
