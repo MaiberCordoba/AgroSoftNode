@@ -2,30 +2,41 @@ import pool from "../db.js";
 
 export const listarPlagas = async (req, resp) => {
   try {
-    const [result] =
-      await pool.query(`select p.nombre, p.descripcion, p.img, p.fk_TiposPlaga as id_tipo_plaga, tp.nombre as tipo_plaga, tp.descripcion as descipcion_tipo_plaga, tp.img as imagen_tipo_plaga
-       from plagas p join tiposplaga tp on p.fk_TiposPlaga = tp.id`);
-    if (result.length > 0) {
-      const plagas = result.map((plaga) => ({
-        nombre: plaga.nombre,
-        descripcion: plaga.descripcion,
-        img: plaga.img,
-        tipoPlaga: {
-          id: plaga.id_tipo_plaga,
-          nombre: plaga.tipo_plaga,
-          descripcion: plaga.descripcion_tipo_plaga,
-          img: plaga.imagen_tipo_plaga,
-        },
-      }));
-      return resp.status(200).json(plagas);
-    } else {
-      return resp.status(404).json({ message: "plaga no encontrados" });
-    }
+    const [result] = await pool.query(`
+      SELECT 
+        p.id,  -- << AQUI AGREGO EL ID
+        p.nombre, 
+        p.descripcion, 
+        p.img, 
+        p.fk_TiposPlaga AS id_tipo_plaga, 
+        tp.nombre AS tipo_plaga, 
+        tp.descripcion AS descripcion_tipo_plaga, 
+        tp.img AS imagen_tipo_plaga
+      FROM plagas p 
+      JOIN tiposplaga tp ON p.fk_TiposPlaga = tp.id
+    `);
+
+    const plagas = result.map((plaga) => ({
+      id: plaga.id, // << AQUI LO MAPEO
+      nombre: plaga.nombre,
+      descripcion: plaga.descripcion,
+      img: plaga.img,
+      tipoPlaga: {
+        id: plaga.id_tipo_plaga,
+        nombre: plaga.tipo_plaga,
+        descripcion: plaga.descripcion_tipo_plaga,
+        img: plaga.imagen_tipo_plaga,
+      },
+    }));
+
+    return resp.status(200).json(plagas);
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
+
+
 
 export const registrarPlagas = async (req, resp) => {
   try {

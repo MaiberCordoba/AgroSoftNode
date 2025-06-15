@@ -12,7 +12,7 @@ export const postTipoAfecciones = async (data?:any):Promise<TiposAfecciones> => 
 }
 
 export const patchTipoAfecciones = async ( id: number, data: Partial<TiposAfecciones>): Promise<TiposAfecciones> => {
-    const response = await apiClient.patch<TiposAfecciones>(`tipoPlaga/${id}/`, data);
+    const response = await apiClient.put<TiposAfecciones>(`tipoPlaga/${id}`, data);
     return response.data;
   };
 

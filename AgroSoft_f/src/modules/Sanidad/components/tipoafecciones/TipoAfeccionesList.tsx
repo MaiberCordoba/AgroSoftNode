@@ -89,14 +89,14 @@ export function TipoAfeccionesList() {
           onClose={closeCreateModal}
         />
       )}
-
+{/*
       {isDeleteModalOpen && tipoafeccionEliminada && (
         <EliminarTipoAfeccionModal
           tipoAfeccion={tipoafeccionEliminada}
           isOpen={isDeleteModalOpen}
           onClose={closeDeleteModal}
         />
-      )}
+      )}*/}
     </div>
   );
 }

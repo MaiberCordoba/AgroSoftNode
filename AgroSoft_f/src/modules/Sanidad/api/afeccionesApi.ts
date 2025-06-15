@@ -12,7 +12,7 @@ export const postAfecciones = async (data?:any):Promise<Afecciones> => {
 }
 
 export const patchAfecciones = async ( id: number, data: Partial<Afecciones>): Promise<Afecciones> => {
-    const response = await apiClient.patch<Afecciones>(`plaga/${id}/`, data);
+    const response = await apiClient.put<Afecciones>(`plaga/${id}`, data);
     return response.data;
   };
 

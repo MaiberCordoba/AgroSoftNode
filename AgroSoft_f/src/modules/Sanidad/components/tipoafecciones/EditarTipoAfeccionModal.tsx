@@ -24,6 +24,7 @@ const EditarTipoAfeccionModal: React.FC<EditarTipoAfeccionesModalProps> = ({ tip
         data: {
           nombre,
           descripcion,
+          img: imagen, 
           
         },
       },

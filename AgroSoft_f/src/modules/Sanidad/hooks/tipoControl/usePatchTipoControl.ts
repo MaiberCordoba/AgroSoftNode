@@ -8,14 +8,9 @@ export const usePatchTipoControl = () => {
 
   return useMutation<TipoControl, Error, { id: number; data: Partial<TipoControl> }>({
     mutationFn: ({ id, data }) => patchTipoControl(id, data),
-    onSuccess: (updatedTipoControl, variables) => {
-      // Actualiza la caché después de una mutación exitosa
-      queryClient.setQueryData<TipoControl[]>(['TipoControl'], (oldData) => {
-        if (!oldData) return oldData;
-        return oldData.map((tipoControl) =>
-          tipoControl.id === variables.id ? { ...tipoControl, ...updatedTipoControl } : tipoControl
-        );
-      });
+    onSuccess: () => {
+      // Invalida la query para forzar un refetch automático
+      queryClient.invalidateQueries(['TipoControl']);
 
       // Toast de éxito
       addToast({
