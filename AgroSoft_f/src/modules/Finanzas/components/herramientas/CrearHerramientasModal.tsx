@@ -9,22 +9,22 @@ interface CrearHerramientasModalProps {
 }
 
 export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps) => {
-  const [fk_Lote, setFk_Lote] = useState<number | null>(null);
+  const [fk_Lotes, setFk_Lote] = useState<number | null>(null);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [unidades, setUnidades] = useState<number>(0);
+  const [unidades, setUnidades] = useState(0);
 
   const { data: lotes, isLoading: isLoadingLotes } = useGetLotes();
   const { mutate, isPending } = usePostHerramienta();
 
   const handleSubmit = () => {
-    if (!fk_Lote || !nombre.trim() || !descripcion.trim() || unidades <= 0) {
+    if (!fk_Lotes || !nombre.trim() || !descripcion.trim() || unidades <= 0) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fk_Lote, unidades, nombre, descripcion },
+      { fk_Lotes, unidades, nombre, descripcion },
       {
         onSuccess: () => {
           onClose();
@@ -70,7 +70,7 @@ export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps)
       <Input
         label="Unidades"
         type="number"
-        value={unidades}
+        value={unidades.toString()}
         onChange={(e) => setUnidades(e.target.value ? Number(e.target.value) : 0)}
         required
       />
@@ -82,14 +82,14 @@ export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps)
         <Select
           label="Lote"
           placeholder="Selecciona un Lote"
-          selectedKeys={fk_Lote?.toString() ? [fk_Lote.toString()] : []}
+          selectedKeys={fk_Lotes?.toString() ? [fk_Lotes.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Lote(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(lotes || []).map((lote) => (
-            <SelectItem key={lote.id.toString()}>
+            <SelectItem key={lote?.id.toString()}>
               {lote.nombre}
             </SelectItem>
           ))}

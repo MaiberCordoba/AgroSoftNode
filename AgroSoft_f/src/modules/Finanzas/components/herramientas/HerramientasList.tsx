@@ -1,12 +1,10 @@
 import { useGetHerramientas } from "../../hooks/herramientas/useGetHerramientas";
 import { useEditarHerramienta } from "../../hooks/herramientas/useEditarHerramientas";
 import { useCrearHerramienta } from "../../hooks/herramientas/useCrearHerramientas";
-import { useEliminarHerramienta } from "../../hooks/herramientas/useEliminarHerramientas";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarHerramientasModal from "./EditarHerramientasModal";
 import { CrearHerramientasModal } from "./CrearHerramientasModal";
-import EliminarHerramientaModal from "./EliminarHerramientas";
 import { Herramientas } from "../../types";
 import { useGetLotes } from "@/modules/Trazabilidad/hooks/lotes/useGetLotes";
 
@@ -26,16 +24,9 @@ export function HerramientasList() {
     closeModal: closeCreateModal, 
     handleCrear 
   } = useCrearHerramienta();
-  
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    herramientaEliminada,
-    handleEliminar
-  } = useEliminarHerramienta();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Lote: 0, nombre: "", descripcion: "", unidades: 0 });
+    handleCrear({ id: 0, fk_Lotes: 0, nombre: "", descripcion: "", unidades: 0 });
   };
 
   // Definición de columnas movida aquí
@@ -63,7 +54,6 @@ export function HerramientasList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -100,13 +90,6 @@ export function HerramientasList() {
         />
       )}
 
-      {isDeleteModalOpen && herramientaEliminada && (
-        <EliminarHerramientaModal
-          herramienta={herramientaEliminada}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-        />
-      )}
     </div>
   );
 }
