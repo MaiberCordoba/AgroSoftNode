@@ -61,7 +61,7 @@ export function AfeccionesList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            
           />
         );
       default:

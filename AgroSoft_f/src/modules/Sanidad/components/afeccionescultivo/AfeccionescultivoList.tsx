@@ -57,7 +57,7 @@ export function AfeccionesCultivoList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            
           />
         );
       default:

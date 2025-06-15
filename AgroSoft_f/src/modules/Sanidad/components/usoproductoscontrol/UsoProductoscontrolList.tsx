@@ -84,7 +84,7 @@ export function UsoProductosControlList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            
           />
         );
 
