@@ -6,6 +6,6 @@ const ventas = Router()
 ventas.get("/ventas",verifyJWT,getAllVentas)
 ventas.get("/reporteVentas",registroVentas)
 ventas.post("/ventas",verifyJWT,createVentas)
-ventas.put("/ventas/:id",verifyJWT,updateVentas)
+ventas.patch("/ventas/:id",verifyJWT,updateVentas)
 
 export default ventas;
