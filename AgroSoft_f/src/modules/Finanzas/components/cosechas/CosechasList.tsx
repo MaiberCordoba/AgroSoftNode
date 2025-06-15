@@ -1,12 +1,10 @@
 import { useGetCosechas } from "../../hooks/cosechas/useGetCosechas";
 import { useEditarCosecha } from "../../hooks/cosechas/useEditarCosechas";
 import { useCrearCosecha } from "../../hooks/cosechas/useCrearCosechas";
-import { useEliminarCosecha } from "../../hooks/cosechas/useEliminarCosechas";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarCosechasModal from "./EditarCosechasModal";
 import { CrearCosechasModal } from "./CrearCosechasModal";
-import EliminarCosechasModal from "./EliminarCosechas";
 import { Cosechas } from "../../types";
 import { useGetCultivos } from "@/modules/Trazabilidad/hooks/cultivos/useGetCultivos";
 
@@ -26,16 +24,9 @@ export function CosechasList() {
     closeModal: closeCreateModal, 
     handleCrear 
   } = useCrearCosecha();
-  
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    cosechaEliminada,
-    handleEliminar
-  } = useEliminarCosecha();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Cultivo: 0,unidades: 0, fecha: ""});
+    handleCrear({ id: 0, fk_Cultivos: 0,unidades: 0, fecha: ""});
   };
 
   // Definición de columnas movida aquí
@@ -50,7 +41,7 @@ export function CosechasList() {
   const renderCell = (item: Cosechas, columnKey: React.Key) => {
     switch (columnKey) {
       case "cultivo":
-        const cultivos = cultivo?.find((c) => c.id === item.fk_Cultivo);
+        const cultivos = cultivo?.find((c) => c.id === item.fk_Cultivos);
         return <span>{cultivos ? cultivos.nombre : "No definido"}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;
@@ -60,7 +51,6 @@ export function CosechasList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -94,14 +84,6 @@ export function CosechasList() {
       {isCreateModalOpen && (
         <CrearCosechasModal
           onClose={closeCreateModal}
-        />
-      )}
-
-      {isDeleteModalOpen && cosechaEliminada && (
-        <EliminarCosechasModal
-          cosecha={cosechaEliminada}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
         />
       )}
     </div>
