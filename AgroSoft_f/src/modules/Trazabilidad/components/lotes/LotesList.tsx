@@ -83,7 +83,6 @@ export function LoteList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:

@@ -81,7 +81,6 @@ export function CultivosList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
