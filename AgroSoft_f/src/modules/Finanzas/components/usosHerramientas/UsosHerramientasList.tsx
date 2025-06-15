@@ -1,7 +1,6 @@
 import { useGetUsosHerramientas } from "../../hooks/usosHerramientas/useGetUsosHerramientas";
 import { useEditarUsoHerramienta } from "../../hooks/usosHerramientas/useEditarUsosHerramientas";
 import { useCrearUsosHerramienta } from "../../hooks/usosHerramientas/useCrearUsosHerramientas";
-import { useEliminarUsoHerramienta } from "../../hooks/usosHerramientas/useEliminarUsosHerramientas";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarUsosHerramientasModal from "./EditarUsosHerramientasModal";
@@ -27,16 +26,9 @@ export function UsosHerramientasList() {
     closeModal: closeCreateModal, 
     handleCrear 
   } = useCrearUsosHerramienta();
-  
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    usoHerramientaEliminada,
-    handleEliminar
-  } = useEliminarUsoHerramienta();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Herramientas: 0, fk_Actividad: 0 });
+    handleCrear({ id: 0, fk_Herramientas: 0, fk_Actividades: 0 });
   };
 
   // Definición de columnas
@@ -59,7 +51,6 @@ export function UsosHerramientasList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -94,13 +85,6 @@ export function UsosHerramientasList() {
         <CrearUsoHerramientaModal onClose={closeCreateModal} />
       )}
 
-      {isDeleteModalOpen && usoHerramientaEliminada && (
-        <EliminarUsosHerramientasModal
-          usoHerramienta={usoHerramientaEliminada}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-        />
-      )}
     </div>
   );
 }
