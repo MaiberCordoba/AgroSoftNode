@@ -7,12 +7,11 @@ import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarCultivoModal from "./EditarCultivosModal";
 import { CrearCultivoModal } from "./CrearCultivosModal";
 import EliminarCultivoModal from "./EliminarCultivo";
-import { Cultivos } from "../../types";
 import { useGetEspecies } from "../../hooks/especies/useGetEpecies";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import logo from "../../../../../public/sena.png";
-import { Button } from "@heroui/react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfCultivos } from "./ReportePdfCultivos";
+import { Download } from "lucide-react";
+import { Cultivos } from "../../types";
 
 function formatDate(fecha: string) {
   return new Date(fecha).toISOString().split("T")[0];
@@ -51,49 +50,6 @@ export function CultivosList() {
       fechaSiembra: "",
       activo: true,
     });
-  };
-
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-
-    // Logo
-    const imgProps = doc.getImageProperties(logo);
-    const logoWidth = 30;
-    const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
-    doc.addImage(logo, "PNG", 10, 10, logoWidth, logoHeight);
-
-    // Encabezado
-    doc.setFontSize(16);
-    doc.text("AgroSoft - SENA", 50, 20);
-    doc.setFontSize(12);
-    doc.text("Reporte de Cultivos", 50, 28);
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 50, 34);
-
-    // Tabla
-    const rows = (data || []).map((item) => [
-      item.id,
-      item.nombre,
-      especies?.find((e) => e.id === item.fk_Especies)?.nombre || "Desconocida",
-      item.unidades,
-      formatDate(item.fechaSiembra),
-      item.activo ? "Sí" : "No",
-    ]);
-
-    autoTable(doc, {
-      startY: 50,
-      head: [["ID", "Nombre", "Especie", "Unidades", "Fecha de Siembra", "Activo"]],
-      body: rows,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [46, 204, 113] }, // Rojo estilo "Agregar"
-      theme: "striped",
-    });
-
-    const finalY = (doc as any).lastAutoTable?.finalY || 70;
-    doc.setFontSize(10);
-    doc.text(`Total de registros: ${(data || []).length}`, 14, finalY + 10);
-
-    doc.save("reporte_cultivos.pdf");
   };
 
   const columnas = [
@@ -137,7 +93,7 @@ export function CultivosList() {
   if (error) return <p>Error al cargar los cultivos</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -145,22 +101,36 @@ export function CultivosList() {
         placeholderBusqueda="Buscar por ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
-      />
+        renderReporteAction={(datos) => {
+          const datosConNombreEspecie = datos.map((item) => {
+            const especie = especies?.find((e) => e.id === item.fk_Especies);
+            return {
+              ...item,
+              nombreEspecie: especie ? especie.nombre : "Desconocida",
+            };
+          });
 
-      <div className="mt-4">
-        <Button
-          onClick={handleExportPDF}
-          style={{
-            backgroundColor: "rgba(239, 68, 68, 0.2)",
-            color: "#b91c1c",
-            padding: "0.5rem 1rem",
-            borderRadius: "0.5rem",
-            fontWeight: "500",
-          }}
-        >
-          Exportar PDF
-        </Button>
-      </div>
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfCultivos data={datosConNombreEspecie} />}
+              fileName="reporte_cultivos.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-red-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
+      />
 
       {isEditModalOpen && CultivosEditada && (
         <EditarCultivoModal
