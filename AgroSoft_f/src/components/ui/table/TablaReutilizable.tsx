@@ -8,6 +8,7 @@ import {
   TableCell,
   Button,
   SortDescriptor,
+  addToast,
 } from "@heroui/react";
 import { useFiltrado } from "../../../hooks/useFiltrado";
 import { useFilasPorPagina } from "../../../hooks/useFilasPorPagina";
@@ -18,6 +19,7 @@ import { FilasPorPagina } from "./filasPorPagina";
 import { PaginacionTabla } from "./PaginacionTabla";
 import { PlusIcon } from "lucide-react";
 import { SelectorColumnas } from "./SelectorDeColumnas";
+import { useAuth } from "../../../hooks/UseAuth";
 
 interface TablaReutilizableProps<T extends { [key: string]: any }> {
   datos: T[];
@@ -46,6 +48,8 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
   initialVisibleColumns = columnas.map((c) => c.uid),
   botonExtra,
 }: TablaReutilizableProps<T>) => {
+  const { hasRole } = useAuth();
+
   const {
     valorFiltro,
     setValorFiltro,
@@ -81,6 +85,21 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [datosPaginados, sortDescriptor]);
+
+  // Función para manejar acciones restringidas
+  const restrictAction = (action: () => void) => {
+    return () => {
+      if (hasRole("visitante") || hasRole("aprendiz")) {
+        addToast({
+          title: "Acción no permitida",
+          description: "No tienes permisos para realizar esta acción",
+          color: "danger",
+        });
+        return;
+      }
+      action();
+    };
+  };
 
   return (
     <div className="w-full max-w-[1400px] flex flex-col gap-3 mx-auto p-4 bg-white rounded-lg shadow">
@@ -120,7 +139,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
                 color="success"
                 size="sm"
                 endContent={<PlusIcon size={16} />}
-                onPress={onCrearNuevo}
+                onPress={restrictAction(onCrearNuevo)}
                 className="text-white"
               >
                 Agregar
@@ -131,7 +150,7 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
                 color="success"
                 size="sm"
                 endContent={<PlusIcon size={16} />}
-                onPress={onRegistroMasivo}
+                onPress={restrictAction(onRegistroMasivo)}
                 className="text-white"
               >
                 Registro masivo
@@ -167,9 +186,15 @@ export const TablaReutilizable = <T extends { [key: string]: any }>({
                 <p className="text-gray-500 text-sm mb-2">
                   No se encontraron registros
                 </p>
-                <Button size="sm" variant="flat" onPress={onCrearNuevo}>
-                  Crear nuevo registro
-                </Button>
+                {onCrearNuevo && (
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    onPress={restrictAction(onCrearNuevo)}
+                  >
+                    Crear nuevo registro
+                  </Button>
+                )}
               </div>
             }
           >

@@ -1,3 +1,4 @@
+// Principal.tsx
 import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/Sidebar";
@@ -5,12 +6,13 @@ import { Footer } from "@/components/Footer";
 import { Outlet } from "react-router-dom";
 
 const Principal: React.FC = () => {
+  // isSidebarOpen ahora es el ÚNICO control para el estado del Sidebar.
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLDivElement>(null);
 
-  // Configuración Intersection Observer
+  // Configuración Intersection Observer (sin cambios relevantes)
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -19,7 +21,7 @@ const Principal: React.FC = () => {
       {
         root: null,
         threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px" // Margen negativo para detectar antes
+        rootMargin: "0px 0px -50px 0px",
       }
     );
 
@@ -36,36 +38,80 @@ const Principal: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className={`${isSidebarOpen ? 'w-48' : 'w-0'} fixed h-full z-20 transition-all duration-300`}>
-        <Sidebar isOpen={isSidebarOpen} />
+      {/* Navbar fijo */}
+      <div className="fixed top-0 w-full z-50 shadow-lg h-16 bg-sena-green">
+        <Navbar
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} // Navbar controla el Sidebar
+          onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          isMobileMenuOpen={isMobileMenuOpen}
+        />
       </div>
 
-      {/* Contenedor Principal */}
-      <div className={`flex flex-col flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-48' : 'ml-0'}`}>
-        {/* Navbar */}
-        <div className="sticky top-0 z-10">
-          <Navbar toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
-        </div>
+      {/* Sidebar de escritorio y móvil */}
 
-        {/* Contenido Principal */}
-        <main className="flex-1 pb-16"> {/* Padding para el footer */}
-          <div className="p-6">
-            <Outlet />
+      <div
+        className={`
+          fixed left-0 top-16 h-[calc(100vh-4rem)] z-40 transition-all duration-300
+          ${isSidebarOpen ? "w-48" : "w-20"}
+          hidden md:block 
+        `}
+      >
+        {/* Ya no pasamos isHovering ni onMouseEnter/onMouseLeave */}
+        <Sidebar
+          isOpen={isSidebarOpen}
+          // El Sidebar de escritorio también puede tener su propio botón de toggle si lo deseas,
+          // pero el comportamiento principal lo maneja el Navbar.
+          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        />
+      </div>
+
+      {/* Overlay para Sidebar móvil */}
+      <div
+        className={`md:hidden fixed inset-0 z-40 bg-black/50 transition-opacity
+          ${isSidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
+
+      {/* Sidebar móvil (siempre 'abierto' en su modo móvil) */}
+      <div
+        className={`
+          md:hidden fixed h-full z-50 transition-transform duration-300
+          ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          w-64 bg-white shadow-lg
+        `}
+      >
+        {/* Aquí isOpen siempre es true para el Sidebar móvil, su visibilidad la controla translate-x */}
+        <Sidebar isOpen={true} toggleSidebar={() => setIsSidebarOpen(false)} />
+      </div>
+
+      {/* Contenido Principal */}
+      <div
+        className={`
+          flex flex-col flex-1 mt-16
+          transition-all duration-300
+          ${isSidebarOpen ? "md:ml-48" : "md:ml-20"}
+          min-w-0 bg-[#f2f8f9]
+        `}
+      >
+        <main className="flex-1 pb-16 relative">
+          <div className="relative z-10 min-h-screen">
+            <div className="max-w-full overflow-x-hidden p-6">
+              <Outlet />
+            </div>
           </div>
-          {/* Sentinel (detector invisible) */}
-          <div ref={sentinelRef} className="h-px w-full" />
+          <div ref={sentinelRef} className="h-px w-full relative z-10" />
         </main>
       </div>
 
-      {/* Footer (siempre visible pero con transición) */}
+      {/* Footer */}
       <div
-        ref={footerRef}
-        className={`fixed bottom-0 left-0 right-0 transition-transform duration-500 ${
-          isSidebarOpen ? 'ml-48' : 'ml-0'
-        } ${
-          isFooterVisible ? 'translate-y-0' : 'translate-y-full'
-        }`}
+        className={`
+          fixed bottom-0 transition-transform duration-300
+          ${isFooterVisible ? "translate-y-0" : "translate-y-full"}
+          ${isSidebarOpen ? "md:left-48" : "md:left-20"}
+          right-0 left-0 md:left-20
+          z-20 w-auto
+        `}
       >
         <Footer isSidebarOpen={isSidebarOpen} />
       </div>

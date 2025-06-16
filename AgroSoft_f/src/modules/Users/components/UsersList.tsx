@@ -39,7 +39,6 @@ export function UsersList() {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     UsersEliminada,
-    handleEliminar,
   } = useEliminarUsers();
 
   const handleCrearNuevo = () => {
@@ -98,12 +97,7 @@ export function UsersList() {
           </Chip>
         );
       case "acciones":
-        return (
-          <AccionesTabla
-            onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
-          />
-        );
+        return <AccionesTabla onEditar={() => handleEditar(item)} />;
       default:
         return <span>{String(item[columnKey as keyof User])}</span>;
     }

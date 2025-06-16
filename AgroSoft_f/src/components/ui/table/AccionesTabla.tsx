@@ -6,7 +6,9 @@ import {
   DropdownItem,
   Button,
 } from "@heroui/react";
+import { addToast } from "@heroui/react";
 import { VerticalDotsIcon } from "./Icons";
+import { useAuth } from "@/hooks/UseAuth";
 
 interface AccionesTablaProps {
   onEditar: () => void;
@@ -23,6 +25,38 @@ export const AccionesTabla: React.FC<AccionesTablaProps> = ({
   permitirEliminar = true,
   onVerDetalles,
 }) => {
+  const { hasRole } = useAuth();
+
+  // Función para mostrar toast de permisos denegados
+  const showPermissionDeniedToast = () => {
+    addToast({
+      title: "Acción no permitida",
+      description: "No tienes permisos para realizar esta acción",
+      color: "danger",
+    });
+  };
+
+  // Envolver las funciones originales para verificar permisos
+  const handleEditar = () => {
+    if (hasRole("visitante") || hasRole("aprendiz")) {
+      showPermissionDeniedToast();
+      return;
+    }
+    if (permitirEditar) {
+      onEditar();
+    }
+  };
+
+  const handleEliminar = () => {
+    if (hasRole("visitante") || hasRole("aprendiz")) {
+      showPermissionDeniedToast();
+      return;
+    }
+    if (onEliminar && permitirEliminar) {
+      onEliminar();
+    }
+  };
+
   // Crear elementos de menú de forma condicional
   const menuItems = React.useMemo(() => {
     const items = [];
@@ -35,25 +69,33 @@ export const AccionesTabla: React.FC<AccionesTablaProps> = ({
       );
     }
 
+    // Mostrar "Editar" si permitirEditar es true, sin restringir por rol
     if (permitirEditar) {
       items.push(
-        <DropdownItem key="editar" onPress={onEditar}>
+        <DropdownItem key="editar" onPress={handleEditar}>
           Editar
         </DropdownItem>
       );
     }
 
-    // Solo agregar "Eliminar" si onEliminar está definido y permitirEliminar es true
+    // Mostrar "Eliminar" si onEliminar está definido y permitirEliminar es true, sin restringir por rol
     if (onEliminar && permitirEliminar) {
       items.push(
-        <DropdownItem key="eliminar" onPress={onEliminar}>
+        <DropdownItem key="eliminar" onPress={handleEliminar}>
           Eliminar
         </DropdownItem>
       );
     }
 
     return items;
-  }, [onVerDetalles, permitirEditar, permitirEliminar, onEditar, onEliminar]);
+  }, [
+    onVerDetalles,
+    permitirEditar,
+    permitirEliminar,
+    handleEditar,
+    handleEliminar,
+    onEliminar,
+  ]);
 
   // Si no hay acciones disponibles
   if (menuItems.length === 0) {
