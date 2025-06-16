@@ -4,21 +4,19 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config();
 
-// Lista válida de roles
 const VALID_ROLES = ["admin", "instructor", "pasante", "aprendiz", "visitante"];
 
-export async function getAll(req, res) {
+export const getAll = async (req, res) => {
   try {
-    const sql = "SELECT * FROM Usuarios";
-    const [usuarios] = await pool.query(sql);
+    const usuarios = await pool.usuario.findMany();
     res.status(200).json(usuarios);
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
   }
-}
+};
 
-export async function create(req, res) {
+export const create = async (req, res) => {
   try {
     const {
       identificacion,
@@ -28,53 +26,54 @@ export async function create(req, res) {
       telefono,
       correoElectronico,
       password,
-      rol,
-      estado,
+      rol = "visitante",
+      estado = "activo",
     } = req.body;
 
-    // Validar que el rol sea válido
-    if (rol && !VALID_ROLES.includes(rol)) {
+    if (!VALID_ROLES.includes(rol)) {
       return res.status(400).json({
         msg: "Rol inválido. Debe ser admin, instructor, pasante, aprendiz o visitante",
       });
     }
 
-    const sql =
-      "INSERT INTO Usuarios (identificacion, nombre, apellidos, fechaNacimiento, telefono, correoElectronico, passwordHash, rol, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     const passwordHash = await bcrypt.hash(password, 10);
-    const [result] = await pool.query(sql, [
-      identificacion,
-      nombre,
-      apellidos,
-      fechaNacimiento,
-      telefono,
-      correoElectronico,
-      passwordHash,
-      rol || "visitante",
-      estado,
-    ]);
-    if (result.affectedRows > 0) {
-      return res.status(201).json({ msg: "Usuario created successfully" });
-    }
-    res.status(400).json({ msg: "Error creating usuario" });
+
+    const nuevo = await pool.usuario.create({
+      data: {
+        identificacion: parseInt(identificacion),
+        nombre,
+        apellidos,
+        fechaNacimiento: new Date(fechaNacimiento),
+        telefono,
+        correoElectronico,
+        passwordHash,
+        rol,
+        estado,
+      },
+    });
+
+    res.status(201).json({ msg: "Usuario creado", data: nuevo });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "Error interno al crear usuario" });
   }
-}
+};
 
-export async function login(req, res) {
+export const login = async (req, res) => {
   try {
     const { correoElectronico, password } = req.body;
-    const sql = "SELECT * FROM Usuarios WHERE correoElectronico = ?";
-    const [[user]] = await pool.query(sql, [correoElectronico]);
+
+    const user = await pool.usuario.findUnique({
+      where: { correoElectronico },
+    });
+
     if (!user) {
-      return res.status(404).json({ msg: "Usuario not found" });
+      return res.status(404).json({ msg: "Usuario no encontrado" });
     }
 
-    const verified = await bcrypt.compare(password, user.passwordHash);
-    if (!verified) {
-      return res.status(400).json({ msg: "Wrong password for usuario" });
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) {
+      return res.status(400).json({ msg: "Contraseña incorrecta" });
     }
 
     const token = jwt.sign(
@@ -90,107 +89,69 @@ export async function login(req, res) {
     res.status(200).json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "Error al iniciar sesión" });
   }
-}
+};
 
-export async function update(req, res) {
-  const identificacion = parseInt(req.params.id);
-  const { ...updateFields } = req.body;
-
-  if (Object.keys(updateFields).length === 0) {
-    return res.status(400).json({ error: "No fields provided to update" });
-  }
-
+export const update = async (req, res) => {
   try {
-    const setClauses = [];
-    const values = [];
+    const identificacion = parseInt(req.params.id);
+    const updates = { ...req.body };
 
-    for (const key of Object.keys(updateFields)) {
-      if (key === "identificacion") {
-        continue;
-      }
-
-      if (key === "password") {
-        const passwordHash = await bcrypt.hash(updateFields[key], 10);
-        setClauses.push("passwordHash = ?");
-        values.push(passwordHash);
-      } else if (key === "rol" && !VALID_ROLES.includes(updateFields[key])) {
-        return res.status(400).json({
-          msg: "Rol inválido. Debe ser admin, instructor, pasante, aprendiz o visitante",
-        });
-      } else {
-        setClauses.push(`${key} = ?`);
-        values.push(updateFields[key]);
-      }
+    if (updates.password) {
+      updates.passwordHash = await bcrypt.hash(updates.password, 10);
+      delete updates.password;
     }
 
-    values.push(identificacion);
+    if (updates.identificacion) delete updates.identificacion;
 
-    const sql = `UPDATE Usuarios SET ${setClauses.join(
-      ", "
-    )} WHERE identificacion = ?`;
-    const [result] = await pool.query(sql, values);
+    const updated = await pool.usuario.update({
+      where: { identificacion },
+      data: updates,
+    });
 
-    if (result.affectedRows > 0) {
-      return res.status(200).json({ msg: "Usuario updated successfully" });
-    }
-    res.status(400).json({ msg: "Error updating usuario" });
+    res.status(200).json({ msg: "Usuario actualizado", data: updated });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "Error al actualizar usuario" });
   }
-}
+};
 
 export const getCurrentUser = async (req, res) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ msg: "Datos de usuario no disponibles" });
-    }
-
     const { identificacion, nombre, correoElectronico, rol } = req.user;
-
     if (!identificacion || !correoElectronico) {
-      return res.status(400).json({
-        msg: "Token incompleto",
-        missingFields: {
-          identificacion: !identificacion,
-          correoElectronico: !correoElectronico,
-        },
-      });
+      return res.status(400).json({ msg: "Token incompleto" });
     }
 
     res.status(200).json({
       success: true,
       user: {
         id: identificacion,
-        nombre: nombre || "No especificado",
+        nombre,
         email: correoElectronico,
-        rol: rol || "visitante",
+        rol,
       },
     });
   } catch (error) {
     console.error("Error en getCurrentUser:", error);
-    res.status(500).json({
-      msg: "Error al obtener datos del usuario",
-      error: error.message,
-    });
+    res.status(500).json({ msg: "Error interno" });
   }
 };
 
 export const getTotalUsers = async (req, res) => {
   try {
-    const sql = `
-            SELECT 
-                COUNT(identificacion) AS total_usuarios,
-                SUM(CASE WHEN estado = 'activo' THEN 1 ELSE 0 END) AS usuarios_activos,
-                SUM(CASE WHEN estado = 'inactivo' THEN 1 ELSE 0 END) AS usuarios_inactivos
-            FROM Usuarios
-        `;
-    const [result] = await pool.query(sql);
-    res.status(200).json(result);
+    const total = await pool.usuario.count();
+    const activos = await pool.usuario.count({ where: { estado: "activo" } });
+    const inactivos = total - activos;
+
+    res.status(200).json({
+      total_usuarios: total,
+      usuarios_activos: activos,
+      usuarios_inactivos: inactivos,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    res.status(500).json({ msg: "Error al contar usuarios" });
   }
 };
