@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom"; // Importamos useNavigate
 import { useGetSensor } from "../../hooks/sensor/useGetSensor";
 import { useEditarSensor } from "../../hooks/sensor/useEditarSensor";
 import { useCrearSensor } from "../../hooks/sensor/useCrearSensor";
@@ -19,6 +20,7 @@ const SENSOR_TYPES = [
 ];
 
 export function SensorLista() {
+  const navigate = useNavigate(); // Obtenemos la función de navegación
   const { data, isLoading, error } = useGetSensor();
 
   console.log("Sensores:", data); // 🔍 Verifica qué está llegando
@@ -68,24 +70,46 @@ export function SensorLista() {
     { name: "Acciones", uid: "acciones" },
   ];
 
+  const handleRowClick = (sensorId: number) => {
+    // Navegamos a la ruta de detalle del sensor
+    navigate(`/sensores/${sensorId}`);
+  };
+
   const renderCell = (item: Sensor, columnKey: React.Key) => {
-    switch (columnKey) {
-      case "fecha":
-        return <span>{new Date(item.fecha).toLocaleString()}</span>;
-      case "tipo_sensor":
-        return <span>{getSensorLabel(item.tipo_sensor)}</span>;
-      case "datos_sensor":
-        return <span>{item.datos_sensor}</span>;
-      case "acciones":
-        return (
-          <AccionesTabla
-            onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
-          />
-        );
-      default:
-        return <span>{String(item[columnKey as keyof Sensor])}</span>;
+    // Generamos el contenido de la celda según la columna
+    const cellContent = (() => {
+      switch (columnKey) {
+        case "fecha":
+          return <span>{new Date(item.fecha).toLocaleString()}</span>;
+        case "tipo_sensor":
+          return <span>{getSensorLabel(item.tipo_sensor)}</span>;
+        case "datos_sensor":
+          return <span>{item.datos_sensor}</span>;
+        case "acciones":
+          return (
+            <AccionesTabla
+              onEditar={() => handleEditar(item)}
+              onEliminar={() => handleEliminar(item)}
+            />
+          );
+        default:
+          return <span>{String(item[columnKey as keyof Sensor])}</span>;
+      }
+    })();
+
+    // Si no es la columna de acciones, hacemos la celda clickeable
+    if (columnKey !== "acciones") {
+      return (
+        <div 
+          className="w-full h-full cursor-pointer" 
+          onClick={() => handleRowClick(item.id)}
+        >
+          {cellContent}
+        </div>
+      );
     }
+
+    return cellContent;
   };
 
   if (isLoading) return <p>Cargando...</p>;

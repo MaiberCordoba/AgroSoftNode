@@ -157,3 +157,34 @@ export const ObtenerSensorPorId = async (req, res) => {
         return res.status(500).json({ message: "Error al obtener el sensor" });
     }
 }
+
+// En tu controlador de sensores
+export const ObtenerHistoricoSensor = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fechaInicio, fechaFin } = req.query;
+
+    const sql = `
+      SELECT id, tipo_sensor, datos_sensor, fecha, 
+             CASE 
+               WHEN tipo_sensor = 'Temperatura' THEN '°C'
+               WHEN tipo_sensor = 'Iluminación' THEN 'lux'
+               WHEN tipo_sensor IN ('Humedad Ambiental', 'Humedad del Terreno') THEN '%'
+               WHEN tipo_sensor = 'Nivel de PH' THEN 'pH'
+               WHEN tipo_sensor = 'Viento' THEN 'km/h'
+               WHEN tipo_sensor = 'Lluvia' THEN 'mm'
+               ELSE ''
+             END AS unidad
+      FROM sensores 
+      WHERE id = ? 
+        AND fecha BETWEEN ? AND ?
+      ORDER BY fecha ASC
+    `;
+
+    const [result] = await pool.query(sql, [id, fechaInicio, fechaFin]);
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error al obtener histórico del sensor" });
+  }
+};

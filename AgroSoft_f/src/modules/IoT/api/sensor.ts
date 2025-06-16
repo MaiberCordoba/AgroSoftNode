@@ -20,3 +20,24 @@ export const deleteSensor = async (id: number): Promise<Sensor> => {
   const response = await apiClient.delete<Sensor>(`sensores/${id}`);
   return response.data;
 };
+
+// Nueva función para obtener datos históricos
+export const getHistorico = async (
+  id: string,
+  fechaInicio: string,
+  fechaFin: string
+): Promise<Array<{
+  id: string;
+  tipo_sensor: string;
+  datos_sensor: number;
+  fecha: string;
+  unidad: string;
+}>> => {
+  const response = await apiClient.get(`sensores/historico/${id}`, {
+    params: {
+      fechaInicio,
+      fechaFin
+    }
+  });
+  return response.data;
+};
