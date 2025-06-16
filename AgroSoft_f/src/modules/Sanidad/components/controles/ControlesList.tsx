@@ -45,8 +45,7 @@ export function ControlesList() {
       case "descripcion":
         return <span>{item.descripcion}</span>;
       case "fk_Afeccion":
-        const afeccion = afecciones?.find(a => a.id === item.fk_Afeccion);
-        return <span>{afeccion ? afeccion.nombre : "No definido"}</span>;
+        return <span>{item.fk_Afecciones?.fk_Plagas?.nombre || "No definido"}</span>;
       case "fk_TipoControl":
         return <span>{item.fk_TipoControl?.nombre || "No definido"}</span>;
       case "acciones":

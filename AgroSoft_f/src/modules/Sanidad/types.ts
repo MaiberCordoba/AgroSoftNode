@@ -46,7 +46,15 @@ export interface Controles {
   id: number;
   fechaControl: string;
   descripcion: string;
-  fk_Afeccion: number;
+  fk_Afecciones: {
+    id: 20,
+    fechaEncuentro: "2025-04-08T05:00:00.000Z",
+    estado: "EnControl",
+    fk_Plagas: {
+        idPlaga: 20,
+        nombre: "Mosca blanca"
+    },
+  };
   fk_TipoControl: {
     id: number;
     nombre: string;
