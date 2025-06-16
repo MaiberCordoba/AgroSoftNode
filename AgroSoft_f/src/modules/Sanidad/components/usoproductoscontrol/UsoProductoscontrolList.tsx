@@ -10,24 +10,20 @@ import EditarUsoProductosControlModal from "./EditarUsoProductoscontrolModal";
 import { CrearUsoProductosControlModal } from "./CrearUsoProductoscontrolModal";
 import EliminarUsoProductosControlModal from "./EliminarUsoProductoscontrolModal";
 import { UsoProductosControl } from "../../types";
-import { Chip } from "@heroui/react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import { ReportePdfUsoProductosControl } from "./ReportePdfUuseproductoscontrol";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
+import { useState } from "react";
 
 export function UsoProductosControlList() {
   const { data: rawData, isLoading, error } = usegetUsoProductosControl();
+  const data = rawData?.map((item) => ({
+    id: item.id_usoProductoControl,
+    fk_ProductoControl: item.fk_ProductosControl?.id_productoControl,
+    fk_Control: item.fk_Controles?.id,
+    cantidadProducto: item.cantidad_producto_usada,
+  })) ?? [];
 
-const data = rawData?.map((item) => ({
-  id: item.id_usoProductoControl,
-  fk_ProductoControl: item.fk_ProductosControl?.id_productoControl,
-  fk_Control: item.fk_Controles?.id,
-  cantidadProducto: item.cantidad_producto_usada,
-})) ?? [];
-
-
-
-  // Datos relacionados
   const { data: productosControl } = useGetProductosControl();
   const { data: controles } = useGetControles();
 
@@ -60,8 +56,6 @@ const data = rawData?.map((item) => ({
     });
   };
 
-
-  // Definición de columnas
   const columnas = [
     { name: "Producto de Control", uid: "productoControl" },
     { name: "Control Aplicado", uid: "control" },
@@ -69,7 +63,8 @@ const data = rawData?.map((item) => ({
     { name: "Acciones", uid: "acciones" },
   ];
 
-  // Función de renderizado
+  const [datosPDF, setDatosPDF] = useState<any[]>([]);
+
   const renderCell = (item: UsoProductosControl, columnKey: React.Key) => {
     switch (columnKey) {
       case "productoControl":
@@ -89,7 +84,7 @@ const data = rawData?.map((item) => ({
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            
           />
         );
 
@@ -100,8 +95,7 @@ const data = rawData?.map((item) => ({
     }
   };
 
-  if (isLoading || !productosControl || !controles)
-    return <p>Cargando datos...</p>;
+  if (isLoading || !productosControl || !controles) return <p>Cargando datos...</p>;
   if (error) return <p>Error al cargar los datos</p>;
 
   return (
@@ -114,62 +108,59 @@ const data = rawData?.map((item) => ({
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
 
-        
-              // 🧠 Este es el botón para generar el PDF
-              renderReporteAction={(data) => {
-                const datosPDF = data.map((item: UsoProductosControl) => {
-                  const producto = productosControl?.find(p => p.id === item.fk_ProductoControl)?.nombre || "Desconocido";
-                  const control = controles?.find(c => c.id === item.fk_Control)?.descripcion || "Desconocido";
-      
-                  return {
-                    producto,
-                    control,
-                    cantidadProducto: item.cantidadProducto
-                  };
-                });
-      
-                return (
-                  <PDFDownloadLink
-                    document={<ReportePdfUsoProductosControl data={datosPDF} />}
-                    fileName="reporte_uso_productos_control.pdf"
-                  >
-                    {({ loading }) => (
-                      <button
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                        title="Descargar reporte"
-                      >
-                        {loading ? (
-                          <Download className="h-4 w-4 animate-spin text-blue-500" />
-                        ) : (
-                          <Download className="h-5 w-5 text-green-600" />
-                        )}
-                      </button>
-                    )}
-                  </PDFDownloadLink>
-                );
-              }}
-            />
-    
-      
+        renderReporteAction={(data) => {
+          const datos = data.map((item: UsoProductosControl) => {
+            const producto = productosControl?.find(p => p.id === item.fk_ProductoControl)?.nombre || "Desconocido";
+            const control = controles?.find(c => c.id === item.fk_Control)?.descripcion || "Desconocido";
+            return {
+              producto,
+              control,
+              cantidadProducto: item.cantidadProducto
+            };
+          });
+          return (
+            <button
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              title="Visualizar reporte"
+              onClick={() => setDatosPDF(datos)}
+            >
+              <FileText className="h-5 w-5 text-blue-600" />
+            </button>
+          );
+        }}
+      />
+
+      {/* Espacio entre tabla y visor */}
+      <div className="mt-8"></div>
+
+      {/* Visualización PDF */}
+      {datosPDF.length > 0 && (
+        <div className="w-full flex flex-col items-center mt-4 space-y-4">
+          <div className="w-full max-w-[95%] rounded-lg shadow-lg border border-gray-300 bg-white p-4" style={{ height: "85vh" }}>
+            <PDFViewer style={{ width: "100%", height: "100%", borderRadius: "0.5rem" }}>
+              <ReportePdfUsoProductosControl data={datosPDF} />
+            </PDFViewer>
+          </div>
+
+          <PDFDownloadLink document={<ReportePdfUsoProductosControl data={datosPDF} />} fileName="reporte_uso_productos_control.pdf">
+            {({ loading }) => (
+              <button className="px-4 py-2 bg-green-600 text-white rounded shadow hover:bg-green-700 transition">
+                {loading ? "Generando..." : "Descargar PDF"}
+              </button>
+            )}
+          </PDFDownloadLink>
+        </div>
+      )}
 
       {/* Modales */}
       {isEditModalOpen && usoproductosControlEditado && (
-        <EditarUsoProductosControlModal
-          usoProductoControl={usoproductosControlEditado}
-          onClose={closeEditModal}
-        />
+        <EditarUsoProductosControlModal usoProductoControl={usoproductosControlEditado} onClose={closeEditModal} />
       )}
-
       {isCreateModalOpen && (
         <CrearUsoProductosControlModal onClose={closeCreateModal} />
       )}
-
       {isDeleteModalOpen && usoproductosControlEliminado && (
-        <EliminarUsoProductosControlModal
-          usoProductoControl={usoproductosControlEliminado}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-        />
+        <EliminarUsoProductosControlModal usoProductoControl={usoproductosControlEliminado} isOpen={isDeleteModalOpen} onClose={closeDeleteModal} />
       )}
     </div>
   );

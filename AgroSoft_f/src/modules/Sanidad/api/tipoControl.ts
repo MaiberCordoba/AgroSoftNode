@@ -12,7 +12,7 @@ export const postTipoControl = async (data?: any): Promise<TipoControl> => {
 };
 
 export const patchTipoControl = async (id: number, data: Partial<TipoControl>): Promise<TipoControl> => {
-    const response = await apiClient.patch<TipoControl>(`tiposcontrol/${id}/`, data);
+    const response = await apiClient.put<TipoControl>(`tiposcontrol/${id}/`, data);
     return response.data;
 };
 

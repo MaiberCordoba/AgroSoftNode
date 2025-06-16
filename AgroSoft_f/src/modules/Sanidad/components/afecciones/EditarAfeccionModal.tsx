@@ -1,37 +1,49 @@
-import React, { useState } from 'react';
-import ModalComponent from '@/components/Modal';
-import { usePatchAfecciones } from '../../hooks/afecciones/usePatchAfecciones';
-import { Afecciones } from '../../types';
-import { Input,Textarea,Select, SelectItem } from '@heroui/react';
-import { useGetTipoAfecciones } from '../../hooks/tiposAfecciones/useGetTipoAfecciones'; 
+import React, { useState } from "react";
+import ModalComponent from "@/components/Modal";
+import { usePatchAfecciones } from "../../hooks/afecciones/usePatchAfecciones";
+import { Afecciones } from "../../types";
+import { Input, Textarea, Select, SelectItem } from "@heroui/react";
+import { useGetTipoAfecciones } from "../../hooks/tiposAfecciones/useGetTipoAfecciones";
 
 interface EditarAfeccionModalProps {
-  afeccion: Afecciones; // La afección que se está editando
-  onClose: () => void; // Función para cerrar el modal
+  afeccion: Afecciones;
+  onClose: () => void;
 }
 
-const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({ afeccion, onClose }) => {
+const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({
+  afeccion,
+  onClose,
+}) => {
   const [nombre, setNombre] = useState<string>(afeccion.nombre);
-  const [descripcion, setDescripcion] = useState<string>(afeccion.descripcion);
-  const [fk_Tipo, setFk_Tipo] = useState<number>(afeccion.tipoPlaga.id); // Estado para el ID del tipo de plaga
+  const [descripcion, setDescripcion] = useState<string>(
+    afeccion.descripcion
+  );
+  const [img, setImg] = useState<string>(afeccion.img);
+  const [tipoPlagaId, setTipoPlagaId] = useState<number>(
+    afeccion.tipoPlaga?.id || 0
+  );
 
-  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } = useGetTipoAfecciones(); // Obtener los tipos de plaga
+  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } = useGetTipoAfecciones();
   const { mutate, isPending } = usePatchAfecciones();
 
   const handleSubmit = () => {
-    // Llama a la mutación para actualizar la afección
+    if (!nombre.trim()) return console.log("Ingrese nombre.");
+    if (!descripcion.trim()) return console.log("Ingrese descripción.");
+    if (tipoPlagaId <= 0) return console.log("Seleccione un tipo de plaga.");
+
     mutate(
       {
         id: afeccion.id,
         data: {
           nombre,
-          descripcion,
-          fk_Tipo, // Envía solo el ID del tipo de plaga
+         descripcion,
+          img,
+          fk_TiposPlaga: tipoPlagaId,
         },
       },
       {
         onSuccess: () => {
-          onClose(); // Cierra el modal después de guardar
+          onClose();
         },
       }
     );
@@ -44,46 +56,55 @@ const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({ afeccion, onC
       title="Editar Afección"
       footerButtons={[
         {
-          label: isPending ? 'Guardando...' : 'Guardar',
-          color: 'success',
-          variant: 'light',
+          label: isPending ? "Guardando…" : "Guardar",
+          color: "success",
+          variant: "light",
           onClick: handleSubmit,
         },
       ]}
     >
       <Input
-        value={nombre}
         label="Nombre"
         type="text"
+        value={nombre}
         onChange={(e) => setNombre(e.target.value)}
-      />
-      <Textarea
-        value={descripcion}
-        label="Descripción"
-        type="text"
-        onChange={(e) => setDescripcion(e.target.value)}
+        required
       />
 
-      {/* Selector de tipos de plaga con HeroUI */}
+      <Textarea
+        label="Descripción"
+        value={descripcion}
+        onChange={(e) => setDescripcion(e.target.value)}
+        required
+      />
+
+      <Input
+        label="Imagen (URL)"
+        type="text"
+        value={img}
+        onChange={(e) => setImg(e.target.value)}
+      />
+
       {isLoadingTiposPlaga ? (
         <p>Cargando tipos de plaga...</p>
       ) : (
         <Select
           label="Tipo de Plaga"
           placeholder="Selecciona un tipo de plaga"
-          selectedKeys={[fk_Tipo.toString()]} // HeroUI espera un array de strings
+          selectedKeys={[tipoPlagaId.toString()]}
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0]; // HeroUI devuelve un Set
-            setFk_Tipo(Number(selectedKey)); // Actualiza el estado con el nuevo ID
+            const selectedKey = Array.from(keys)[0];
+            setTipoPlagaId(Number(selectedKey));
           }}
         >
-          {(tiposPlaga || []).map((tipo) => ( // Usa un array vacío como valor por defecto
-            <SelectItem key={tipo.id.toString()} >
+          {(tiposPlaga || []).map((tipo) => (
+            <SelectItem key={tipo.id.toString()}>
               {tipo.nombre}
             </SelectItem>
           ))}
         </Select>
       )}
+
     </ModalComponent>
   );
 };

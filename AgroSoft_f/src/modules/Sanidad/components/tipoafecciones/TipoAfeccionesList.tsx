@@ -53,7 +53,7 @@ export function TipoAfeccionesList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            
           />
         );
       default:
@@ -89,14 +89,14 @@ export function TipoAfeccionesList() {
           onClose={closeCreateModal}
         />
       )}
-
+{/*
       {isDeleteModalOpen && tipoafeccionEliminada && (
         <EliminarTipoAfeccionModal
           tipoAfeccion={tipoafeccionEliminada}
           isOpen={isDeleteModalOpen}
           onClose={closeDeleteModal}
         />
-      )}
+      )}*/}
     </div>
   );
 }

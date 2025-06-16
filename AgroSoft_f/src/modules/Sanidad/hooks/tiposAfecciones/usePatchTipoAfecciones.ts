@@ -8,30 +8,20 @@ export const usePatchTipoAfecciones = () => {
 
   return useMutation<TiposAfecciones, Error, { id: number; data: Partial<TiposAfecciones> }>({
     mutationFn: ({ id, data }) => patchTipoAfecciones(id, data),
-    onSuccess: (updatedTipoAfeccion, variables) => {
-      // Actualiza la caché después de una mutación exitosa
-      queryClient.setQueryData<TiposAfecciones[]>(['TiposAfecciones'], (oldData) => {
-        if (!oldData) return oldData;
-        return oldData.map((tipoafeccion) =>
-          tipoafeccion.id === variables.id ? { ...tipoafeccion, ...updatedTipoAfeccion } : tipoafeccion
-        );
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['TiposAfecciones'] });
 
-      // Toast de éxito
       addToast({
         title: "Actualización exitosa",
-        description: "el tipo de afeccion se actualizó correctamente",
+        description: "El tipo de afección se actualizó correctamente",
         color: "success",
-     
       });
     },
-    onError: (error) => {
-      console.error(error)
+    onError: () => {
       addToast({
         title: "Error al actualizar",
         description: "No se pudo actualizar el tipo de afección",
         color: "danger",
-       
       });
     }
   });
