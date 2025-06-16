@@ -1,14 +1,25 @@
 export interface User {
-  
   identificacion: number;
   nombre: string;
   apellidos: string;
-  fechaNacimiento: string; // Puedes usar Date si lo parseas antes de usarlo
+  fechaNacimiento: string | undefined;
   telefono: string;
   correoElectronico: string;
-  admin: boolean;
   password?: string;
-  estado:string;
+  estado: string;
+  rol: string;
+}
+
+export interface UserFormState {
+  identificacion: string;
+  nombre: string;
+  apellidos: string;
+  fechaNacimiento: string;
+  telefono: string;
+  correoElectronico: string;
+  password: string;
+  rol: string;
+  estado: string;
 }
 
 export interface SensorData {
@@ -19,8 +30,8 @@ export interface SensorData {
   timestamp: string;
 }
 
-export interface TotalUsers{
-  total_usuarios: number,
-  usuarios_activos: string, 
-  usuarios_inactivos:string,
+export interface TotalUsers {
+  total_usuarios: number;
+  usuarios_activos: string;
+  usuarios_inactivos: string;
 }

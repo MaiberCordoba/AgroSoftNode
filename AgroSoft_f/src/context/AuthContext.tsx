@@ -1,133 +1,229 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
-import { getUser } from '@/api/Auth'; // Suponiendo que getUser verifica el token y devuelve los datos del usuario
+import { createContext, useState, useEffect, useCallback } from "react";
+import { getUser } from "@/api/Auth";
+import { jwtDecode } from "jwt-decode";
+
+interface JwtPayload {
+  exp?: number;
+  identificacion: number;
+  rol: string;
+  tokenVersion?: number;
+}
 
 interface AuthContextType {
   user: any;
   token: string | null;
-  isLoading: boolean; // <-- Nuevo estado para indicar si estamos cargando/validando
-  login: (token: string) => void;
+  rol: string | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (token: string) => Promise<void>;
   logout: () => void;
+  hasRole: (role: string) => boolean;
+  hasAnyRole: (roles: string[]) => boolean;
+  executeWithRole: (role: string, action: () => void) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true); // <-- Inicia en true
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token")
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const logout = useCallback(() => {
-    console.log('Cerrando sesión...');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setToken(null);
-    setUser(null);
-    setIsLoading(false); // Cuando hacemos logout, ya no estamos cargando
+  const isTokenValid = useCallback((tokenString: string): boolean => {
+    try {
+      const decoded = jwtDecode<JwtPayload>(tokenString);
+      if (decoded.exp) {
+        return decoded.exp > Date.now() / 1000;
+      }
+      console.warn("Token sin fecha de expiración");
+      return true;
+    } catch (error) {
+      console.error("Token inválido:", error);
+      return false;
+    }
   }, []);
 
-  // Efecto principal para verificar el token y sincronizar el estado
+  const logout = useCallback(() => {
+    console.log("Cerrando sesión...");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
+    setIsLoading(false);
+  }, []);
+
+  const refreshUser = async () => {
+    if (!token) return;
+    try {
+      console.log("Refrescando usuario con token:", token);
+      let userData = await getUser(token);
+      console.log("Usuario refrescado:", userData);
+      // Normalizar si viene como { success: true, user: {...} }
+      if (userData.success && userData.user) {
+        userData = userData.user;
+        console.log("Normalizando userData:", userData);
+      }
+      if (!userData.rol) {
+        console.error("Error: userData no incluye rol:", userData);
+        throw new Error("Respuesta inválida: falta rol");
+      }
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error("Error al refrescar usuario:", error.message, error.stack);
+      logout();
+    }
+  };
+
   useEffect(() => {
     const checkAuthStatus = async () => {
-      setIsLoading(true); // Siempre que iniciamos la verificación, estamos cargando
-      const storedToken = localStorage.getItem('token');
+      setIsLoading(true);
+      const storedToken = localStorage.getItem("token");
 
       if (!storedToken) {
-        // No hay token en localStorage, limpia el estado y termina la carga
+        console.log("No hay token en localStorage");
         setToken(null);
         setUser(null);
+        setIsAuthenticated(false);
         setIsLoading(false);
         return;
       }
 
-      // Si el token en el estado no coincide con el de localStorage, actualiza
       if (token !== storedToken) {
+        console.log("Token en localStorage cambió, actualizando estado");
         setToken(storedToken);
       }
 
-      // Si hay un token y no hay usuario (o el token es diferente al validado)
-      if (storedToken && !user) {
+      if (storedToken && isTokenValid(storedToken)) {
         try {
-          const userData = await getUser(storedToken);
+          console.log("Verificando usuario con token:", storedToken);
+          let userData = await getUser(storedToken);
+          console.log("Usuario verificado:", userData);
+          // Normalizar si viene como { success: true, user: {...} }
+          if (userData.success && userData.user) {
+            userData = userData.user;
+            console.log("Normalizando userData:", userData);
+          }
+          if (!userData.rol) {
+            console.error("Error: userData no incluye rol:", userData);
+            throw new Error("Respuesta inválida: falta rol");
+          }
           setUser(userData);
-          setToken(storedToken); // Asegura que el token en estado sea el correcto
+          setIsAuthenticated(true);
         } catch (error) {
-          console.error('Error al verificar el token o cargar el usuario:', error);
-          logout(); // Si falla, cerramos sesión
+          console.error(
+            "Error al verificar el token o cargar el usuario:",
+            error.message,
+            error.stack
+          );
+          logout();
         } finally {
-          setIsLoading(false); // Terminamos de cargar/validar
+          setIsLoading(false);
         }
-      } else if (storedToken && user) {
-        // Ya tenemos token y usuario válidos, solo terminamos de cargar
-        setIsLoading(false);
       } else {
-        // Caso de no token y no usuario, ya se manejó arriba.
-        // Pero si llegamos aquí, simplemente aseguramos que isLoading sea false
-        setIsLoading(false);
+        console.log("Token inválido o expirado");
+        logout();
       }
     };
 
     checkAuthStatus();
-  }, [token, user, logout]); // Dependencias: token, user y logout
+  }, [isTokenValid, logout]);
 
-  // Efecto para una "verificación periódica" (polling) del token
-  // Mantiene esta lógica si te gusta la detección a tiempo.
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const currentToken = localStorage.getItem('token');
-      // Si el token en el estado actual difiere del localStorage
-      if (token !== currentToken) {
-        console.log("Detectado cambio externo en el token de localStorage. Sincronizando...");
-        setToken(currentToken); // Actualizar el estado para que el primer useEffect lo maneje
-        if (!currentToken) {
-            logout(); // Si fue eliminado, forzar logout inmediato
-        }
-      }
-    }, 2000); // Verifica cada 2 segundos (ajusta si es necesario)
-
-    return () => clearInterval(interval);
-  }, [token, logout]);
-
-  // Efecto para escuchar cambios en localStorage desde OTRAS PESTAÑAS/VENTANAS
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'token') {
+      if (event.key === "token") {
         const newToken = event.newValue;
         if (!newToken) {
-          console.log('Token removido/malformado en localStorage por otra pestaña. Cerrando sesión...');
+          console.log(
+            "Token removido en localStorage por otra pestaña. Cerrando sesión..."
+          );
           logout();
         } else {
-          setToken(newToken); // Actualiza el estado para que el useEffect principal lo revalide
+          console.log("Token actualizado en localStorage:", newToken);
+          setToken(newToken);
         }
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, [logout]);
 
-  const login = (newToken: string) => {
-    setIsLoading(true); // Al iniciar sesión, estamos cargando
-    localStorage.setItem('token', newToken);
+  const login = async (newToken: string) => {
+    setIsLoading(true);
+    console.log("Iniciando sesión con token:", newToken);
+    localStorage.setItem("token", newToken);
     setToken(newToken);
-    // Podrías llamar a getUser aquí o dejar que el useEffect principal lo haga
-    getUser(newToken)
-      .then(userData => {
-        setUser(userData);
-      })
-      .catch(error => {
-        console.error('Error al iniciar sesión y cargar usuario:', error);
-        logout(); // Si falla al cargar usuario después de login, cerrar sesión
-      })
-      .finally(() => {
-        setIsLoading(false); // Terminamos de cargar
+    try {
+      let userData = await getUser(newToken);
+      console.log("Usuario cargado:", userData);
+      // Normalizar si viene como { success: true, user: {...} }
+      if (userData.success && userData.user) {
+        userData = userData.user;
+        console.log("Normalizando userData:", userData);
+      }
+      if (!userData.rol) {
+        console.error("Error: userData no incluye rol:", userData);
+        throw new Error("Respuesta inválida: falta rol");
+      }
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error(
+        "Error al iniciar sesión y cargar usuario:",
+        error.message,
+        error.stack
+      );
+      logout();
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const hasRole = useCallback(
+    (role: string) => {
+      const hasRoleResult = user?.rol === role;
+      console.log("Evaluando hasRole:", {
+        role,
+        userRol: user?.rol,
+        user,
+        result: hasRoleResult,
       });
+      return hasRoleResult;
+    },
+    [user]
+  );
+
+  const hasAnyRole = (roles: string[]) => roles.includes(user?.rol || "");
+  const executeWithRole = async (role: string, action: () => void) => {
+    await refreshUser();
+    if (user?.rol === role) {
+      action();
+    } else {
+      console.error(`Acceso denegado: Se requiere rol ${role}`);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        rol: user?.rol || null,
+        isLoading,
+        isAuthenticated,
+        login,
+        logout,
+        hasRole,
+        hasAnyRole,
+        executeWithRole,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

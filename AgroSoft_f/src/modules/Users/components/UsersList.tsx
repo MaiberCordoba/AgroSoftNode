@@ -1,4 +1,3 @@
-
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import { useGetUsers } from "../hooks/useGetUsers";
@@ -16,88 +15,94 @@ import { Download } from "lucide-react";
 import { getTotalUsers } from "../api/usersApi";
 import { useQuery } from "@tanstack/react-query";
 
-
 export function UsersList() {
   const { data, isLoading, error } = useGetUsers();
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    UsersEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    UsersEditada,
+    handleEditar,
   } = useEditarUsers();
-  
+
   const { data: totalUsers } = useQuery({
-    queryKey: ['userStats'],
-    queryFn: getTotalUsers
+    queryKey: ["userStats"],
+    queryFn: getTotalUsers,
   });
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearUsers();
-  
+
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     UsersEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarUsers();
 
   const handleCrearNuevo = () => {
-    handleCrear({ 
-      identificacion: 0, 
-      nombre: "", 
-      apellidos: "", 
-      fechaNacimiento: "", 
-      telefono: "", 
-      correoElectronico: "", 
-      admin: false,
-      estado:"",
+    handleCrear({
+      identificacion: 0,
+      nombre: "",
+      apellidos: "",
+      fechaNacimiento: "",
+      telefono: "",
+      correoElectronico: "",
+      estado: "",
+      rol: "visitante",
     });
   };
 
   const columnas = [
-    { name: "Identificacion", uid: "identificacion", sortable: true },
-    { name: "FechaNacimiento", uid: "fechaNacimiento", sortable: true },
+    { name: "Identificación", uid: "identificacion", sortable: true },
+    { name: "Fecha de Nacimiento", uid: "fechaNacimiento", sortable: true },
     { name: "Nombre", uid: "nombre", sortable: true },
     { name: "Apellidos", uid: "apellidos" },
     { name: "Email", uid: "correoElectronico" },
-    { name: "Rol", uid: "admin" },
-    {name: "estado", uid: "estado"},
+    { name: "Rol", uid: "rol", sortable: true },
+    { name: "Estado", uid: "estado" },
     { name: "Acciones", uid: "acciones" },
   ];
 
   const renderCell = (item: User, columnKey: React.Key) => {
     switch (columnKey) {
-        
-        case "identificacion":
-            return <span>{item.identificacion}</span>;
-        case "fechaNacimiento":
-            return <span>{item.fechaNacimiento}</span>;
-        case "nombre":
-            return <span>{item.nombre}</span>;
-        case "apellidos":
-            return <span>{item.apellidos}</span>;
-        case "correoElectronico":
-            return <span>{item.correoElectronico}</span>;
-        case "admin":
-            return <span>{item.admin ? "Administrador" : "Usuario"}</span>;
-        case "estado":
-            return <Chip 
-            size="sm" 
+      case "identificacion":
+        return <span>{item.identificacion}</span>;
+      case "fechaNacimiento":
+        return <span>{item.fechaNacimiento}</span>;
+      case "nombre":
+        return <span>{item.nombre}</span>;
+      case "apellidos":
+        return <span>{item.apellidos}</span>;
+      case "correoElectronico":
+        return <span>{item.correoElectronico}</span>;
+      case "rol":
+        return (
+          <span
+            className={`px-2 py-1 rounded-full text-xs  || "bg-gray-100 text-gray-800"}`}
+          >
+            {item.rol.charAt(0).toUpperCase() + item.rol.slice(1)}
+          </span>
+        );
+      case "estado":
+        return (
+          <Chip
+            size="sm"
             className="capitalize"
             variant="flat"
-            color={item.estado === "activo" ? "success" : "danger"} 
+            color={item.estado === "activo" ? "success" : "danger"}
           >
             {item.estado}
-          </Chip>;
-        case "acciones":
-            return (
-            <AccionesTabla
-                onEditar={() => handleEditar(item)}
-                onEliminar={() => handleEliminar(item)}
-            />
+          </Chip>
+        );
+      case "acciones":
+        return (
+          <AccionesTabla
+            onEditar={() => handleEditar(item)}
+            onEliminar={() => handleEliminar(item)}
+          />
         );
       default:
         return <span>{String(item[columnKey as keyof User])}</span>;
@@ -118,13 +123,11 @@ export function UsersList() {
         onCrearNuevo={handleCrearNuevo}
         opcionesEstado={[
           { uid: "activo", nombre: "Activo" },
-          { uid: "inactivo", nombre: "Inactivo" }
-        ]}  
-
-        //prompt para descargar reportes
-        renderReporteAction={() => (  // ⚠️ Ya no pasamos "data", porque no la usaremos
+          { uid: "inactivo", nombre: "Inactivo" },
+        ]}
+        renderReporteAction={() => (
           <PDFDownloadLink
-            document={<ReportePdfUsuarios data={totalUsers || 0} />} // Solo el total
+            document={<ReportePdfUsuarios data={totalUsers || []} />}
             fileName="reporte_total_usuarios.pdf"
           >
             {({ loading }) => (
@@ -140,19 +143,11 @@ export function UsersList() {
         )}
       />
 
-      {/* Modales */}
       {isEditModalOpen && UsersEditada && (
-        <EditarUserModal
-          user={UsersEditada}
-          onClose={closeEditModal}
-        />
+        <EditarUserModal user={UsersEditada} onClose={closeEditModal} />
       )}
 
-      {isCreateModalOpen && (
-        <CrearUsersModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearUsersModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && UsersEliminada && (
         <EliminarUserModal

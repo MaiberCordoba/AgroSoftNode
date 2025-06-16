@@ -1,22 +1,16 @@
 import { useState, ChangeEvent } from "react";
 import ModalComponent from "@/components/Modal";
-import { Input, Checkbox } from "@heroui/react";
+import { Input, Select, SelectItem } from "@heroui/react";
 import { usePostUsers } from "../hooks/usePostUsers";
+import { UserFormState } from "../types";
+
+// Lista de roles válida, alineada con el backend
+const VALID_ROLES = ["admin", "instructor", "pasante", "aprendiz", "visitante"];
+// Lista de estados válida
+const VALID_ESTADOS = ["activo", "inactivo"];
 
 interface CrearUsersModalProps {
   onClose: () => void;
-}
-
-interface UserFormState {
-  identificacion: string;
-  nombre: string;
-  apellidos: string;
-  fechaNacimiento: string;
-  telefono: string;
-  correoElectronico: string;
-  password: string;
-  estado:string;
-  admin: boolean;
 }
 
 export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
@@ -28,38 +22,65 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
     telefono: "",
     correoElectronico: "",
     password: "",
-    estado:"",
-    admin: false
-    
+    rol: "visitante", // Valor por defecto
+    estado: "activo", // Valor por defecto
   });
 
   const { mutate, isPending } = usePostUsers();
 
   // Maneja cambios en inputs normales
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>, field: keyof Omit<UserFormState, 'admin'>) => {
-    setUserData(prev => ({
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    field: keyof Omit<UserFormState, "rol" | "estado">
+  ) => {
+    setUserData((prev) => ({
       ...prev,
-      [field]: e.target.value
+      [field]: e.target.value,
     }));
   };
 
-  // Maneja cambio específico del checkbox
-  const handleAdminChange = (isChecked: boolean) => {
-    setUserData(prev => ({
+  // Maneja cambios en selects (rol y estado)
+  const handleSelectChange = (value: string, field: "rol" | "estado") => {
+    setUserData((prev) => ({
       ...prev,
-      admin: isChecked
+      [field]: value,
     }));
   };
 
   const handleSubmit = () => {
-    if (!userData.identificacion || !userData.nombre || 
-        !userData.correoElectronico || !userData.password) {
+    if (
+      !userData.identificacion ||
+      !userData.nombre ||
+      !userData.correoElectronico ||
+      !userData.password
+    ) {
       console.log("Por favor, completa los campos requeridos.");
       return;
     }
 
-    mutate(userData, {
+    if (!VALID_ROLES.includes(userData.rol)) {
+      console.log("Rol inválido:", userData.rol);
+      return;
+    }
+
+    if (!VALID_ESTADOS.includes(userData.estado)) {
+      console.log("Estado inválido:", userData.estado);
+      return;
+    }
+
+    const payload = {
+      ...userData,
+      identificacion: Number(userData.identificacion),
+      rol: userData.rol.trim().toLowerCase(), // Normalizar
+      estado: userData.estado,
+      fechaNacimiento: userData.fechaNacimiento || null, // Manejar fecha vacía
+    };
+
+    console.log("Datos enviados:", payload);
+
+    mutate(payload, {
       onSuccess: () => {
+        console.log("Usuario creado con éxito");
         onClose();
         setUserData({
           identificacion: "",
@@ -69,10 +90,16 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           telefono: "",
           correoElectronico: "",
           password: "",
-          estado: "",
-          admin: false
+          rol: "visitante",
+          estado: "activo",
         });
-      }
+      },
+      onError: (error: any) => {
+        console.error(
+          "Error al crear usuario:",
+          error.response?.data || error.message
+        );
+      },
     });
   };
 
@@ -86,7 +113,7 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           label: isPending ? "Guardando..." : "Guardar",
           color: "success",
           variant: "light",
-          onClick: handleSubmit
+          onClick: handleSubmit,
         },
       ]}
     >
@@ -95,7 +122,7 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           label="Identificación"
           type="number"
           value={userData.identificacion}
-          onChange={(e) => handleInputChange(e, 'identificacion')}
+          onChange={(e) => handleInputChange(e, "identificacion")}
           required
         />
 
@@ -103,7 +130,7 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           label="Nombre"
           type="text"
           value={userData.nombre}
-          onChange={(e) => handleInputChange(e, 'nombre')}
+          onChange={(e) => handleInputChange(e, "nombre")}
           required
         />
 
@@ -111,28 +138,28 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           label="Apellidos"
           type="text"
           value={userData.apellidos}
-          onChange={(e) => handleInputChange(e, 'apellidos')}
+          onChange={(e) => handleInputChange(e, "apellidos")}
         />
 
         <Input
           label="Fecha de Nacimiento"
           type="date"
           value={userData.fechaNacimiento}
-          onChange={(e) => handleInputChange(e, 'fechaNacimiento')}
+          onChange={(e) => handleInputChange(e, "fechaNacimiento")}
         />
 
         <Input
           label="Teléfono"
           type="tel"
           value={userData.telefono}
-          onChange={(e) => handleInputChange(e, 'telefono')}
+          onChange={(e) => handleInputChange(e, "telefono")}
         />
 
         <Input
           label="Correo Electrónico"
           type="email"
           value={userData.correoElectronico}
-          onChange={(e) => handleInputChange(e, 'correoElectronico')}
+          onChange={(e) => handleInputChange(e, "correoElectronico")}
           required
         />
 
@@ -140,18 +167,22 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           label="Contraseña"
           type="password"
           value={userData.password}
-          onChange={(e) => handleInputChange(e, 'password')}
+          onChange={(e) => handleInputChange(e, "password")}
           required
         />
 
-        <div className="flex items-center mt-2">
-          <Checkbox
-            isSelected={userData.admin}
-            onValueChange={handleAdminChange}
-          >
-            ¿Es administrador?
-          </Checkbox>
-        </div>
+        <Select
+          label="Rol"
+          value={userData.rol}
+          onChange={(e) => handleSelectChange(e.target.value, "rol")}
+          required
+        >
+          {VALID_ROLES.map((rol) => (
+            <SelectItem key={rol}>
+              {rol.charAt(0).toUpperCase() + rol.slice(1)}
+            </SelectItem>
+          ))}
+        </Select>
       </div>
     </ModalComponent>
   );
