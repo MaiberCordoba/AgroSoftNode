@@ -8,10 +8,10 @@ import EditarLoteModal from "./EditarLotesModal";
 import { CrearLoteModal } from "./CrearLotesModal";
 import EliminarLoteModal from "./EliminarLotes";
 import { Lotes } from "../../types";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import logo from "../../../../../public/sena.png";
-import { Button } from "@heroui/react";
+
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfLotes } from "./ReportePdfLotes";
+import { Download } from "lucide-react";
 
 export function LoteList() {
   const { data, isLoading, error } = useGetLotes();
@@ -49,47 +49,6 @@ export function LoteList() {
     });
   };
 
-  const handleExportPDF = () => {
-    const doc = new jsPDF();
-    const imgProps = doc.getImageProperties(logo);
-    const logoWidth = 30;
-    const logoHeight = (imgProps.height * logoWidth) / imgProps.width;
-    doc.addImage(logo, "PNG", 10, 10, logoWidth, logoHeight);
-
-    doc.setFontSize(16);
-    doc.text("AgroSoft - SENA", 50, 20);
-    doc.setFontSize(12);
-    doc.text("Reporte de Lotes", 50, 28);
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 50, 34);
-
-    const rows = (data || []).map((item) => [
-      item.id,
-      item.nombre,
-      item.descripcion,
-      item.tamX,
-      item.tamY,
-      item.estado ? "Disponible" : "Ocupado",
-      item.posX,
-      item.posY,
-    ]);
-
-    autoTable(doc, {
-      startY: 50,
-      head: [["ID", "Nombre", "Descripción", "Tamaño X", "Tamaño Y", "Estado", "Posición X", "Posición Y"]],
-      body: rows,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [46, 204, 113] },
-      theme: "striped",
-    });
-
-    const finalY = (doc as any).lastAutoTable?.finalY || 70;
-    doc.setFontSize(10);
-    doc.text(`Total de registros: ${(data || []).length}`, 14, finalY + 10);
-
-    doc.save("reporte_lotes.pdf");
-  };
-
   const columnas = [
     { name: "ID", uid: "id", sortable: true },
     { name: "Nombre", uid: "nombre", sortable: true },
@@ -124,7 +83,6 @@ export function LoteList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -136,7 +94,7 @@ export function LoteList() {
   if (error) return <p>Error al cargar los lotes</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -144,23 +102,27 @@ export function LoteList() {
         placeholderBusqueda="Buscar por ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        renderReporteAction={(data) => (
+          <PDFDownloadLink
+            document={<ReportePdfLotes data={data} />}
+            fileName="reporte_lotes.pdf"
+          >
+            {({ loading }) => (
+              <button
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                title="Descargar reporte"
+              >
+                {loading ? (
+                  <Download className="h-4 w-4 animate-spin text-blue-500" />
+                ) : (
+                  <Download className="h-5 w-5 text-red-600" />
+                )}
+              </button>
+            )}
+          </PDFDownloadLink>
+        )}
       />
 
-      <br />
-      <Button
-        onClick={handleExportPDF}
-        style={{
-          backgroundColor: "rgba(239, 68, 68, 0.2)",
-          color: "#b91c1c",
-          padding: "0.5rem 1rem",
-          borderRadius: "0.5rem",
-          fontWeight: "500",
-        }}
-      >
-        Exportar PDF
-      </Button>
-
-      {/* Modales */}
       {isEditModalOpen && LotesEditada && (
         <EditarLoteModal lote={LotesEditada} onClose={closeEditModal} />
       )}

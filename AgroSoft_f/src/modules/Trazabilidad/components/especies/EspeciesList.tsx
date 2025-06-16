@@ -85,7 +85,7 @@ export function EspecieList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+
           />
         );
       default:
