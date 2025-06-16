@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import FormComponent from "@/components/Form";
 import logo from "../../public/sena.png";
 import sideLogo from "../../public/logoAgrosoft.png";
-import { Link } from "@heroui/react";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
@@ -73,27 +72,7 @@ const Login = () => {
             onSubmit={handleSubmit}
             submitLabel="Iniciar sesión"
           />
-          <div className="mt-1 text-left">
-            <Link
-              href="/forgot-password"
-              size="sm"
-              style={{ fontSize: "10px" }}
-              underline="hover"
-              className="text-blue-500 hover:text-blue-700"
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
-            <br />
-            <Link
-              href="/registro"
-              size="sm"
-              style={{ fontSize: "10px" }}
-              underline="hover"
-              className="text-blue-500 hover:text-blue-700"
-            >
-              ¿Nuevo? Regístrate aquí
-            </Link>
-          </div>
+          <div className="mt-1 text-left"></div>
           {errorMessage && (
             <p className="text-red-500 text-sm font-semibold text-center mt-3">
               {errorMessage}
