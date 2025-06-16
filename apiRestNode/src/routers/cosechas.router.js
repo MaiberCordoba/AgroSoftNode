@@ -5,6 +5,6 @@ import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 const cosechas = Router()
 cosechas.get("/cosechas",verifyJWT,getAllCosechas)
 cosechas.post("/cosechas",verifyJWT,createCosechas)
-cosechas.put("/cosechas/:id",verifyJWT,updateCosechas)
+cosechas.patch("/cosechas/:id",verifyJWT,updateCosechas)
 
 export default cosechas;

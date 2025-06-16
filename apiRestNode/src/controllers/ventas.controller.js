@@ -5,7 +5,11 @@ export const getAllVentas = async (req,res) => {
         const sql = `SELECT * FROM ventas`
         const [rows] = await pool.query(sql)
         if (rows.length > 0){
-            return res.status(200).json(rows)
+            const ventasFormateadas = rows.map((venta)=>({
+                ...venta,
+                fecha:venta.fecha.toISOString().split("T")[0],
+            }))
+            return res.status(200).json({rows:ventasFormateadas})
         }
         else{
             return res.status(404).json({msg : "No se encontraron datos de ventas."})

@@ -13,8 +13,8 @@ interface EditarHerramientaModalProps {
 const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herramienta, onClose }) => {
   const [nombre, setNombre] = useState<string>(herramienta.nombre);
   const [descripcion, setDescripcion] = useState<string>(herramienta.descripcion);
-  const [unidades, setUnidades] = useState<number>(herramienta.unidades);
-  const [fk_Lote, setFk_Lote] = useState<number | undefined>(herramienta.fk_Lote); // Estado para el ID del lote
+  const [unidades, setUnidades] = useState(herramienta.unidades);
+  const [fk_Lotes, setFk_Lote] = useState<number | undefined>(herramienta.fk_Lotes); // Estado para el ID del lote
 
   const { data: lotes, isLoading: isLoadingLotes } = useGetLotes(); // Obtener los lotes
   const { mutate, isPending } = usePatchHerramientas(); // Mutación para actualizar herramientas
@@ -28,7 +28,7 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
           nombre,
           descripcion,
           unidades,
-          fk_Lote, // Envía solo el ID del lote
+          fk_Lotes, // Envía solo el ID del lote
         },
       },
       {
@@ -66,7 +66,7 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
         onChange={(e) => setDescripcion(e.target.value)}
       />
       <Input
-        value={unidades}
+        value={unidades.toString()}
         label="Unidades"
         type="number"
         onChange={(e) => setUnidades(Number(e.target.value))}
@@ -79,7 +79,7 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
         <Select
           label="Lote"
           placeholder="Selecciona un lote"
-          selectedKeys={fk_Lote ? [fk_Lote.toString()] : []} // HeroUI espera un array de strings
+          selectedKeys={fk_Lotes ? [fk_Lotes.toString()] : []} // HeroUI espera un array de strings
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0]; // HeroUI devuelve un Set
             setFk_Lote(selectedKey ? Number(selectedKey) : undefined); // Actualiza el estado con el nuevo ID

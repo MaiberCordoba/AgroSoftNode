@@ -1,12 +1,10 @@
 import { useGetVentas } from "../../hooks/ventas/useGetVentas";
 import { useEditarVenta } from "../../hooks/ventas/useEditarVentas";
 import { useCrearVenta } from "../../hooks/ventas/useCrearVentas";
-import { useEliminarVenta } from "../../hooks/ventas/useEliminarVentas";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarVentasModal from "./EditarVentasModal";
 import { CrearVentasModal } from "./CrearVentasModal";
-import EliminarVentaModal from "./EliminarVentas";
 import { ReporteVentas, Ventas } from "../../types";
 import { useGetCosechas } from "../../hooks/cosechas/useGetCosechas";
 import { getReporteVentas } from "../../api/ventasApi";
@@ -35,13 +33,6 @@ const { data: ventasData } = useQuery<ReporteVentas[]>({
     handleCrear 
   } = useCrearVenta();
   
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    ventaEliminada,
-    handleEliminar
-  } = useEliminarVenta();
-
   const handleCrearNuevo = () => {
     handleCrear({ id: 0, fk_Cosechas: 0, precioUnitario: 0, fecha: "" });
   };
@@ -57,7 +48,7 @@ const { data: ventasData } = useQuery<ReporteVentas[]>({
     switch (columnKey) {
       case "cosecha":
         const cosecha = cosechas?.find((c) => c.id === item.fk_Cosechas);
-        return <span>{cosecha ? cosecha.fecha : "No definido"}</span>;
+        return <span>{cosecha ? cosecha?.fecha : "No definido"}</span>;
       case "precioUnitario":
         return <span>{item.precioUnitario}</span>;
       case "fecha":
@@ -66,7 +57,6 @@ const { data: ventasData } = useQuery<ReporteVentas[]>({
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -115,14 +105,6 @@ const { data: ventasData } = useQuery<ReporteVentas[]>({
       {isCreateModalOpen && (
         <CrearVentasModal
           onClose={closeCreateModal}
-        />
-      )}
-
-      {isDeleteModalOpen && ventaEliminada && (
-        <EliminarVentaModal
-          venta={ventaEliminada}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
         />
       )}
     </div>

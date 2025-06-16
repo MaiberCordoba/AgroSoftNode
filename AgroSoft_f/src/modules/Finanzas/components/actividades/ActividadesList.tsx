@@ -1,12 +1,10 @@
 import { useGetActividades } from "../../hooks/actividades/useGetActividades";
 import { useEditarActividad } from "../../hooks/actividades/useEditarActividades";
 import { useCrearActividad } from "../../hooks/actividades/useCrearActividades";
-import { useEliminarActividad } from "../../hooks/actividades/useEliminarActividades";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarActividadesModal from "./EditarActividadesModal";
 import { CrearActividadesModal } from "./CrearActividadModal";
-import EliminarActividadesModal from "./EliminarActividades";
 import { Actividades } from "../../types";
 import { useGetUsers } from "@/modules/Users/hooks/useGetUsers";
 import { useGetCultivos } from "@/modules/Trazabilidad/hooks/cultivos/useGetCultivos";
@@ -29,13 +27,6 @@ export function ActividadesList() {
     handleCrear 
   } = useCrearActividad();
   
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    actividadEliminada,
-    handleEliminar
-  } = useEliminarActividad();
-
   const handleCrearNuevo = () => {
     handleCrear({ id: 0, fk_Cultivos: 0, fk_Usuarios: 0, titulo: "", descripcion: "", fecha: "", estado: "Asignada" });
   };
@@ -72,7 +63,6 @@ export function ActividadesList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -101,10 +91,6 @@ export function ActividadesList() {
       )}
 
       {isCreateModalOpen && <CrearActividadesModal onClose={closeCreateModal} />}
-
-      {isDeleteModalOpen && actividadEliminada && (
-        <EliminarActividadesModal actividad={actividadEliminada} isOpen={isDeleteModalOpen} onClose={closeDeleteModal} />
-      )}
     </div>
   );
 }

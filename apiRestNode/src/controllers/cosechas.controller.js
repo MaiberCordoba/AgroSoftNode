@@ -5,7 +5,12 @@ export const getAllCosechas = async (req,res) => {
         const sql = `SELECT * FROM cosechas`
         const [rows] = await pool.query(sql)
         if (rows.length > 0){
-            return res.status(200).json(rows)
+
+            const cosechasFormateadas = rows.map((cosecha)=>({
+                ...cosecha,
+                fecha:cosecha.fecha.toISOString().split("T")[0],
+            }))
+            return res.status(200).json({rows:cosechasFormateadas})
         }
         else{
             return res.status(404).json({msg : "No se encontraron datos de cosechas."})

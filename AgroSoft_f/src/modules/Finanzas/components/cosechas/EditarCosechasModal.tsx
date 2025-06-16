@@ -11,15 +11,15 @@ interface EditarCosechaModalProps {
 }
 
 const EditarCosechaModal: React.FC<EditarCosechaModalProps> = ({ cosecha, onClose }) => {
-  const [unidades, setUnidades] = useState<number>(cosecha.unidades);
+  const [unidades, setUnidades] = useState(cosecha.unidades);
   const [fecha, setFecha] = useState<string>(cosecha.fecha);
-  const [fk_Cultivo, setFk_Cultivo] = useState<number | null>(cosecha.fk_Cultivo ?? null); // Estado para el ID del cultivo
+  const [fk_Cultivos, setFk_Cultivo] = useState<number | null>(cosecha.fk_Cultivos ?? null); // Estado para el ID del cultivo
 
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();  // Obtener los cultivos
   const { mutate, isPending } = usePatchCosechas();  // Mutación para actualizar las cosechas
 
   const handleSubmit = () => {
-    if (!fk_Cultivo || unidades <= 0 || !fecha) {
+    if (!fk_Cultivos || unidades <= 0 || !fecha) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
@@ -31,7 +31,7 @@ const EditarCosechaModal: React.FC<EditarCosechaModalProps> = ({ cosecha, onClos
         data: {
           unidades,
           fecha,
-          fk_Cultivo,  // Envía solo el ID del cultivo
+          fk_Cultivos,  // Envía solo el ID del cultivo
         },
       },
       {
@@ -57,7 +57,7 @@ const EditarCosechaModal: React.FC<EditarCosechaModalProps> = ({ cosecha, onClos
       ]}
     >
       <Input
-        value={unidades}
+        value={unidades.toString()}
         label="Unidades"
         type="number"
         onChange={(e) => setUnidades(Number(e.target.value))}
@@ -76,14 +76,14 @@ const EditarCosechaModal: React.FC<EditarCosechaModalProps> = ({ cosecha, onClos
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fk_Cultivo ? [fk_Cultivo.toString()] : []}  // HeroUI espera un array de strings
+          selectedKeys={fk_Cultivos ? [fk_Cultivos.toString()] : []}  // HeroUI espera un array de strings
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];  // HeroUI devuelve un Set
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);  // Actualiza el estado con el nuevo ID
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo.id.toString()}>
+            <SelectItem key={cultivo.id}>
               {cultivo.nombre}
             </SelectItem>
           ))}

@@ -15,9 +15,9 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
   const [titulo, setTitulo] = useState<string>(actividad.titulo);
   const [descripcion, setDescripcion] = useState<string>(actividad.descripcion);
   const [fecha, setFecha] = useState<string>(actividad.fecha);
-  const [estado, setEstado] = useState<"AS" | "CO" | "CA">(actividad.estado);
-  const [fk_Cultivo, setFk_Cultivo] = useState<number | null>(actividad.fk_Cultivos || null);  
-  const [fk_Usuario, setFk_Usuario] = useState<number | null>(actividad.fk_Usuarios || null); 
+  const [estado, setEstado] = useState<"Asignada" | "Completada" | "Cancelada">(actividad.estado);
+  const [fk_Cultivos, setFk_Cultivo] = useState<number | null>(actividad.fk_Cultivos || null);  
+  const [fk_Usuarios, setFk_Usuario] = useState<number | null>(actividad.fk_Usuarios || null); 
 
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();
   const { data: users, isLoading: isLoadingUsers } = useGetUsers();
@@ -25,7 +25,7 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
 
   const handleSubmit = () => {
     // Verificar que todos los campos estén completos
-    if (!fk_Cultivo || !fk_Usuario || !titulo || !descripcion || !fecha || !estado) {
+    if (!fk_Cultivos || !fk_Usuarios || !titulo || !descripcion || !fecha || !estado) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
@@ -38,8 +38,8 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
           descripcion,
           fecha,
           estado,
-          fk_Cultivo,  
-          fk_Usuario,  
+          fk_Cultivos,  
+          fk_Usuarios,  
         },
       },
       {
@@ -90,14 +90,14 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         label="Estado"
         value={estado}
         onSelectionChange={(keys) => {
-          const selectedKey = Array.from(keys)[0] as "AS" | "CO" | "CA";
+          const selectedKey = Array.from(keys)[0] as "Asignada" | "Completada" | "Cancelada";
           setEstado(selectedKey);
         }}
         required
       >
-        <SelectItem key="AS">Asignado</SelectItem>
-        <SelectItem key="CO">Completado</SelectItem>
-        <SelectItem key="CA">Cancelado</SelectItem>
+        <SelectItem key="Asignada">Asignado</SelectItem>
+        <SelectItem key="Completada">Completado</SelectItem>
+        <SelectItem key="Cancelada">Cancelado</SelectItem>
       </Select>
 
       {/* Selector de Cultivos */}
@@ -107,14 +107,14 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fk_Cultivo ? [fk_Cultivo.toString()] : []} 
+          selectedKeys={fk_Cultivos ? [fk_Cultivos.toString()] : []} 
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];  
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);  
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo.id.toString()}>{cultivo.nombre}</SelectItem>
+            <SelectItem key={cultivo?.id.toString()}>{cultivo.nombre}</SelectItem>
           ))}
         </Select>
       )}
@@ -126,14 +126,14 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Usuario"
           placeholder="Selecciona un Usuario"
-          selectedKeys={fk_Usuario ? [fk_Usuario.toString()] : []} 
+          selectedKeys={fk_Usuarios ? [fk_Usuarios.toString()] : []} 
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];  
             setFk_Usuario(selectedKey ? Number(selectedKey) : null);  
           }}
         >
           {(users || []).map((usuario) => (
-            <SelectItem key={usuario.id.toString()}>{usuario.nombre}</SelectItem>
+            <SelectItem key={usuario.identificacion.toString()}>{usuario.nombre}</SelectItem>
           ))}
         </Select>
       )}
