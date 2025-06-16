@@ -1,5 +1,12 @@
 import React from "react";
-import { Input, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@heroui/react";
+import {
+  Input,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+} from "@heroui/react";
 import { SearchIcon, ChevronDownIcon } from "./Icons";
 
 interface OpcionEstado {
@@ -24,31 +31,37 @@ export const FiltrosTabla: React.FC<FiltrosTablaProps> = ({
   opcionesEstado,
   filtroEstado,
   onCambiarFiltroEstado,
-  placeholderBusqueda = "Search by nombre...", // Cambiado a inglés para consistencia
+  placeholderBusqueda = "Buscar por nombre...",
 }) => {
   return (
-    <div className="flex items-center gap-3">
-      {/* Campo de búsqueda */}
+    <div className="flex items-center gap-3 w-full">
       <Input
         isClearable
-        endContent={<ChevronDownIcon className="text-gray-400" width={16} height={16} />} 
-        className="w-full sm:max-w-[100%]" // Ajuste de ancho
+        endContent={
+          <ChevronDownIcon className="text-gray-400" width={16} height={16} />
+        }
+        className="w-full"
         placeholder={placeholderBusqueda}
         startContent={<SearchIcon className="text-default-400" />}
         value={valorFiltro}
         onClear={onLimpiarBusqueda}
         onValueChange={onCambiarBusqueda}
+        size="sm"
       />
-
-      {/* Dropdown para filtrar por estado */}
       {opcionesEstado && opcionesEstado.length > 0 && (
         <Dropdown>
           <DropdownTrigger>
             <Button
-              endContent={<ChevronDownIcon className="text-gray-400" width={16} height={16} />} 
+              endContent={
+                <ChevronDownIcon
+                  className="text-gray-400"
+                  width={16}
+                  height={16}
+                />
+              }
               variant="flat"
               size="sm"
-              className="hidden sm:flex"
+              className="w-auto"
             >
               Estado
             </Button>
