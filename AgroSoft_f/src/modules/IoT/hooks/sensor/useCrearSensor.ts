@@ -1,21 +1,20 @@
 import { UseModal } from "@/hooks/useModal"
-import { SensorData } from "../../types/sensorTypes";
+import { Sensor } from "../../types/sensorTypes";
 import { useState } from "react";
 
-
 export const useCrearSensor = () => {
-    const {isOpen, openModal, closeModal} = UseModal();
-    const [sensorCreado, setSensorCreado] = useState<SensorData | null>(null);
+  const { isOpen, openModal, closeModal } = UseModal(); // corregido aquí también
+  const [sensorCreado, setSensorCreado] = useState<Sensor | null>(null);
 
-    const handleCrear = (sensor: SensorData) => {
-        setSensorCreado(sensor);
-        openModal();
-    };
+  const handleCrear = (sensor: Sensor) => {
+    setSensorCreado(sensor);
+    openModal();
+  };
 
-    return{
-        isOpen,
-        closeModal,
-        sensorCreado,
-        handleCrear,
-    };
+  return {
+    isOpen,
+    closeModal,
+    sensorCreado,
+    handleCrear,
+  };
 };

@@ -1,12 +1,10 @@
 import { useGetTiposDesechos } from "../../hooks/tiposDesechos/useGetTiposDesechos";
 import { useEditarTiposDesechos } from "../../hooks/tiposDesechos/useEditarTiposDesechos";
 import { useCrearTiposDesechos } from "../../hooks/tiposDesechos/useCrearTiposDesechos";
-import { useEliminarTiposDesechos } from "../../hooks/tiposDesechos/useEliminarTiposDesechos";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarTiposDesechosModal from "./EditarTiposDesechosModal";
 import { CrearTiposDesechosModal } from "./CrearTiposDesechosModal";
-import EliminarTiposDesechosModal from "./EliminarTiposDesechos";
 import { TiposDesechos } from "../../types";
 
 export function TiposDesechosList() {
@@ -23,13 +21,6 @@ export function TiposDesechosList() {
     closeModal: closeCreateModal, 
     handleCrear 
   } = useCrearTiposDesechos();
-  
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    tiposDesechosEliminada,
-    handleEliminar
-  } = useEliminarTiposDesechos();
 
   const handleCrearNuevo = () => {
     handleCrear({ id: 0, nombre: "", descripcion: ""});
@@ -53,7 +44,6 @@ export function TiposDesechosList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -87,14 +77,6 @@ export function TiposDesechosList() {
       {isCreateModalOpen && (
         <CrearTiposDesechosModal
           onClose={closeCreateModal}
-        />
-      )}
-
-      {isDeleteModalOpen && tiposDesechosEliminada && (
-        <EliminarTiposDesechosModal
-          tipoDesecho={tiposDesechosEliminada}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
         />
       )}
     </div>

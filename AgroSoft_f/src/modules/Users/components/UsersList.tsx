@@ -13,6 +13,8 @@ import { Chip } from "@heroui/react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ReportePdfUsuarios } from "./ReportePdfUsuarios";
 import { Download } from "lucide-react";
+import { getTotalUsers } from "../api/usersApi";
+import { useQuery } from "@tanstack/react-query";
 
 
 export function UsersList() {
@@ -24,6 +26,11 @@ export function UsersList() {
     handleEditar 
   } = useEditarUsers();
   
+  const { data: totalUsers } = useQuery({
+    queryKey: ['userStats'],
+    queryFn: getTotalUsers
+  });
+
   const { 
     isOpen: isCreateModalOpen, 
     closeModal: closeCreateModal, 
@@ -115,16 +122,13 @@ export function UsersList() {
         ]}  
 
         //prompt para descargar reportes
-        renderReporteAction={(data) => (
+        renderReporteAction={() => (  // ⚠️ Ya no pasamos "data", porque no la usaremos
           <PDFDownloadLink
-            document={<ReportePdfUsuarios data={data} />}
-            fileName="reporte_usuarios.pdf"
+            document={<ReportePdfUsuarios data={totalUsers || 0} />} // Solo el total
+            fileName="reporte_total_usuarios.pdf"
           >
             {({ loading }) => (
-              <button
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                title="Descargar reporte"
-              >
+              <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
                 {loading ? (
                   <Download className="h-4 w-4 animate-spin text-blue-500" />
                 ) : (

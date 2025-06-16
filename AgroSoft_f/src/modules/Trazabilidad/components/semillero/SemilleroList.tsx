@@ -8,32 +8,47 @@ import EditarSemilleroModal from "./EditarSemilleroModal";
 import { CrearSemilleroModal } from "./CrearSemilleroModal";
 import EliminarSemilleroModal from "./EliminarSemillero";
 import { Semilleros } from "../../types";
+import { useGetEspecies } from "../../hooks/especies/useGetEpecies";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfSemilleros } from "./ReportePdfSemilleros";
+import { Download } from "lucide-react";
+
+function formatDate(fecha: string) {
+  return new Date(fecha).toISOString().split("T")[0];
+}
 
 export function SemilleroList() {
   const { data, isLoading, error } = useGetSemilleros();
+  const { data: especies } = useGetEspecies();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    SemillerosEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    SemillerosEditada,
+    handleEditar,
   } = useEditarSemilleros();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearSemilleros();
 
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     SemillerosEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarSemilleros();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_especie: 0, unidades: 0, fechasiembra: "", fechaestimada: "" });
+    handleCrear({
+      id: 0,
+      fk_Especies: 0,
+      unidades: 0,
+      fechaSiembra: "",
+      fechaEstimada: "",
+    });
   };
 
   const columnas = [
@@ -50,18 +65,18 @@ export function SemilleroList() {
       case "id":
         return <span>{item.id}</span>;
       case "fk_Especie":
-        return <span>{item.fk_especie}</span>;
+        const especie = especies?.find((e) => e.id === item.fk_Especies);
+        return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;
       case "fechaSiembra":
-        return <span>{item.fechasiembra}</span>;
+        return <span>{formatDate(item.fechaSiembra)}</span>;
       case "fechaEstimada":
-        return <span>{item.fechaestimada}</span>;
+        return <span>{formatDate(item.fechaEstimada)}</span>;
       case "acciones":
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -73,7 +88,7 @@ export function SemilleroList() {
   if (error) return <p>Error al cargar los semilleros</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -81,9 +96,37 @@ export function SemilleroList() {
         placeholderBusqueda="Buscar por ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        renderReporteAction={(datos) => {
+          const datosConNombreEspecie = datos.map((item) => {
+            const especie = especies?.find((e) => e.id === item.fk_Especies);
+            return {
+              ...item,
+              nombreEspecie: especie ? especie.nombre : "Desconocida",
+            };
+          });
+
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfSemilleros data={datosConNombreEspecie} />}
+              fileName="reporte_semilleros.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-red-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
       />
 
-      {/* Modales */}
       {isEditModalOpen && SemillerosEditada && (
         <EditarSemilleroModal
           semillero={SemillerosEditada}
@@ -91,11 +134,7 @@ export function SemilleroList() {
         />
       )}
 
-      {isCreateModalOpen && (
-        <CrearSemilleroModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearSemilleroModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && SemillerosEliminada && (
         <EliminarSemilleroModal

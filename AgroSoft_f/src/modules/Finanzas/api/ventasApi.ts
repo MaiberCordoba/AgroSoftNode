@@ -1,10 +1,15 @@
 import apiClient from "@/api/apiClient";
-import { Ventas } from "../types";
+import { ReporteVentas, Ventas } from "../types";
 
 export const getVentas = async (): Promise<Ventas[]> => {
   const response = await apiClient.get("ventas/")
-  return response.data
+  return response.data.rows
 }
+
+export const getReporteVentas = async (): Promise<ReporteVentas[]> => {
+  const response = await apiClient.get('reporteVentas');
+  return response.data;
+};
 
 export const postVentas = async (VentasData: Partial<Ventas>): Promise<Ventas> => {
   const response = await apiClient.post("ventas/", VentasData);

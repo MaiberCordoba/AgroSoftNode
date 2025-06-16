@@ -4,27 +4,27 @@ import { User } from "../Users/types"
 
 export interface Actividades {
     id : number,
-    fk_Cultivo?: number,
+    fk_Cultivos?: number,
     cultivo?: Cultivos,
-    fk_Usuario? : number,
+    fk_Usuarios? : number,
     usuario? : User,
     titulo : string,
     descripcion : string,
     fecha : string,
-    estado : "AS" | "CO" | "CA"
+    estado : "Asignada" | "Completada" | "Cancelada"
 }
 
 export interface UsosHerramientas {
     id : number,
     fk_Herramientas? : number,
     herramienta?: Herramientas,
-    fk_Actividad? : number,
+    fk_Actividades? : number,
     actividad? : Actividades
 }
 
 export interface Herramientas {
     id : number,
-    fk_Lote?: number,
+    fk_Lotes?: number,
     lote? : Lotes ,
     nombre : string,
     descripcion : string,
@@ -40,16 +40,16 @@ export interface Insumos {
 }
 export interface UsosProductos {
     id : number,
-    fk_Insumo? : number,
+    fk_Insumos? : number,
     insumo? : Insumos ,
-    fk_Actividad? : number,
+    fk_Actividades? : number,
     actividad? : Actividades,
     cantidadProducto : number
 }
 
 export interface Cosechas {
     id : number,
-    fk_Cultivo? : number,
+    fk_Cultivos? : number,
     cultivo? : Cultivos,
     unidades : number,
     fecha : string
@@ -57,16 +57,16 @@ export interface Cosechas {
 
 export interface Ventas {
     id : number,
-    fk_Cosecha? : number,
+    fk_Cosechas? : number,
     cosecha? : Cosechas,
     precioUnitario : number,
     fecha : string
 }
 export interface Desechos {
     id : number,
-    fk_Cultivo? : number,
+    fk_Cultivos? : number,
     cultivo? : Cultivos,
-    fk_TipoDesecho? : number,
+    fk_TiposDesecho? : number,
     tipoDesecho? : TiposDesechos,
     nombre : string,
     descripcion : string
@@ -77,3 +77,11 @@ export interface TiposDesechos {
     nombre : string,
     descripcion : string
 }
+
+export type ReporteVentas = {
+    Producto: string;
+    Cantidad: number;
+    PrecioProducto: number;
+    PrecioFinal: number;
+    FechaVenta: string;
+  };

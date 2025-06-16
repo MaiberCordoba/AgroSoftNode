@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardBody, CardFooter, Divider } from "@heroui/react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Divider,
+} from "@heroui/react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 interface SensorChartProps {
   sensorId: string;
@@ -12,25 +26,31 @@ export default function SensorChart({ sensorId, title }: SensorChartProps) {
   const [lastValue, setLastValue] = useState<string>("Cargando...");
 
   useEffect(() => {
-    const url = `ws://localhost:8000/ws/sensor/${sensorId}/`;
-    const ws = new WebSocket(url);
+    const ws = new WebSocket("ws://localhost:8080");
 
-    ws.onopen = () => console.log(`✅ Conectado a WebSocket de ${sensorId}`);
+    ws.onopen = () => console.log(`✅ Conectado al WebSocket general`);
 
     ws.onmessage = (event) => {
       try {
         const sensorData = JSON.parse(event.data);
-        const newValue = sensorData.valor || 0;
-        const time = new Date().toLocaleTimeString();
 
-        setLastValue(`${newValue}`);
-        setData((prevData) => [...prevData.slice(-9), { time, value: newValue }]);
+        // Solo procesar datos del sensor específico
+        if (sensorData.tipo_sensor === sensorId) {
+          const newValue = sensorData.valor || 0;
+          const time = new Date().toLocaleTimeString();
+
+          setLastValue(`${newValue}`);
+          setData((prevData) => [
+            ...prevData.slice(-9),
+            { time, value: newValue },
+          ]);
+        }
       } catch (error) {
-        console.error(`❌ Error en ${sensorId}:`, error);
+        console.error(`❌ Error al recibir datos:`, error);
       }
     };
 
-    ws.onclose = () => console.warn(`⚠️ WebSocket cerrado en ${sensorId}`);
+    ws.onclose = () => console.warn(`⚠️ WebSocket cerrado`);
 
     return () => {
       ws.close();
@@ -49,12 +69,19 @@ export default function SensorChart({ sensorId, title }: SensorChartProps) {
             <XAxis dataKey="time" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke="#8884d8"
+              strokeWidth={2}
+            />
           </LineChart>
         </ResponsiveContainer>
       </CardBody>
       <Divider />
-      <CardFooter className="text-gray-500 text-sm text-center">⚡ Datos en tiempo real</CardFooter>
+      <CardFooter className="text-gray-500 text-sm text-center">
+        ⚡ Datos en tiempo real
+      </CardFooter>
     </Card>
   );
 }

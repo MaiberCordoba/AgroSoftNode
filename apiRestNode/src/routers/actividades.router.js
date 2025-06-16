@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { createActividad, getAllActividad, updateActividad } from "../controllers/actividades.controller.js";
+import { createActividad, getAllActividad, graficoActividades, reporteCostoActividad, reporteRentabilidad, updateActividad } from "../controllers/actividades.controller.js";
 import  verifyJWT  from "../middlewares/verifyJWT.middleware.js"
 
 const actividades = Router()
-actividades.get('/actividad',verifyJWT,getAllActividad)
-actividades.post('/actividad',verifyJWT,createActividad)
-actividades.put('/actividad/:id',verifyJWT,updateActividad)
+actividades.get('/actividades',getAllActividad)
+actividades.post('/actividades',createActividad)
+actividades.patch('/actividades/:id',updateActividad)
+actividades.get('/reporteRentabilidad',reporteRentabilidad)
+actividades.get('/graficoActividades',graficoActividades)
+actividades.get('/reporteCostoActividad',reporteCostoActividad)
 
 export default actividades;

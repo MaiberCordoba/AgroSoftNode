@@ -81,7 +81,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           {
             title: "Actividades",
             icon: Wrench,
-            submenus: ["Actividades", "Usos herramientas", "Herramientas", "Usos productos"],
+            submenus: ["Actividades", "Usos herramientas", "Herramientas"],
           },
           {
             title: "Finanzas",
@@ -142,16 +142,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         ))}
 
         {/* Calendario y Mapa al final */}
-        <NavLink 
-          to="/calendario" 
-          className={({ isActive }) => 
-            `flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-200 text-sm ${
-              isActive ? "bg-gray-200 font-medium" : ""
-            }`
-          }
-        >
-          <Calendar size={18} /> Calendario
-        </NavLink>
         <NavLink 
           to="/mapa" 
           className={({ isActive }) => 

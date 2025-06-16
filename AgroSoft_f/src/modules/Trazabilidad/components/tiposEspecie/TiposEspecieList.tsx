@@ -9,6 +9,11 @@ import { CrearTiposEspecieModal } from "./CrearTiposEspecieModal";
 import EliminarTiposEspecieModal from "./EliminarTiposEspecie";
 import { TiposEspecie } from "../../types";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Download } from "lucide-react";
+import { ReportePdfTiposEspecie } from "./ReportePdfTiposEspecie";
+
+
 export function TiposEspecieList() {
   const { data, isLoading, error } = useGetTiposEspecie();
   const { 
@@ -51,7 +56,6 @@ export function TiposEspecieList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -71,6 +75,27 @@ export function TiposEspecieList() {
         placeholderBusqueda="Buscar por nombre"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+
+        renderReporteAction={(data) => (
+          <PDFDownloadLink
+            document={<ReportePdfTiposEspecie data={data} />}
+            fileName="reporte_tipos_especie.pdf"
+          >
+            {({ loading }) => (
+              <button
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                title="Descargar reporte"
+              >
+                {loading ? (
+                  <Download className="h-4 w-4 animate-spin text-blue-500" />
+                ) : (
+                  <Download className="h-5 w-5 text-red-600" />
+                )}
+              </button>
+            )}
+          </PDFDownloadLink>
+        )}
+
       />
 
       {/* Modales */}

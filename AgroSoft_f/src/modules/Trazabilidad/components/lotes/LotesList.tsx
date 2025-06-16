@@ -9,31 +9,44 @@ import { CrearLoteModal } from "./CrearLotesModal";
 import EliminarLoteModal from "./EliminarLotes";
 import { Lotes } from "../../types";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfLotes } from "./ReportePdfLotes";
+import { Download } from "lucide-react";
+
 export function LoteList() {
   const { data, isLoading, error } = useGetLotes();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    LotesEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    LotesEditada,
+    handleEditar,
   } = useEditarLotes();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearLotes();
 
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     LotesEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarLotes();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, nombre: "", descripcion: "", tamX: 0, tamY: 0, estado: false, posX: 0.0, posY: 0.0 });
+    handleCrear({
+      id: 0,
+      nombre: "",
+      descripcion: "",
+      tamX: 0,
+      tamY: 0,
+      estado: false,
+      posX: 0.0,
+      posY: 0.0,
+    });
   };
 
   const columnas = [
@@ -70,7 +83,6 @@ export function LoteList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -82,7 +94,7 @@ export function LoteList() {
   if (error) return <p>Error al cargar los lotes</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -90,21 +102,32 @@ export function LoteList() {
         placeholderBusqueda="Buscar por ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        renderReporteAction={(data) => (
+          <PDFDownloadLink
+            document={<ReportePdfLotes data={data} />}
+            fileName="reporte_lotes.pdf"
+          >
+            {({ loading }) => (
+              <button
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                title="Descargar reporte"
+              >
+                {loading ? (
+                  <Download className="h-4 w-4 animate-spin text-blue-500" />
+                ) : (
+                  <Download className="h-5 w-5 text-red-600" />
+                )}
+              </button>
+            )}
+          </PDFDownloadLink>
+        )}
       />
 
-      {/* Modales */}
       {isEditModalOpen && LotesEditada && (
-        <EditarLoteModal
-          lote={LotesEditada}
-          onClose={closeEditModal}
-        />
+        <EditarLoteModal lote={LotesEditada} onClose={closeEditModal} />
       )}
 
-      {isCreateModalOpen && (
-        <CrearLoteModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearLoteModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && LotesEliminada && (
         <EliminarLoteModal

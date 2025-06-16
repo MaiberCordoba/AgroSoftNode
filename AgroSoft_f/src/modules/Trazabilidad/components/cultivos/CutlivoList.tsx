@@ -7,33 +7,49 @@ import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarCultivoModal from "./EditarCultivosModal";
 import { CrearCultivoModal } from "./CrearCultivosModal";
 import EliminarCultivoModal from "./EliminarCultivo";
+import { useGetEspecies } from "../../hooks/especies/useGetEpecies";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { ReportePdfCultivos } from "./ReportePdfCultivos";
+import { Download } from "lucide-react";
 import { Cultivos } from "../../types";
+
+function formatDate(fecha: string) {
+  return new Date(fecha).toISOString().split("T")[0];
+}
 
 export function CultivosList() {
   const { data, isLoading, error } = useGetCultivos();
+  const { data: especies } = useGetEspecies();
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    CultivosEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    CultivosEditada,
+    handleEditar,
   } = useEditarCultivos();
 
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearCultivos();
 
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     CultivosEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarCultivos();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, nombre: "", fk_Especie: 0, unidades: 0, fechaSiembra: "", activo: true });
+    handleCrear({
+      id: 0,
+      nombre: "",
+      fk_Especies: 0,
+      unidades: 0,
+      fechaSiembra: "",
+      activo: true,
+    });
   };
 
   const columnas = [
@@ -53,18 +69,18 @@ export function CultivosList() {
       case "nombre":
         return <span>{item.nombre}</span>;
       case "fk_especie":
-        return <span>{item.fk_Especie}</span>;
+        const especie = especies?.find((e) => e.id === item.fk_Especies);
+        return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;
       case "fechasiembra":
-        return <span>{item.fechaSiembra}</span>;
+        return <span>{formatDate(item.fechaSiembra)}</span>;
       case "activo":
         return <span>{item.activo ? "Sí" : "No"}</span>;
       case "acciones":
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -76,7 +92,7 @@ export function CultivosList() {
   if (error) return <p>Error al cargar los cultivos</p>;
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-4">
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
@@ -84,9 +100,37 @@ export function CultivosList() {
         placeholderBusqueda="Buscar por ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
+        renderReporteAction={(datos) => {
+          const datosConNombreEspecie = datos.map((item) => {
+            const especie = especies?.find((e) => e.id === item.fk_Especies);
+            return {
+              ...item,
+              nombreEspecie: especie ? especie.nombre : "Desconocida",
+            };
+          });
+
+          return (
+            <PDFDownloadLink
+              document={<ReportePdfCultivos data={datosConNombreEspecie} />}
+              fileName="reporte_cultivos.pdf"
+            >
+              {({ loading }) => (
+                <button
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  title="Descargar reporte"
+                >
+                  {loading ? (
+                    <Download className="h-4 w-4 animate-spin text-blue-500" />
+                  ) : (
+                    <Download className="h-5 w-5 text-red-600" />
+                  )}
+                </button>
+              )}
+            </PDFDownloadLink>
+          );
+        }}
       />
 
-      {/* Modales */}
       {isEditModalOpen && CultivosEditada && (
         <EditarCultivoModal
           cultivo={CultivosEditada}
@@ -94,11 +138,7 @@ export function CultivosList() {
         />
       )}
 
-      {isCreateModalOpen && (
-        <CrearCultivoModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearCultivoModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && CultivosEliminada && (
         <EliminarCultivoModal

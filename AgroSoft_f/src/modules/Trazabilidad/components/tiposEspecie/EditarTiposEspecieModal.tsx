@@ -3,17 +3,19 @@ import ModalComponent from "@/components/Modal";
 import { usePatchTiposEspecie } from "../../hooks/tiposEspecie/usePatchTiposEspecie";
 import { TiposEspecie } from "../../types";
 import { Input, Textarea } from "@heroui/react";
+import { useQueryClient } from "@tanstack/react-query"; // 👈 Import necesario
 
 interface EditarTiposEspecieModalProps {
-  especie: TiposEspecie; // La especie que se está editando
-  onClose: () => void; // Función para cerrar el modal
+  especie: TiposEspecie;
+  onClose: () => void;
 }
 
 const EditarTiposEspecieModal: React.FC<EditarTiposEspecieModalProps> = ({ especie, onClose }) => {
   const [nombre, setNombre] = useState<string>(especie.nombre);
   const [descripcion, setDescripcion] = useState<string>(especie.descripcion);
-  const [img, setImg] = useState<string>(especie.img); // Estado para la imagen
+  const [img, setImg] = useState<string>(especie.img);
 
+  const queryClient = useQueryClient(); // 👈 Cliente para refrescar queries
   const { mutate, isPending } = usePatchTiposEspecie();
 
   const handleSubmit = () => {
@@ -23,12 +25,13 @@ const EditarTiposEspecieModal: React.FC<EditarTiposEspecieModalProps> = ({ espec
         data: {
           nombre,
           descripcion,
-          img, // Se envía la URL de la imagen
+          img,
         },
       },
       {
         onSuccess: () => {
-          onClose(); // Cierra el modal después de guardar
+          queryClient.invalidateQueries({ queryKey: ["tiposEspecie"] }); // ✅ Refresca la lista
+          onClose();
         },
       }
     );
