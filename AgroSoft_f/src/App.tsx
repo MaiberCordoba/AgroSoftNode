@@ -89,6 +89,7 @@ function App() {
             {/* ProtectedRoute ahora debería usar 'token' para su propia lógica */}
             <Route element={<ProtectedRoute />}>
               <Route path="/home" element={<Inicio />} />
+              <Route path="/" element={<Inicio />} />
 
               {/* Usuarios */}
               <Route path="/usuarios" element={<Usuarios />} />
