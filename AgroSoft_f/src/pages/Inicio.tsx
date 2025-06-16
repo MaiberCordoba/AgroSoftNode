@@ -5,7 +5,7 @@ export function Inicio() {
   const navigate = useNavigate();
 
   const handleRedirect = () => {
-    navigate("/sensores");
+    navigate("/iot");
   };
 
   return (
