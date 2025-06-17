@@ -104,14 +104,19 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       title: "Actividades",
       icon: Wrench,
       color: "text-[#254030]",
-      submenus: ["Actividades"],
+      submenus: [
+        "Actividades",
+        "Herramientas",
+        "Insumos",
+        "Usos herramientas"
+      ],
       restricted: ["visitante"],
     },
     {
       title: "Finanzas",
       icon: DollarSign,
       color: "text-[#254030]",
-      submenus: ["Cosechas", "Ventas"],
+      submenus: ["Cosechas", "Ventas","Desechos","Tipos desechos"],
       restricted: ["visitante", "aprendiz"],
     },
     //{
