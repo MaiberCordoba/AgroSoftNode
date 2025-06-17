@@ -50,6 +50,7 @@ import { Usuarios } from "./modules/Users/pages/pageUsers";
 import Testeo from "./pages/testeo";
 import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
 import MapaEras from "./modules/Trazabilidad/pages/mapaPage";
+import { Insumos } from "./modules/Finanzas/pages/pageInsumos";
 
 const queryClient = new QueryClient();
 
@@ -96,13 +97,14 @@ function App() {
               <Route path="/usuarios/reporte" element={<TotalUsersPage />} />
 
               {/* Finanzas */}
-              <Route path="/tipos-de-desechos" element={<TiposDesechos />} />
+              <Route path="/tipos-desechos" element={<TiposDesechos />} />
               <Route path="/desechos" element={<Desechos />} />
               <Route path="/herramientas" element={<Herramientas />} />
               <Route path="/ventas" element={<Ventas />} />
               <Route path="/cosechas" element={<Cosechas />} />
               <Route path="/actividades" element={<Actividades />} />
               <Route path="/usos-herramientas" element={<UsosHerramientas />} />
+              <Route path="/insumos" element={<Insumos />} />
 
               {/* Electronica */}
               <Route path="/iot" element={<IoTPage />} />
