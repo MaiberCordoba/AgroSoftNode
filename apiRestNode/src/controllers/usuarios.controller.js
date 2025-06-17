@@ -20,7 +20,7 @@ const formatUsers = (users) =>
 
 export const getAll = async (req, res) => {
   try {
-    const usuarios = await pool.usuario.findMany();
+    const usuarios = await pool.usuarios.findMany();
     res.status(200).json(formatUsers(usuarios));
   } catch (error) {
     console.error(error);
@@ -55,7 +55,7 @@ export const create = async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const nuevo = await pool.usuario.create({
+    const nuevo = await pool.usuarios.create({
       data: {
         identificacion: parseInt(identificacion),
         nombre,
@@ -80,7 +80,7 @@ export const login = async (req, res) => {
   try {
     const { correoElectronico, password } = req.body;
 
-    const user = await pool.usuario.findUnique({
+    const user = await pool.usuarios.findUnique({
       where: { correoElectronico },
     });
 
@@ -128,7 +128,7 @@ export const update = async (req, res) => {
       updates.fechaNacimiento = fechaValida;
     }
 
-    const updated = await pool.usuario.update({
+    const updated = await pool.usuarios.update({
       where: { identificacion },
       data: updates,
     });
@@ -167,8 +167,8 @@ export const getCurrentUser = async (req, res) => {
 
 export const getTotalUsers = async (req, res) => {
   try {
-    const total = await pool.usuario.count();
-    const activos = await pool.usuario.count({ where: { estado: "activo" } });
+    const total = await pool.usuarios.count();
+    const activos = await pool.usuarios.count({ where: { estado: "activo" } });
     const inactivos = total - activos;
 
     res.status(200).json({

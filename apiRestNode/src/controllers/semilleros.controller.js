@@ -12,11 +12,11 @@ export const getAllSemilleros = async (req, res) => {
 
 export const createSemilleros = async (req, res) => {
   try {
-    const { especieId, unidades, fechaSiembra, fechaEstimada } = req.body;
+    const { fk_Especies, unidades, fechaSiembra, fechaEstimada } = req.body;
 
     const nuevoSemillero = await pool.semillero.create({
       data: {
-        especieId: parseInt(especieId),
+        fk_Especies: parseInt(fk_Especies),
         unidades: parseInt(unidades),
         fechaSiembra: new Date(fechaSiembra),
         fechaEstimada: new Date(fechaEstimada),
@@ -37,10 +37,10 @@ export const createSemilleros = async (req, res) => {
 export const patchSemillero = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { especieId, unidades, fechaSiembra, fechaEstimada } = req.body;
+    const { fk_Especies, unidades, fechaSiembra, fechaEstimada } = req.body;
 
     const data = {};
-    if (especieId !== undefined) data.especieId = parseInt(especieId);
+    if (fk_Especies !== undefined) data.fk_Especies = parseInt(fk_Especies);
     if (unidades !== undefined) data.unidades = parseInt(unidades);
     if (fechaSiembra !== undefined) data.fechaSiembra = new Date(fechaSiembra);
     if (fechaEstimada !== undefined) data.fechaEstimada = new Date(fechaEstimada);

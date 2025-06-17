@@ -10,10 +10,11 @@ const VALID_ROLES = ["admin", "instructor", "pasante", "aprendiz", "visitante"];
 const VALID_ESTADOS = ["activo", "inactivo"];
 
 interface CrearUsersModalProps {
+  isOpen: boolean; // Agrega la prop isOpen
   onClose: () => void;
 }
 
-export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
+export const CrearUsersModal = ({ isOpen, onClose }: CrearUsersModalProps) => {
   const [userData, setUserData] = useState<UserFormState>({
     identificacion: "",
     nombre: "",
@@ -105,7 +106,7 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
 
   return (
     <ModalComponent
-      isOpen={true}
+      isOpen={isOpen} // Usa la prop isOpen
       onClose={onClose}
       title="Registro de Usuario"
       footerButtons={[
@@ -125,7 +126,6 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           onChange={(e) => handleInputChange(e, "identificacion")}
           required
         />
-
         <Input
           label="Nombre"
           type="text"
@@ -133,28 +133,24 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           onChange={(e) => handleInputChange(e, "nombre")}
           required
         />
-
         <Input
           label="Apellidos"
           type="text"
           value={userData.apellidos}
           onChange={(e) => handleInputChange(e, "apellidos")}
         />
-
         <Input
           label="Fecha de Nacimiento"
           type="date"
           value={userData.fechaNacimiento}
           onChange={(e) => handleInputChange(e, "fechaNacimiento")}
         />
-
         <Input
           label="Teléfono"
           type="tel"
           value={userData.telefono}
           onChange={(e) => handleInputChange(e, "telefono")}
         />
-
         <Input
           label="Correo Electrónico"
           type="email"
@@ -162,7 +158,6 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           onChange={(e) => handleInputChange(e, "correoElectronico")}
           required
         />
-
         <Input
           label="Contraseña"
           type="password"
@@ -170,7 +165,6 @@ export const CrearUsersModal = ({ onClose }: CrearUsersModalProps) => {
           onChange={(e) => handleInputChange(e, "password")}
           required
         />
-
         <Select
           label="Rol"
           value={userData.rol}

@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import FormComponent from "@/components/Form";
 import logo from "../../public/sena.png";
 import sideLogo from "../../public/logoAgrosoft.png";
+import { CrearUsersModal } from "@/modules/Users/components/CrearUsersModal";
 
 const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado para controlar el modal
   const { login: authLogin } = useAuth();
   const navigate = useNavigate();
 
@@ -31,6 +33,16 @@ const Login = () => {
           "Error al iniciar sesión. Verifica tus credenciales."
       );
     }
+  };
+
+  // Función para abrir el modal
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -72,7 +84,14 @@ const Login = () => {
             onSubmit={handleSubmit}
             submitLabel="Iniciar sesión"
           />
-          <div className="mt-1 text-left"></div>
+          <div className="mt-4 text-center">
+            <button
+              onClick={openModal}
+              className="text-blue-600 hover:underline text-sm font-semibold"
+            >
+              ¿No tienes cuenta? Regístrate aquí
+            </button>
+          </div>
           {errorMessage && (
             <p className="text-red-500 text-sm font-semibold text-center mt-3">
               {errorMessage}
@@ -88,6 +107,8 @@ const Login = () => {
         alt="Logo"
         className="w-[90px] absolute bottom-6 left-4"
       />
+      {/* Renderiza el modal de registro */}
+      <CrearUsersModal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 };

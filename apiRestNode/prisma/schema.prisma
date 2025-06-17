@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum RolUsuario {
+enum Rol {
   admin
   instructor
   pasante
@@ -26,362 +23,394 @@ enum EstadoUsuario {
   inactivo
 }
 
-model Usuario {
-  identificacion    Int           @id
-  nombre            String
-  apellidos         String
-  fechaNacimiento   DateTime      @db.Date
-  telefono          String
-  correoElectronico String        @unique
-  passwordHash      String
-  rol               RolUsuario    @default(visitante)
-  estado            EstadoUsuario @default(activo)
-
-  actividades Actividad[]
-  pasantes    Pasante[]
-}
-
-model Actividad {
-  id          Int             @id @default(autoincrement())
-  cultivoId   Int
-  usuarioId   Int
-  titulo      String
-  descripcion String
-  fecha       DateTime
-  estado      EstadoActividad @default(ASIGNADA)
-
-  cultivo          Cultivo          @relation(fields: [cultivoId], references: [id])
-  usuario          Usuario          @relation(fields: [usuarioId], references: [identificacion])
-  usosHerramientas UsoHerramienta[]
-  usosProductos    UsoProducto[]
-}
-
 enum EstadoActividad {
-  ASIGNADA
-  COMPLETADA
-  CANCELADA
-}
-
-model Cultivo {
-  id           Int      @id @default(autoincrement())
-  especieId    Int
-  nombre       String
-  unidades     Int
-  activo       Boolean  @default(true)
-  fechaSiembra DateTime
-
-  especie      Especie      @relation(fields: [especieId], references: [id])
-  actividades  Actividad[]
-  desechos     Desecho[]
-  cosechas     Cosecha[]
-  plantaciones Plantacion[]
-}
-
-model Especie {
-  id                Int     @id @default(autoincrement())
-  nombre            String
-  descripcion       String
-  img               String?
-  tiempoCrecimiento Int
-  tipoEspecieId     Int
-
-  tipoEspecie TipoEspecie @relation(fields: [tipoEspecieId], references: [id])
-  cultivos    Cultivo[]
-  semilleros  Semillero[]
-}
-
-model TipoEspecie {
-  id          Int     @id @default(autoincrement())
-  nombre      String
-  descripcion String
-  img         String?
-
-  especies Especie[]
-}
-
-model Semillero {
-  id            Int      @id @default(autoincrement())
-  especieId     Int
-  unidades      Int
-  fechaSiembra  DateTime
-  fechaEstimada DateTime
-
-  especie Especie @relation(fields: [especieId], references: [id])
-}
-
-model Desecho {
-  id            Int    @id @default(autoincrement())
-  cultivoId     Int
-  tipoDesechoId Int
-  nombre        String
-  descripcion   String
-
-  cultivo     Cultivo     @relation(fields: [cultivoId], references: [id])
-  tipoDesecho TipoDesecho @relation(fields: [tipoDesechoId], references: [id])
-}
-
-model TipoDesecho {
-  id          Int    @id @default(autoincrement())
-  nombre      String
-  descripcion String
-
-  desechos Desecho[]
-}
-
-model Pasante {
-  id                  Int      @id @default(autoincrement())
-  usuarioId           Int
-  fechaInicioPasantia DateTime
-  fechaFinalizacion   DateTime
-  salarioHora         Int
-  area                String
-
-  usuario        Usuario       @relation(fields: [usuarioId], references: [identificacion])
-  horasMensuales HoraMensual[]
-}
-
-model HoraMensual {
-  id        Int    @id @default(autoincrement())
-  pasanteId Int
-  minutos   Int
-  salario   Int
-  mes       String
-
-  pasante Pasante @relation(fields: [pasanteId], references: [id])
-}
-
-model UsoHerramienta {
-  id            Int @id @default(autoincrement())
-  herramientaId Int
-  actividadId   Int
-
-  herramienta Herramienta @relation(fields: [herramientaId], references: [id])
-  actividad   Actividad   @relation(fields: [actividadId], references: [id])
-}
-
-model UsoProducto {
-  id               Int @id @default(autoincrement())
-  insumoId         Int
-  actividadId      Int
-  cantidadProducto Int
-
-  insumo    Insumo    @relation(fields: [insumoId], references: [id])
-  actividad Actividad @relation(fields: [actividadId], references: [id])
-}
-
-model Insumo {
-  id          Int    @id @default(autoincrement())
-  nombre      String
-  descripcion String
-  precio      Int
-  unidades    Int
-
-  usos UsoProducto[]
-}
-
-model Herramienta {
-  id          Int    @id @default(autoincrement())
-  loteId      Int
-  nombre      String
-  descripcion String
-  unidades    Int
-
-  lote Lote             @relation(fields: [loteId], references: [id])
-  usos UsoHerramienta[]
-}
-
-model Lote {
-  id          Int     @id @default(autoincrement())
-  nombre      String
-  descripcion String
-  tamX        Int
-  tamY        Int
-  estado      Boolean @default(true)
-  posX        Float
-  posY        Float
-
-  eras                 Era[]
-  herramientas         Herramienta[]
-  precipitaciones      Precipitacion[]
-  evapotranspiraciones Evapotranspiracion[]
-  sensores             Sensor[]
-}
-
-model Era {
-  id     Int     @id @default(autoincrement())
-  loteId Int
-  tamX   Float
-  tamY   Float
-  posX   Float
-  posY   Float
-  estado Boolean @default(true)
-
-  lote         Lote         @relation(fields: [loteId], references: [id])
-  sensores     Sensor[]
-  plantaciones Plantacion[]
-}
-
-model Plantacion {
-  id        Int @id @default(autoincrement())
-  cultivoId Int
-  eraId     Int
-
-  cultivo    Cultivo    @relation(fields: [cultivoId], references: [id])
-  era        Era        @relation(fields: [eraId], references: [id])
-  afecciones Afeccion[]
-}
-
-model Afeccion {
-  id             Int            @id @default(autoincrement())
-  plantacionId   Int
-  plagaId        Int
-  fechaEncuentro DateTime
-  estado         EstadoAfeccion @default(SINTRATAMIENTO)
-
-  plantacion Plantacion @relation(fields: [plantacionId], references: [id])
-  plaga      Plaga      @relation(fields: [plagaId], references: [id])
-  controles  Control[]
+  Asignada
+  Completada
+  Cancelada
 }
 
 enum EstadoAfeccion {
-  SINTRATAMIENTO
-  ENCONTROL
-  ELIMINADO
-}
-
-model Plaga {
-  id          Int     @id @default(autoincrement())
-  tipoPlagaId Int
-  nombre      String
-  descripcion String
-  img         String?
-
-  tipoPlaga  TipoPlaga  @relation(fields: [tipoPlagaId], references: [id])
-  afecciones Afeccion[]
-}
-
-model TipoPlaga {
-  id          Int    @id @default(autoincrement())
-  nombre      String
-  descripcion String
-  img         String
-
-  plagas Plaga[]
-}
-
-model Control {
-  id            Int      @id @default(autoincrement())
-  afeccionId    Int
-  tipoControlId Int
-  descripcion   String
-  fechaControl  DateTime
-
-  afeccion             Afeccion             @relation(fields: [afeccionId], references: [id])
-  tipoControl          TipoControl          @relation(fields: [tipoControlId], references: [id])
-  usosProductosControl UsoProductoControl[]
-}
-
-model TipoControl {
-  id          Int    @id @default(autoincrement())
-  nombre      String
-  descripcion String
-
-  controles Control[]
-}
-
-model ProductoControl {
-  id              Int    @id @default(autoincrement())
-  nombre          String
-  precio          Int
-  compuestoActivo String
-  fichaTecnica    String
-  contenido       Int
-  tipoContenido   String
-  unidades        Int
-
-  usosProducto UsoProductoControl[]
-}
-
-model UsoProductoControl {
-  id               Int @id @default(autoincrement())
-  productoId       Int
-  controlId        Int
-  cantidadProducto Int
-
-  producto ProductoControl @relation(fields: [productoId], references: [id])
-  control  Control         @relation(fields: [controlId], references: [id])
-}
-
-model Sensor {
-  id          Int        @id @default(autoincrement())
-  tipoSensor  TipoSensor
-  datosSensor Float
-  fecha       DateTime   @default(now())
-  eraId       Int?
-  loteId      Int?
-
-  lote     Lote?    @relation(fields: [loteId], references: [id])
-  era      Era?     @relation(fields: [eraId], references: [id])
-  umbrales Umbral[]
+  SinTratamiento
+  EnControl
+  Eliminado
 }
 
 enum TipoSensor {
-  TEMPERATURA
-  ILUMINACION
-  HUMEDAD_AMBIENTAL
-  HUMEDAD_TERRENO
-  PH
-  VIENTO
-  LLUVIA
+  Temperatura
+  Iluminación
+  Humedad_Ambiental @map("Humedad Ambiental")
+  Humedad_del_Terreno @map("Humedad del Terreno")
+  Nivel_de_PH @map("Nivel de PH")
+  Viento
+  Lluvia
 }
 
-model Umbral {
-  id          Int   @id @default(autoincrement())
-  sensorId    Int
-  valorMinimo Float
-  valorMaximo Float
+model Usuarios {
+  identificacion    Int        @id @map("identificacion")
+  nombre            String        @map("nombre")
+  apellidos         String        @map("apellidos")
+  fechaNacimiento   DateTime      @map("fechaNacimiento") @db.Date
+  telefono          String        @map("telefono")
+  correoElectronico String        @map("correoElectronico") @unique
+  passwordHash      String        @map("passwordHash")
+  estado            EstadoUsuario @map("estado") @default(activo)
+  rol               Rol           @map("rol") @default(visitante)
 
-  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  actividades       Actividades[] @relation("actividades_usuario")
+  pasantes          Pasantes[]
+  @@map("usuarios")
 }
 
-model Precipitacion {
-  id     Int      @id @default(autoincrement())
-  loteId Int
-  fecha  DateTime
-  mm     Int
+model Actividades {
+  id          Int             @id @default(autoincrement())
+  fkCultivos  Int             @map("fk_Cultivos")
+  fkUsuarios  Int          @map("fk_Usuarios")
+  titulo      String          @map("titulo")
+  descripcion String          @map("descripcion") @db.Text
+  fecha       DateTime        @map("fecha") @db.Date
+  estado      EstadoActividad @map("estado") @default(Asignada)
 
-  lote Lote @relation(fields: [loteId], references: [id])
+  cultivos          Cultivos          @relation(fields: [fkCultivos], references: [id])
+  usuarios          Usuarios          @relation("actividades_usuario", fields: [fkUsuarios], references: [identificacion])
+  usosHerramientas  UsosHerramientas[]
+  usosProductos     UsosProductos[]
+  @@map("actividades")
 }
 
-model Evapotranspiracion {
+model Cultivos {
+  id           Int      @id @default(autoincrement())
+  fkEspecies   Int      @map("fk_Especies")
+  nombre       String   @map("nombre")
+  unidades     Int      @map("unidades")
+  activo       Boolean  @map("activo") @default(true)
+  fechaSiembra DateTime @map("fechaSiembra") @db.Date
+
+  especies      Especies      @relation(fields: [fkEspecies], references: [id])
+  actividades   Actividades[]
+  desechos      Desechos[]
+  cosechas      Cosechas[]
+  plantaciones  Plantaciones[]
+  @@map("cultivos")
+}
+
+model Especies {
+  id                Int          @id @default(autoincrement())
+  nombre            String       @map("nombre")
+  descripcion       String       @map("descripcion") @db.Text
+  img               String?      @map("img")
+  tiempoCrecimiento Int          @map("tiempoCrecimiento")
+  fkTiposEspecie    Int          @map("fk_TiposEspecie")
+
+  tiposEspecie  TiposEspecie @relation(fields: [fkTiposEspecie], references: [id])
+  cultivos      Cultivos[]
+  semilleros    Semilleros[]
+  @@map("especies")
+}
+
+model TiposEspecie {
+  id          Int       @id @default(autoincrement())
+  nombre      String    @map("nombre")
+  descripcion String    @map("descripcion") @db.Text
+  img         String?   @map("img")
+
+  especies    Especies[]
+  @@map("tiposespecie")
+}
+
+model Semilleros {
+  id            Int      @id @default(autoincrement())
+  fkEspecies    Int      @map("fk_Especies")
+  unidades      Int      @map("unidades")
+  fechaSiembra  DateTime @map("fechaSiembra") @db.Date
+  fechaEstimada DateTime @map("fechaEstimada") @db.Date
+
+  especies      Especies @relation(fields: [fkEspecies], references: [id])
+  @@map("semilleros")
+}
+
+model Desechos {
+  id              Int          @id @default(autoincrement())
+  fkCultivos      Int          @map("fk_Cultivos")
+  fkTiposDesecho  Int          @map("fk_TiposDesecho")
+  nombre          String       @map("nombre")
+  descripcion     String       @map("descripcion") @db.Text
+
+  cultivos        Cultivos      @relation(fields: [fkCultivos], references: [id])
+  tiposDesecho    TiposDesecho  @relation(fields: [fkTiposDesecho], references: [id])
+  @@map("desechos")
+}
+
+model TiposDesecho {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @map("nombre")
+  descripcion String   @map("descripcion") @db.Text
+
+  desechos    Desechos[]
+  @@map("tiposdesecho")
+}
+
+model Pasantes {
   id                  Int      @id @default(autoincrement())
-  loteId              Int
-  fecha               DateTime
-  milimetrosMCuadrado Int
+  fkUsuarios          Int   @map("fk_Usuarios")
+  fechaInicioPasantia DateTime @map("fechaInicioPasantia") @db.Date
+  fechaFinalizacion   DateTime @map("fechaFinalizacion") @db.Date
+  salarioHora         Int      @map("salarioHora")
+  area                String   @map("area")
 
-  lote Lote @relation(fields: [loteId], references: [id])
+  usuarios            Usuarios        @relation(fields: [fkUsuarios], references: [identificacion])
+  horasMensuales      HorasMensuales[]
+  @@map("pasantes")
+}
+
+model HorasMensuales {
+  id          Int    @id @default(autoincrement())
+  fkPasantes  Int    @map("fk_Pasantes")
+  minutos     Int    @map("minutos")
+  salario     Int    @map("salario")
+  mes         String @map("mes")
+
+  pasantes    Pasantes @relation(fields: [fkPasantes], references: [id])
+  @@map("horasmensuales")
+}
+
+model UsosHerramientas {
+  id             Int         @id @default(autoincrement())
+  fkHerramientas Int         @map("fk_Herramientas")
+  fkActividades  Int         @map("fk_Actividades")
+
+  herramientas   Herramientas @relation(fields: [fkHerramientas], references: [id])
+  actividades    Actividades  @relation(fields: [fkActividades], references: [id])
+  @@map("usosherramientas")
+}
+
+model UsosProductos {
+  id               Int         @id @default(autoincrement())
+  fkInsumos        Int         @map("fk_Insumos")
+  fkActividades    Int         @map("fk_Actividades")
+  cantidadProducto Int         @map("cantidadProducto")
+
+  insumos         Insumos     @relation(fields: [fkInsumos], references: [id])
+  actividades     Actividades @relation(fields: [fkActividades], references: [id])
+  @@map("usosproductos")
+}
+
+model Insumos {
+  id          Int    @id @default(autoincrement())
+  nombre      String @map("nombre")
+  descripcion String @map("descripcion") @db.Text
+  precio      Int    @map("precio")
+  unidades    Int    @map("unidades")
+
+  usosProductos UsosProductos[]
+  @@map("insumos")
+}
+
+model Herramientas {
+  id          Int    @id @default(autoincrement())
+  fkLotes     Int    @map("fk_Lotes")
+  nombre      String @map("nombre")
+  descripcion String @map("descripcion") @db.Text
+  unidades    Int    @map("unidades")
+
+  lotes         Lotes          @relation(fields: [fkLotes], references: [id])
+  usosHerramientas UsosHerramientas[]
+  @@map("herramientas")
+}
+
+model Lotes {
+  id          Int     @id @default(autoincrement())
+  nombre      String  @map("nombre")
+  descripcion String  @map("descripcion") @db.Text
+  tamX        Int     @map("tamX")
+  tamY        Int     @map("tamY")
+  estado      Boolean @map("estado") @default(true)
+  posX        Float   @map("posX") 
+  posY        Float   @map("posY") 
+
+  eras                 Eras[]
+  herramientas         Herramientas[]
+  precipitaciones      Precipitaciones[]
+  evapotranspiraciones Evapotranspiraciones[]
+  sensores             Sensores[]
+  @@map("lotes")
+}
+
+model Eras {
+  id     Int     @id @default(autoincrement())
+  fkLotes Int    @map("fk_Lotes")
+  tamX   Float   @map("tamX") 
+  tamY   Float   @map("tamY") 
+  posX   Float   @map("posX") 
+  posY   Float   @map("posY") 
+  estado Boolean @map("estado") @default(true)
+
+  lotes        Lotes        @relation(fields: [fkLotes], references: [id])
+  sensores     Sensores[]
+  plantaciones Plantaciones[]
+  @@map("eras")
+}
+
+model Plantaciones {
+  id          Int  @id @default(autoincrement())
+  fkCultivos  Int  @map("fk_Cultivos")
+  fkEras      Int  @map("fk_Eras")
+
+  cultivos    Cultivos    @relation(fields: [fkCultivos], references: [id])
+  eras        Eras        @relation(fields: [fkEras], references: [id])
+  afecciones  Afecciones[]
+  @@map("plantaciones")
+}
+
+model Afecciones {
+  id              Int            @id @default(autoincrement())
+  fkPlantaciones  Int            @map("fk_Plantaciones")
+  fkPlagas        Int            @map("fk_Plagas")
+  fechaEncuentro  DateTime       @map("fechaEncuentro") @db.Date
+  estado          EstadoAfeccion @map("estado") @default(SinTratamiento)
+
+  plantaciones    Plantaciones @relation(fields: [fkPlantaciones], references: [id])
+  plagas          Plagas       @relation(fields: [fkPlagas], references: [id])
+  controles       Controles[]
+  @@map("afecciones")
+}
+
+model Plagas {
+  id            Int       @id @default(autoincrement())
+  fkTiposPlaga  Int       @map("fk_TiposPlaga")
+  nombre        String    @map("nombre")
+  descripcion   String    @map("descripcion") @db.Text
+  img           String?   @map("img")
+
+  tiposPlaga    TiposPlaga  @relation(fields: [fkTiposPlaga], references: [id])
+  afecciones    Afecciones[]
+  @@map("plagas")
+}
+
+model TiposPlaga {
+  id          Int     @id @default(autoincrement())
+  nombre      String  @map("nombre")
+  descripcion String  @map("descripcion") @db.Text
+  img         String  @map("img")
+
+  plagas      Plagas[]
+  @@map("tiposplaga")
+}
+
+model Controles {
+  id             Int      @id @default(autoincrement())
+  fkAfecciones   Int      @map("fk_Afecciones")
+  fkTiposControl Int      @map("fk_TiposControl")
+  descripcion    String   @map("descripcion") @db.Text
+  fechaControl   DateTime @map("fechaControl") @db.Date
+
+  afecciones        Afecciones        @relation(fields: [fkAfecciones], references: [id])
+  tiposControl      TiposControl      @relation(fields: [fkTiposControl], references: [id])
+  usoProductoControl UsoProductoControl[]
+  @@map("controles")
+}
+
+model TiposControl {
+  id          Int      @id @default(autoincrement())
+  nombre      String   @map("nombre")
+  descripcion String   @map("descripcion") @db.Text
+
+  controles    Controles[]
+  @@map("tiposcontrol")
+}
+
+model ProductosControl {
+  id              Int    @id @default(autoincrement())
+  nombre          String @map("nombre")
+  precio          Int    @map("precio")
+  compuestoActivo String @map("compuestoActivo")
+  fichaTecnica    String @map("fichaTecnica") @db.Text
+  contenido       Int    @map("contenido")
+  tipoContenido   String @map("tipoContenido")
+  unidades        Int    @map("unidades")
+
+  usoProductoControl UsoProductoControl[]
+  @@map("productoscontrol")
+}
+
+model UsoProductoControl {
+  id                 Int  @id @default(autoincrement())
+  fkProductosControl Int  @map("fk_ProductosControl")
+  fkControles        Int  @map("fk_Controles")
+  cantidadProducto   Int  @map("cantidadProducto")
+
+  productosControl   ProductosControl @relation(fields: [fkProductosControl], references: [id])
+  controles          Controles        @relation(fields: [fkControles], references: [id])
+  @@map("usoproductocontrol")
+}
+
+model Sensores {
+  id          Int        @id @default(autoincrement())
+  tipoSensor  TipoSensor @map("tipo_sensor")
+  datosSensor Float      @map("datos_sensor")
+  fecha       DateTime   @map("fecha") @default(now()) @db.Timestamp(0)
+  eraId       Int?       @map("era_id")
+  loteId      Int?       @map("lote_id")
+
+  eras        Eras?      @relation(fields: [eraId], references: [id])
+  lotes       Lotes?     @relation(fields: [loteId], references: [id])
+  umbrales    Umbrales[]
+  @@map("sensores")
+}
+
+model Umbrales {
+  id          Int   @id @default(autoincrement())
+  sensorId    Int   @map("sensor_id")
+  valorMinimo Float @map("valor_minimo")
+  valorMaximo Float @map("valor_maximo")
+
+  sensores    Sensores @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  @@map("umbrales")
+}
+
+model Precipitaciones {
+  id       Int      @id @default(autoincrement())
+  fkLotes  Int      @map("fk_Lotes")
+  fecha    DateTime @map("fecha") @db.Date
+  mm       Int      @map("mm")
+
+  lotes    Lotes @relation(fields: [fkLotes], references: [id])
+  @@map("precipitaciones")
+}
+
+model Evapotranspiraciones {
+  id                  Int      @id @default(autoincrement())
+  fkLotes             Int      @map("fk_Lotes")
+  fecha               DateTime @map("fecha") @db.Date
+  milimetrosMCuadrado Int      @map("milimetrosMCuadrado")
+
+  lotes               Lotes @relation(fields: [fkLotes], references: [id])
+  @@map("evapotranspiraciones")
 }
 
 model UnidadMedida {
   id     Int    @id @default(autoincrement())
-  nombre String
+  nombre String @map("nombre")
+
+  @@map("unidadmedida")
 }
 
-model Venta {
+model Ventas {
   id             Int      @id @default(autoincrement())
-  cosechaId      Int
-  precioUnitario Int
-  fecha          DateTime
+  fkCosechas     Int      @map("fk_Cosechas")
+  precioUnitario Int      @map("precioUnitario")
+  fecha          DateTime @map("fecha") @db.Date
 
-  cosecha Cosecha @relation(fields: [cosechaId], references: [id])
+  cosechas       Cosechas @relation(fields: [fkCosechas], references: [id])
+  @@map("ventas")
 }
 
-model Cosecha {
-  id        Int      @id @default(autoincrement())
-  cultivoId Int
-  unidades  Int
-  fecha     DateTime
+model Cosechas {
+  id          Int      @id @default(autoincrement())
+  fkCultivos  Int      @map("fk_Cultivos")
+  unidades    Int      @map("unidades")
+  fecha       DateTime @map("fecha") @db.Date
 
-  cultivo Cultivo @relation(fields: [cultivoId], references: [id])
-  ventas  Venta[]
+  cultivos    Cultivos @relation(fields: [fkCultivos], references: [id])
+  ventas      Ventas[]
+  @@map("cosechas")
 }
