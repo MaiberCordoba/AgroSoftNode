@@ -1,144 +1,138 @@
 import pool from "../db.js";
+
+// ✅ LISTAR CONTROLES
 export const listarControles = async (req, resp) => {
   try {
-    const sql = `SELECT 
-      co.id AS id_co, co.descripcion AS descripcion_co, co.fechaControl,
-      tpC.id AS id_tpC, tpC.nombre AS nombre_tpC, tpC.descripcion AS descripcion_tpC,
-      a.id, a.fechaEncuentro, a.estado, a.fk_plagas,
-      p.nombre AS nombre_plaga, p.fk_TiposPlaga AS idTipoPlaga, tp.nombre AS tipo_plaga,
-      pl.id AS id_plantaciones,
-      c.id AS id_cultivo, c.nombre AS nombre_cultivo, c.unidades AS unCultivo,
-      er.id AS id_era, er.posX AS posXera, er.posY AS posYera,
-      lo.id AS id_lote, lo.posX AS posXlote, lo.posY AS posYlote 
-    FROM controles co
-    JOIN tiposcontrol tpC ON fk_TiposControl = tpC.id
-    JOIN afecciones a ON fk_Afecciones = a.id
-    JOIN plagas p ON a.fk_Plagas = p.id
-    JOIN tiposPlaga tp ON p.fk_TiposPlaga = tp.id
-    JOIN plantaciones pl ON fk_Plantaciones = pl.id
-    JOIN cultivos c ON fk_Cultivos = c.id
-    JOIN eras er ON fk_Eras = er.id
-    JOIN lotes lo ON fk_Lotes = lo.id`;
+    const controles = await pool.control.findMany({
+      include: {
+        tipoControl: true,
+        afeccion: {
+          include: {
+            plaga: {
+              include: {
+                tipoPlaga: true,
+              },
+            },
+            plantacion: {
+              include: {
+                cultivo: true,
+                era: {
+                  include: {
+                    lote: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    const [result] = await pool.query(sql);
-
-    const controles = result.map((control) => ({
-      id: control.id_co,
-      descripcion: control.descripcion_co,
+    const resultado = controles.map((control) => ({
+      id: control.id,
+      descripcion: control.descripcion,
       fechaControl: control.fechaControl,
       fk_TipoControl: {
-        id: control.id_tpC,
-        nombre: control.nombre_tpC,
-        descripcion: control.descripcion_tpC,
+        id: control.tipoControl.id,
+        nombre: control.tipoControl.nombre,
+        descripcion: control.tipoControl.descripcion,
       },
       fk_Afecciones: {
-        id: control.id,
-        fechaEncuentro: control.fechaEncuentro,
-        estado: control.estado,
+        id: control.afeccion.id,
+        fechaEncuentro: control.afeccion.fechaEncuentro,
+        estado: control.afeccion.estado,
         fk_Plagas: {
-          idPlaga: control.id,
-          nombre: control.nombre_plaga,
+          id: control.afeccion.plaga.id,
+          nombre: control.afeccion.plaga.nombre,
+          tipo: {
+            id: control.afeccion.plaga.tipoPlaga.id,
+            nombre: control.afeccion.plaga.tipoPlaga.nombre,
+          },
         },
         fk_Plantaciones: {
-          id: control.id_plantaciones,
+          id: control.afeccion.plantacion.id,
           fk_cultivo: {
-            id_cultivo: control.id_cultivo,
-            nombre: control.nombre_cultivo,
-            unidades: control.unCultivo,
+            id: control.afeccion.plantacion.cultivo.id,
+            nombre: control.afeccion.plantacion.cultivo.nombre,
+            unidades: control.afeccion.plantacion.cultivo.unidades,
           },
           fk_era: {
-            id: control.id_era,
-            posX: control.posXera,
-            posY: control.posYera,
+            id: control.afeccion.plantacion.era.id,
+            posX: control.afeccion.plantacion.era.posX,
+            posY: control.afeccion.plantacion.era.posY,
             fk_lote: {
-              id: control.id_lote,
-              posX: control.posXlote,
-              posY: control.posYlote,
+              id: control.afeccion.plantacion.era.lote.id,
+              posX: control.afeccion.plantacion.era.lote.posX,
+              posY: control.afeccion.plantacion.era.lote.posY,
             },
           },
         },
       },
     }));
 
-    return resp.status(200).json(controles); // siempre devuelve 200, aunque sea []
-    
+    return resp.status(200).json(resultado);
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al listar controles:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
-
-
+// ✅ REGISTRAR CONTROL
 export const registrarControles = async (req, resp) => {
   try {
-    const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } =
-      req.body;
-    const sql = `INSERT INTO controles (fk_Afecciones, fk_TiposControl,descripcion,fechaControl) VALUES (?,?,?,?)`;
-    const [rows] = await pool.query(sql, [
-      fk_Afeccion,
-      fk_TipoControl,
-      descripcion,
-      fechaControl,
-    ]);
+    const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } = req.body;
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "Tipo de control registrado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo registrar el tipo de control" });
-    }
+    await pool.control.create({
+      data: {
+        fk_Afecciones: fk_Afeccion,
+        fk_TiposControl: fk_TipoControl,
+        descripcion,
+        fechaControl: new Date(fechaControl),
+      },
+    });
+
+    return resp.status(201).json({ message: "Control registrado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al registrar control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
+// ✅ ACTUALIZAR CONTROL
 export const actualizarControles = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } =
-      req.body;
-    const sql = `UPDATE controles SET fk_Afecciones=?, fk_TiposControl=?, descripcion=?,fechaControl=?
-     WHERE id=${id}`;
+    const id = parseInt(req.params.id);
+    const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } = req.body;
 
-    const [rows] = await pool.query(sql, [
-      fk_Afeccion,
-      fk_TipoControl,
-      descripcion,
-      fechaControl,
-    ]);
+    await pool.control.update({
+      where: { id },
+      data: {
+        fk_Afecciones: fk_Afeccion,
+        fk_TiposControl: fk_TipoControl,
+        descripcion,
+        fechaControl: new Date(fechaControl),
+      },
+    });
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "control actualizado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo actualizar el control" });
-    }
+    return resp.status(200).json({ message: "Control actualizado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al actualizar control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
+// ✅ ELIMINAR CONTROL
 export const eliminarControles = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const sql = `DELETE FROM controles WHERE id=?`;
+    const id = parseInt(req.params.id);
 
-    const [rows] = await pool.query(sql, [id]);
+    await pool.control.delete({
+      where: { id },
+    });
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "Control eliminado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo eliminar el control" });
-    }
+    return resp.status(200).json({ message: "Control eliminado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al eliminar control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };

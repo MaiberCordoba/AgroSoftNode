@@ -1,134 +1,130 @@
-import pool from "../db.js";
+import prisma from "../db.js";
 
-export const listarPlagas = async (req, resp) => {
+// ✅ LISTAR
+export const listarPlagas = async (req, res) => {
   try {
-    const [result] = await pool.query(`
-      SELECT 
-        p.id,  -- << AQUI AGREGO EL ID
-        p.nombre, 
-        p.descripcion, 
-        p.img, 
-        p.fk_TiposPlaga AS id_tipo_plaga, 
-        tp.nombre AS tipo_plaga, 
-        tp.descripcion AS descripcion_tipo_plaga, 
-        tp.img AS imagen_tipo_plaga
-      FROM plagas p 
-      JOIN tiposplaga tp ON p.fk_TiposPlaga = tp.id
-    `);
+    const plagas = await prisma.plaga.findMany({
+      include: {
+        tipoPlaga: true, // Relación con TipoPlaga
+      },
+    });
 
-    const plagas = result.map((plaga) => ({
-      id: plaga.id, // << AQUI LO MAPEO
+    const resultado = plagas.map((plaga) => ({
+      id: plaga.id,
       nombre: plaga.nombre,
       descripcion: plaga.descripcion,
       img: plaga.img,
       tipoPlaga: {
-        id: plaga.id_tipo_plaga,
-        nombre: plaga.tipo_plaga,
-        descripcion: plaga.descripcion_tipo_plaga,
-        img: plaga.imagen_tipo_plaga,
+        id: plaga.tipoPlaga.id,
+        nombre: plaga.tipoPlaga.nombre,
+        descripcion: plaga.tipoPlaga.descripcion,
+        img: plaga.tipoPlaga.img,
       },
     }));
 
-    return resp.status(200).json(plagas);
+    return res.status(200).json(resultado);
   } catch (error) {
-    console.error(error);
-    return resp.status(500).json({ message: "error en el sistema" });
+    console.error("🔥 Error al listar plagas:", error);
+    return res.status(500).json({ message: "error en el sistema" });
   }
 };
 
-
-
-export const registrarPlagas = async (req, resp) => {
+// ✅ REGISTRAR
+export const registrarPlagas = async (req, res) => {
   try {
     const { fk_Tipo, nombre, descripcion, img } = req.body;
-    const sql = `insert into plagas (fk_TiposPlaga,nombre,descripcion,img) values (?,?,?,?)`;
-    const [rows] = await pool.query(sql, [
-      fk_Tipo,
-      nombre,
-      descripcion,
-      img,
-    ]);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: " plaga registrada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: " nueva plaga no se pudo registrar" });
-    }
-  } catch (error) {
-    console.error(error);
-    return resp.status(500).json({ message: "error en el sistema" });
-  }
-};
 
-export const actualizarPlagas = async (req, resp) => {
-  try {
-    const id = req.params.id;
-    const { fk_TiposPlaga, nombre, descripcion, img } = req.body;
-    const sql = `update plagas set fk_TiposPlaga=?,nombre=?,descripcion=?,img=? where id=${id}`;
-
-    const [rows] = await pool.query(sql, [
-      fk_TiposPlaga,
-      nombre,
-      descripcion,
-      img,
-    ]);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "plaga actualizada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible actualizar esta plaga" });
-    }
-  } catch (error) {
-    console.error(error);
-    return resp.status(500).json({ message: "error en el sistema" });
-  }
-};
-
-export const eliminarPlagas = async (req, resp) => {
-  try {
-    const id = req.params.id;
-    const sql = `delete from plagas where id=${id}`;
-
-    const [rows] = await pool.query(sql);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: " plaga eliminada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible eliminar la plaga" });
-    }
-  } catch (error) {
-    console.error(error);
-    return resp.status(500).json({ message: "error en el sistema" });
-  }
-};
-
-export const buscarPlaga = async (req, resp) => {
-  try {
-    const id = req.params.id;
-    const [result] =
-      await pool.query(`select p.nombre, p.descripcion, p.img, p.fk_TiposPlaga as id_tipo_plaga, tp.nombre as tipo_plaga, tp.descripcion as descipcion_tipo_plaga, tp.img as imagen_tipo_plaga
-       from plagas p join tiposplaga tp on p.fk_TiposPlaga = tp.id where p.id=${id}`);
-    if (result.length > 0) {
-      const plagas = result.map((plaga) => ({
-        nombre: plaga.nombre,
-        descripcion: plaga.descripcion,
-        img: plaga.img,
-        fk_TiposPlaga: {
-          id: plaga.id_tipo_plaga,
-          nombre: plaga.tipo_plaga,
-          descripcion: plaga.descripcion_tipo_plaga,
-          img: plaga.imagen_tipo_plaga,
+    await prisma.plaga.create({
+      data: {
+        nombre,
+        descripcion,
+        img,
+        tipoPlaga: {
+          connect: { id: fk_Tipo },
         },
-      }));
-      return resp.status(200).json(plagas);
-    } else {
-      return resp.status(404).json({ message: "plaga no encontrados" });
-    }
+      },
+    });
+
+    return res.status(201).json({ message: "Plaga registrada" });
   } catch (error) {
-    console.error(error);
-    return resp.status(500).json({ message: "error en el sistema" });
+    console.error("🔥 Error al registrar plaga:", error);
+    return res.status(500).json({ message: "error en el sistema" });
+  }
+};
+
+// ✅ ACTUALIZAR
+export const actualizarPlagas = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { fk_TiposPlaga, nombre, descripcion, img } = req.body;
+
+    await prisma.plaga.update({
+      where: { id },
+      data: {
+        nombre,
+        descripcion,
+        img,
+        tipoPlaga: {
+          connect: { id: fk_TiposPlaga },
+        },
+      },
+    });
+
+    return res.status(200).json({ message: "Plaga actualizada" });
+  } catch (error) {
+    console.error("🔥 Error al actualizar plaga:", error);
+    return res.status(500).json({ message: "error en el sistema" });
+  }
+};
+
+// ✅ ELIMINAR
+export const eliminarPlagas = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    await prisma.plaga.delete({
+      where: { id },
+    });
+
+    return res.status(200).json({ message: "Plaga eliminada" });
+  } catch (error) {
+    console.error("🔥 Error al eliminar plaga:", error);
+    return res.status(500).json({ message: "error en el sistema" });
+  }
+};
+
+// ✅ BUSCAR POR ID
+export const buscarPlaga = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+
+    const plaga = await prisma.plaga.findUnique({
+      where: { id },
+      include: {
+        tipoPlaga: true,
+      },
+    });
+
+    if (!plaga) {
+      return res.status(404).json({ message: "Plaga no encontrada" });
+    }
+
+    const resultado = {
+      id: plaga.id,
+      nombre: plaga.nombre,
+      descripcion: plaga.descripcion,
+      img: plaga.img,
+      tipoPlaga: {
+        id: plaga.tipoPlaga.id,
+        nombre: plaga.tipoPlaga.nombre,
+        descripcion: plaga.tipoPlaga.descripcion,
+        img: plaga.tipoPlaga.img,
+      },
+    };
+
+    return res.status(200).json(resultado);
+  } catch (error) {
+    console.error("🔥 Error al buscar plaga:", error);
+    return res.status(500).json({ message: "error en el sistema" });
   }
 };
