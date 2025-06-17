@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { createUsosHerramientas, getAllUsosHerramientas, updateUsoHerramienta } from '../controllers/usosHerramientas.controller.js';
+import { createUsoHerramientas, getAllUsoHerramientas, updateUsoHerramientas } from '../controllers/usosHerramientas.controller.js';
 import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
 const usosHerramientas = Router();
 
-usosHerramientas.get('/usosherramientas',verifyJWT,getAllUsosHerramientas);
-usosHerramientas.post('/usosherramientas',verifyJWT,createUsosHerramientas);
-usosHerramientas.patch('/usosherramientas/:id',verifyJWT,updateUsoHerramienta);
+usosHerramientas.get('/usosherramientas',verifyJWT,getAllUsoHerramientas);
+usosHerramientas.post('/usosherramientas',verifyJWT,createUsoHerramientas);
+usosHerramientas.patch('/usosherramientas/:id',verifyJWT,updateUsoHerramientas);
 
 export default usosHerramientas;

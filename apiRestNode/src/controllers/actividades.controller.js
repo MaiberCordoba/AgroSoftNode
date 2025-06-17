@@ -2,22 +2,11 @@ import pool from "../db.js";
 
 export const createActividad = async (req, res) => {
   try {
-    const { fk_Cultivos, fk_Usuarios, titulo, descripcion, fecha, estado } =
-      req.body;
-    const sql =
-      "INSERT INTO actividades (fk_Cultivos,fk_Usuarios,titulo,descripcion,fecha,estado) VALUES (?,?,?,?,?,?)";
-    const [rows] = await pool.query(sql, [
-      fk_Cultivos,
-      fk_Usuarios,
-      titulo,
-      descripcion,
-      fecha,
-      estado,
-    ]);
-    if (rows.affectedRows > 0) {
+    const sql = await pool.actividad.create({
+      data: req.body
+    })
+    if (sql) {
       return res.status(201).json({ msg: "Actividad creada correctamente" });
-    } else {
-      return res.status(400).json({ msg: "Error al crear la actividad" });
     }
   } catch (error) {
     console.error(error);
@@ -27,19 +16,10 @@ export const createActividad = async (req, res) => {
 
 export const getAllActividad = async (req, res) => {
   try {
-    const sql = "SELECT * FROM actividades";
-    const [rows] = await pool.query(sql);
+    const sql = await pool.actividad.findMany()
 
-    if (rows.length > 0) {
-      // Formatear la fecha al formato YYYY-MM-DD
-      const actividadesFormateadas = rows.map((actividad) => ({
-        ...actividad,
-        fecha: actividad.fecha.toISOString().split("T")[0],
-      }));
-
-      return res.status(200).json({ rows: actividadesFormateadas });
-    } else {
-      return res.status(404).json({ msg: "No se encontraron actividades" });
+    if (sql) {
+      return res.status(200).json(sql)
     }
   } catch (error) {
     console.error(error);
@@ -50,29 +30,22 @@ export const getAllActividad = async (req, res) => {
 export const updateActividad = async (req, res) => {
   try {
     const id = req.params.id;
-    const { fk_Cultivos, fk_Usuarios, titulo, descripcion, fecha, estado } =
-      req.body;
-    const sql = `UPDATE actividades SET fk_Cultivos=?,fk_Usuarios=?,titulo=?,descripcion=?,fecha=?,estado=? WHERE id = ${id}`;
-    const [rows] = await pool.query(sql, [
-      fk_Cultivos,
-      fk_Usuarios,
-      titulo,
-      descripcion,
-      fecha,
-      estado,
-    ]);
-    if (rows.affectedRows > 0) {
-      return res
-        .status(201)
-        .json({ msg: "Actividad actualizada correctamente" });
-    } else {
-      return res.status(400).json({ msg: "Error al actualizar la actividad" });
+    const sql = await pool.actividad.update({
+      where: { id: parseInt(id) },
+      data: req.body
+    })
+    if (sql) {
+      return res.status(200).json({ msg: "Se actualizo Correctamente" }, sql)
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ msg: "Internal server error" });
+    console.error(error)
+    if (error.code == "P2025") {
+      return res.status(404).json({ msg: "No se encontro el ID" })
+    }
+    return res.status(500).json({ msg: "Error en el servidor" })
   }
-};
+}
+
 
 export const reporteRentabilidad = async (req, res) => {
   try {

@@ -1,54 +1,54 @@
-import pool from "../db.js";
+import pool from "../db.js"
 
-export const createInsumo = async(req,res) => {
-    try{
-        const {nombre,descripcion,precio,unidades}=req.body
-        const sql = "INSERT INTO insumos (nombre,descripcion,precio,unidades) VALUES (?,?,?,?)"
-        const [rows] = await pool.query(sql,[nombre,descripcion,precio,unidades])
-        if (rows.affectedRows > 0){
-            return res.status(201).json({msg : "Insumo agregado correctamente"})
-        }
-        else{
-            return res.status(400).json({msg : "Error al agregar el insumo"})
+export const getAllInsumos = async (req, res) => {
+    try {
+        const sql = await pool.insumo.findMany({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json(sql)
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
 
-export const getAllInsumos = async(req,res) => {
-    try{
-        const sql = "SELECT * FROM insumos"
-        const [rows] = await pool.query(sql)
-        if (rows.length > 0){
-            return res.status(200).json({rows})
-        }
-        else{
-            return res.status(404).json({msg : "No se encontraron insumos"})
+export const createInsumos = async (req, res) => {
+    try {
+        const sql = await pool.insumo.create({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(201).json({ msg: "Se creo correctamente" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
-export const updateInsumos = async(req,res) => {
-    try{
-        const {nombre,descripcion,precio,unidades}=req.body
+
+export const updateInsumos = async (req, res) => {
+    try {
         const id = req.params.id
-        const sql = `UPDATE insumos SET nombre=?,descripcion=?,precio=?,unidades=? WHERE id = ${id}`
-        const [rows] = await pool.query(sql,[nombre,descripcion,precio,unidades])
-        if (rows.affectedRows > 0){
-            return res.status(201).json({msg : "Insumo actualizado correctamente"})
+        const sql = await pool.insumo.update({
+            where: { id: parseInt(id) },
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
         }
-        else{
-            return res.status(400).json({msg : "Error al actualizar el insumo"})
+        else {
+            return res.status(404).json({ msg: "No se encontro el ID" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        res.status(500).json({msg : "Internal server error"})
+        if (error.code == "P2025") {
+            return res.status(404).json({ msg: "No se encontro el ID" })
+        }
+        return res.status(500).json({ msg: "Error en el servidor" })
     }
 }
