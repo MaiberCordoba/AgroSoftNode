@@ -1,95 +1,82 @@
 import pool from "../db.js";
 
+// ✅ LISTAR
 export const listarTiposControl = async (req, resp) => {
   try {
-    const sql = `SELECT * FROM tiposcontrol`;
-    const [rows] = await pool.query(sql);
-
-    // Aunque esté vacío, devolvemos 200 con un array
-    return resp.status(200).json(rows);
+    const tiposControl = await pool.tipoControl.findMany(); // correcto
+    return resp.status(200).json(tiposControl);
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al listar tipos de control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
-
+// ✅ REGISTRAR
 export const registrarTipoControl = async (req, resp) => {
   try {
     const { nombre, descripcion } = req.body;
-    const sql = `INSERT INTO tiposcontrol (nombre, descripcion) VALUES (?, ?)`;
-    const [rows] = await pool.query(sql, [nombre, descripcion]);
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "Tipo de control registrado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo registrar el tipo de control" });
-    }
+    await pool.tipoControl.create({
+      data: { nombre, descripcion },
+    });
+
+    return resp.status(200).json({ message: "Tipo de control registrado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al registrar tipo de control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
+// ✅ ACTUALIZAR
 export const actualizarTipoControl = async (req, resp) => {
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const { nombre, descripcion } = req.body;
-    const sql = `UPDATE tiposcontrol SET nombre=?, descripcion=? WHERE id=?`;
 
-    const [rows] = await pool.query(sql, [nombre, descripcion, id]);
+    await pool.tipoControl.update({
+      where: { id },
+      data: { nombre, descripcion },
+    });
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "Tipo de control actualizado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo actualizar el tipo de control" });
-    }
+    return resp.status(200).json({ message: "Tipo de control actualizado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al actualizar tipo de control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
+// ✅ ELIMINAR
 export const eliminarTipoControl = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const sql = `DELETE FROM tiposcontrol WHERE id=?`;
+    const id = parseInt(req.params.id);
 
-    const [rows] = await pool.query(sql, [id]);
+    await pool.tipoControl.delete({
+      where: { id },
+    });
 
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "Tipo de control eliminado" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "No se pudo eliminar el tipo de control" });
-    }
+    return resp.status(200).json({ message: "Tipo de control eliminado" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al eliminar tipo de control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
 
+// ✅ BUSCAR POR ID
 export const buscarTipoControl = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const [result] = await pool.query("SELECT * FROM tiposcontrol WHERE id=?", [
-      id,
-    ]);
+    const id = parseInt(req.params.id);
 
-    if (result.length > 0) {
-      return resp.status(200).json(result);
+    const tipoControl = await pool.tipoControl.findUnique({
+      where: { id },
+    });
+
+    if (tipoControl) {
+      return resp.status(200).json(tipoControl);
     } else {
-      return resp
-        .status(404)
-        .json({ message: "Tipo de control no encontrado" });
+      return resp.status(404).json({ message: "Tipo de control no encontrado" });
     }
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al buscar tipo de control:", error);
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };

@@ -1,87 +1,79 @@
 import pool from "../db.js";
 
+// ✅ LISTAR
 export const listarTipoPlaga = async (req, resp) => {
   try {
-    const [result] = await pool.query("SELECT * FROM tiposplaga");
-
-    // Siempre devolver un array, incluso si está vacío
-    return resp.status(200).json(result);
+    const tiposPlaga = await pool.tipoPlaga.findMany();
+    return resp.status(200).json(tiposPlaga);
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
-
+// ✅ REGISTRAR
 export const registrarTipoPlaga = async (req, resp) => {
   try {
     const { nombre, descripcion, img } = req.body;
-    const sql = `insert into tiposplaga (nombre,descripcion,img) values (?,?,?)`;
-    const [rows] = await pool.query(sql, [nombre, descripcion, img]);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "tipo de plaga registrada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "el tipo de plaga no se pudo registrar" });
-    }
+
+    await pool.tipoPlaga.create({
+      data: { nombre, descripcion, img },
+    });
+
+    return resp.status(200).json({ message: "tipo de plaga registrada" });
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ ACTUALIZAR
 export const actualizarTipoPlaga = async (req, resp) => {
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const { nombre, descripcion, img } = req.body;
-    const sql = `update tiposplaga set nombre=?,descripcion=?,img=? where id=${id}`;
 
-    const [rows] = await pool.query(sql, [nombre, descripcion, img]);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "tipo de plaga actualizada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible actualizar el tipo de plaga" });
-    }
+    await pool.tipoPlaga.update({
+      where: { id },
+      data: { nombre, descripcion, img },
+    });
+
+    return resp.status(200).json({ message: "tipo de plaga actualizada" });
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ ELIMINAR
 export const eliminarTipoPlaga = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const sql = `delete from tiposplaga where id=${id}`;
+    const id = parseInt(req.params.id);
 
-    const [rows] = await pool.query(sql);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "tipo de plaga eliminada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible eliminar el tipo de plaga" });
-    }
+    await pool.tipoPlaga.delete({
+      where: { id },
+    });
+
+    return resp.status(200).json({ message: "tipo de plaga eliminada" });
   } catch (error) {
     console.error(error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ BUSCAR
 export const buscarTipoPlaga = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const [result] = await pool.query(
-      `select * from tiposplaga where id=${id}`
-    );
-    if (result.length > 0) {
-      return resp.status(200).json(result);
+    const id = parseInt(req.params.id);
+
+    const tipoPlaga = await pool.tipoPlaga.findUnique({
+      where: { id },
+    });
+
+    if (tipoPlaga) {
+      return resp.status(200).json(tipoPlaga);
     } else {
-      return resp
-        .status(404)
-        .json({ message: "tipos de plaga no encontrados" });
+      return resp.status(404).json({ message: "tipo de plaga no encontrada" });
     }
   } catch (error) {
     console.error(error);

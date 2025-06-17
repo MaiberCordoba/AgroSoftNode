@@ -1,186 +1,190 @@
-import pool from "../db.js";
+import prisma from "../db.js";
 
+// ✅ LISTAR AFECCIONES
 export const listarAfecciones = async (req, resp) => {
   try {
-    const sql = `SELECT a.id, a.fechaEncuentro, a.estado, a.fk_plagas,
-      p.nombre as nombre_plaga, p.fk_TiposPlaga as idTipoPlaga, tp.nombre as tipo_plaga,
-      pl.id as id_plantaciones,
-      c.id as id_cultivo, c.nombre as nombre_cultivo, c.unidades as unCultivo,
-      er.id as id_era, er.posX as posXera, er.posY as posYera,
-      lo.id as id_lote, lo.posX as posXlote, lo.posY as posYlote 
-    FROM afecciones a
-    JOIN plagas p ON a.fk_Plagas = p.id
-    JOIN tiposPlaga tp ON p.fk_TiposPlaga = tp.id
-    JOIN plantaciones pl ON fk_Plantaciones = pl.id
-    JOIN cultivos c ON fk_Cultivos = c.id
-    JOIN eras er ON fk_Eras = er.id
-    JOIN lotes lo ON fk_Lotes = lo.id`;
+    const afecciones = await prisma.afeccion.findMany({
+      include: {
+        plaga: {
+          include: {
+            tipoPlaga: true
+          }
+        },
+        plantacion: {
+          include: {
+            cultivo: true,
+            era: {
+              include: {
+                lote: true
+              }
+            }
+          }
+        }
+      }
+    });
 
-    const [result] = await pool.query(sql);
-
-    const afecciones = result.map((afeccion) => ({
-      id: afeccion.id,
-      fechaEncuentro: afeccion.fechaEncuentro,
-      estado: afeccion.estado,
+    const resultado = afecciones.map((a) => ({
+      id: a.id,
+      fechaEncuentro: a.fechaEncuentro,
+      estado: a.estado,
       fk_Plagas: {
-        idPlaga: afeccion.fk_plagas,
-        nombre: afeccion.nombre_plaga,
+        idPlaga: a.plaga.id,
+        nombre: a.plaga.nombre,
       },
       fk_Plantaciones: {
-        id: afeccion.id_plantaciones,
+        id: a.plantacion.id,
         fk_cultivo: {
-          id_cultivo: afeccion.id_cultivo,
-          nombre: afeccion.nombre_cultivo,
-          unidades: afeccion.unCultivo,
+          id_cultivo: a.plantacion.cultivo.id,
+          nombre: a.plantacion.cultivo.nombre,
+          unidades: a.plantacion.cultivo.unidades,
         },
         fk_era: {
-          id: afeccion.id_era,
-          posX: afeccion.posXera,
-          posY: afeccion.posYera,
+          id: a.plantacion.era.id,
+          posX: a.plantacion.era.posX,
+          posY: a.plantacion.era.posY,
           fk_lote: {
-            id: afeccion.id_lote,
-            posX: afeccion.posXlote,
-            posY: afeccion.posYlote,
+            id: a.plantacion.era.lote.id,
+            posX: a.plantacion.era.lote.posX,
+            posY: a.plantacion.era.lote.posY,
           },
         },
       },
     }));
 
-    return resp.status(200).json(afecciones);
+    return resp.status(200).json(resultado);
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al listar afecciones:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ REGISTRAR AFECCION
 export const registrarAfecciones = async (req, resp) => {
   try {
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
 
-    // Agregamos logs para depurar
-    console.log("Recibiendo datos:");
-    console.log("fk_Plantaciones:", fk_Plantaciones);
-    console.log("fk_Plagas:", fk_Plagas);
-    console.log("fechaEncuentro:", fechaEncuentro);
-    console.log("estado:", estado);
+    await prisma.afeccion.create({
+      data: {
+        fechaEncuentro,
+        estado,
+        plaga: {
+          connect: { id: fk_Plagas }
+        },
+        plantacion: {
+          connect: { id: fk_Plantaciones }
+        }
+      }
+    });
 
-    const sql = `insert into afecciones (fk_Plantaciones,fk_Plagas,fechaEncuentro,estado) values (?,?,?,?)`;
-    const [rows] = await pool.query(sql, [
-      fk_Plantaciones,
-      fk_Plagas,
-      fechaEncuentro,
-      estado,
-    ]);
-
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "afección registrada" });
-    } else {
-      return resp.status(400).json({ message: "no se pudo registrar" });
-    }
+    return resp.status(200).json({ message: "afección registrada" });
   } catch (error) {
-    console.error("Error en registrarAfecciones:", error);
+    console.error("🔥 Error al registrar afección:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
-
+// ✅ ACTUALIZAR AFECCION
 export const actualizarAfecciones = async (req, resp) => {
   try {
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
-    const sql = `update afecciones set fk_Plantaciones=?,fk_Plagas=?,fechaEncuentro=?,estado=? where id=${id}`;
 
-    const [rows] = await pool.query(sql, [
-      fk_Plantaciones,
-      fk_Plagas,
-      fechaEncuentro,
-      estado,
-    ]);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "afeccion actualizada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible actualizar esta afeccion" });
-    }
+    await prisma.afeccion.update({
+      where: { id },
+      data: {
+        fechaEncuentro,
+        estado,
+        plaga: {
+          connect: { id: fk_Plagas }
+        },
+        plantacion: {
+          connect: { id: fk_Plantaciones }
+        }
+      }
+    });
+
+    return resp.status(200).json({ message: "afección actualizada" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al actualizar afección:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ ELIMINAR AFECCION
 export const eliminarAfecciones = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const sql = `delete from afecciones where id=${id}`;
+    const id = parseInt(req.params.id);
 
-    const [rows] = await pool.query(sql);
-    if (rows.affectedRows > 0) {
-      return resp.status(200).json({ message: "tipo de afeccion eliminada" });
-    } else {
-      return resp
-        .status(400)
-        .json({ message: "no fue posible eliminar la afeccion" });
-    }
+    await prisma.afeccion.delete({
+      where: { id }
+    });
+
+    return resp.status(200).json({ message: "afección eliminada" });
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al eliminar afección:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
+// ✅ BUSCAR POR ID
 export const buscarAfecciones = async (req, resp) => {
   try {
-    const id = req.params.id;
-    const sql = `select a.id, a.fechaEncuentro, a. estado, a.fk_plagas,
-      p.nombre as nombre_plaga, p.fk_TiposPlaga as idTipoPlaga, tp.nombre as tipo_plaga,
-      pl.id as id_plantaciones,
-      c.id as id_cultivo, c.nombre as nombre_cultivo, c.unidades as unCultivo,
-      er.id as id_era, er.posX as posXera, er.posY as posYera,
-      lo.id as id_lote, lo.posX as posXlote, lo.posY as posYlote 
-    from afecciones a
-    join plagas p on a.fk_Plagas = p.id
-    join tiposPlaga tp on p.fk_TiposPlaga = tp.id
-    join plantaciones pl on fk_Plantaciones = pl.id
-    join cultivos c on fk_Cultivos = c.id
-    join eras er on fk_Eras = er.id
-    join lotes lo on fk_Lotes = lo.id
-    where a.id=${id}`;
+    const id = parseInt(req.params.id);
 
-    const [result] = await pool.query(sql);
-    if (result.length > 0) {
-      const afecciones = result.map((afeccion) => ({
-        id: afeccion.id,
-        fechaEncuentro: afeccion.fechaEncuentro,
-        estado: afeccion.estado,
-        fk_Plagas: {
-          idPlaga: afeccion.id,
-          nombre: afeccion.nombre_plaga,
+    const a = await prisma.afeccion.findUnique({
+      where: { id },
+      include: {
+        plaga: {
+          include: {
+            tipoPlaga: true
+          }
         },
-        fk_Plantaciones: {
-          id: afeccion.id_plantaciones,
-          fk_cultivo: {
-            id_cultivo: afeccion.id_cultivo,
-            nombre: afeccion.nombre_cultivo,
-            unidades: afeccion.unCultivo,
-          },
-          fk_era: {
-            id: afeccion.id_era,
-            posX: afeccion.posXera,
-            posY: afeccion.posYera,
-            fk_lote: {
-              id: afeccion.id_lote,
-              posX: afeccion.posXlote,
-              posY: afeccion.posYlote,
-            },
+        plantacion: {
+          include: {
+            cultivo: true,
+            era: {
+              include: {
+                lote: true
+              }
+            }
+          }
+        }
+      }
+    });
+
+    if (!a) return resp.status(404).json({ message: "afección no encontrada" });
+
+    const resultado = {
+      id: a.id,
+      fechaEncuentro: a.fechaEncuentro,
+      estado: a.estado,
+      fk_Plagas: {
+        idPlaga: a.plaga.id,
+        nombre: a.plaga.nombre,
+      },
+      fk_Plantaciones: {
+        id: a.plantacion.id,
+        fk_cultivo: {
+          id_cultivo: a.plantacion.cultivo.id,
+          nombre: a.plantacion.cultivo.nombre,
+          unidades: a.plantacion.cultivo.unidades,
+        },
+        fk_era: {
+          id: a.plantacion.era.id,
+          posX: a.plantacion.era.posX,
+          posY: a.plantacion.era.posY,
+          fk_lote: {
+            id: a.plantacion.era.lote.id,
+            posX: a.plantacion.era.lote.posX,
+            posY: a.plantacion.era.lote.posY,
           },
         },
-      }));
-      return resp.status(200).json(afecciones);
-    } else {
-      return resp.status(404).json({ message: "afeccion no encontrada" });
-    }
+      },
+    };
+
+    return resp.status(200).json(resultado);
   } catch (error) {
-    console.error(error);
+    console.error("🔥 Error al buscar afección:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
