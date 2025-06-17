@@ -6,10 +6,22 @@ dotenv.config();
 
 const VALID_ROLES = ["admin", "instructor", "pasante", "aprendiz", "visitante"];
 
+const formatUser = (user) => ({
+  ...user,
+  fechaNacimiento: user.fechaNacimiento
+    ? user.fechaNacimiento.toISOString().split("T")[0]
+    : null,
+});
+
+const formatUsers = (users) =>
+  Array.isArray(users)
+    ? users.map(formatUser)
+    : formatUser(users);
+
 export const getAll = async (req, res) => {
   try {
     const usuarios = await pool.usuario.findMany();
-    res.status(200).json(usuarios);
+    res.status(200).json(formatUsers(usuarios));
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Internal server error" });
@@ -36,6 +48,11 @@ export const create = async (req, res) => {
       });
     }
 
+    const fechaValida = new Date(fechaNacimiento);
+    if (isNaN(fechaValida)) {
+      return res.status(400).json({ msg: "Fecha de nacimiento inválida" });
+    }
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     const nuevo = await pool.usuario.create({
@@ -43,7 +60,7 @@ export const create = async (req, res) => {
         identificacion: parseInt(identificacion),
         nombre,
         apellidos,
-        fechaNacimiento: new Date(fechaNacimiento),
+        fechaNacimiento: fechaValida,
         telefono,
         correoElectronico,
         passwordHash,
@@ -52,7 +69,7 @@ export const create = async (req, res) => {
       },
     });
 
-    res.status(201).json({ msg: "Usuario creado", data: nuevo });
+    res.status(201).json({ msg: "Usuario creado", data: formatUser(nuevo) });
   } catch (error) {
     console.error(error);
     res.status(500).json({ msg: "Error interno al crear usuario" });
@@ -105,14 +122,23 @@ export const update = async (req, res) => {
 
     if (updates.identificacion) delete updates.identificacion;
 
+    // Convertir fechaNacimiento a Date 
+    if (updates.fechaNacimiento) {
+      const fechaValida = new Date(updates.fechaNacimiento);
+      updates.fechaNacimiento = fechaValida;
+    }
+
     const updated = await pool.usuario.update({
       where: { identificacion },
       data: updates,
     });
 
-    res.status(200).json({ msg: "Usuario actualizado", data: updated });
+    res.status(200).json({ msg: "Usuario actualizado", data: formatUser(updated) });
   } catch (error) {
     console.error(error);
+    if (error instanceof Prisma.PrismaClientValidationError) {
+      return res.status(400).json({ msg: "Error de validación en los datos proporcionados" });
+    }
     res.status(500).json({ msg: "Error al actualizar usuario" });
   }
 };

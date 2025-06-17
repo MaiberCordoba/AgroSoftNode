@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { createVentas, getAllVentas, registroVentas, updateVentas } from "../controllers/ventas.controller.js";
+import { createVentas, getAllVentas,/*  registroVentas,  */updateVentas } from "../controllers/ventas.controller.js";
 import verifyJWT from '../middlewares/verifyJWT.middleware.js';
 
 const ventas = Router()
 ventas.get("/ventas",verifyJWT,getAllVentas)
-ventas.get("/reporteVentas",registroVentas)
+/* ventas.get("/reporteVentas",registroVentas) */
 ventas.post("/ventas",verifyJWT,createVentas)
 ventas.patch("/ventas/:id",verifyJWT,updateVentas)
 

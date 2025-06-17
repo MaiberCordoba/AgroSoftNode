@@ -12,6 +12,7 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 enum RolUsuario {
   admin
   instructor
@@ -26,22 +27,22 @@ enum EstadoUsuario {
 }
 
 model Usuario {
-  identificacion     Int   @id
-  nombre             String
-  apellidos          String
-  fechaNacimiento    DateTime
-  telefono           String
-  correoElectronico  String   @unique
-  passwordHash       String
-  rol                RolUsuario    @default(visitante)
-  estado             EstadoUsuario @default(activo)
+  identificacion    Int           @id
+  nombre            String
+  apellidos         String
+  fechaNacimiento   DateTime      @db.Date
+  telefono          String
+  correoElectronico String        @unique
+  passwordHash      String
+  rol               RolUsuario    @default(visitante)
+  estado            EstadoUsuario @default(activo)
 
-  actividades        Actividad[]
-  pasantes           Pasante[]
+  actividades Actividad[]
+  pasantes    Pasante[]
 }
 
 model Actividad {
-  id          Int      @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   cultivoId   Int
   usuarioId   Int
   titulo      String
@@ -49,8 +50,8 @@ model Actividad {
   fecha       DateTime
   estado      EstadoActividad @default(ASIGNADA)
 
-  cultivo     Cultivo  @relation(fields: [cultivoId], references: [id])
-  usuario     Usuario  @relation(fields: [usuarioId], references: [identificacion])
+  cultivo          Cultivo          @relation(fields: [cultivoId], references: [id])
+  usuario          Usuario          @relation(fields: [usuarioId], references: [identificacion])
   usosHerramientas UsoHerramienta[]
   usosProductos    UsoProducto[]
 }
@@ -62,142 +63,142 @@ enum EstadoActividad {
 }
 
 model Cultivo {
-  id            Int        @id @default(autoincrement())
-  especieId     Int
-  nombre        String
-  unidades      Int
-  activo        Boolean    @default(true)
-  fechaSiembra  DateTime
+  id           Int      @id @default(autoincrement())
+  especieId    Int
+  nombre       String
+  unidades     Int
+  activo       Boolean  @default(true)
+  fechaSiembra DateTime
 
-  especie       Especie    @relation(fields: [especieId], references: [id])
-  actividades   Actividad[]
-  desechos      Desecho[]
-  cosechas      Cosecha[]
-  plantaciones  Plantacion[]
+  especie      Especie      @relation(fields: [especieId], references: [id])
+  actividades  Actividad[]
+  desechos     Desecho[]
+  cosechas     Cosecha[]
+  plantaciones Plantacion[]
 }
 
 model Especie {
-  id                Int       @id @default(autoincrement())
+  id                Int     @id @default(autoincrement())
   nombre            String
   descripcion       String
   img               String?
   tiempoCrecimiento Int
   tipoEspecieId     Int
 
-  tipoEspecie       TipoEspecie @relation(fields: [tipoEspecieId], references: [id])
-  cultivos          Cultivo[]
-  semilleros        Semillero[]
+  tipoEspecie TipoEspecie @relation(fields: [tipoEspecieId], references: [id])
+  cultivos    Cultivo[]
+  semilleros  Semillero[]
 }
 
 model TipoEspecie {
-  id          Int       @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   nombre      String
   descripcion String
   img         String?
 
-  especies    Especie[]
+  especies Especie[]
 }
 
 model Semillero {
-  id             Int      @id @default(autoincrement())
-  especieId      Int
-  unidades       Int
-  fechaSiembra   DateTime
-  fechaEstimada  DateTime
+  id            Int      @id @default(autoincrement())
+  especieId     Int
+  unidades      Int
+  fechaSiembra  DateTime
+  fechaEstimada DateTime
 
-  especie        Especie  @relation(fields: [especieId], references: [id])
+  especie Especie @relation(fields: [especieId], references: [id])
 }
 
 model Desecho {
-  id             Int      @id @default(autoincrement())
-  cultivoId      Int
-  tipoDesechoId  Int
-  nombre         String
-  descripcion    String
+  id            Int    @id @default(autoincrement())
+  cultivoId     Int
+  tipoDesechoId Int
+  nombre        String
+  descripcion   String
 
-  cultivo        Cultivo  @relation(fields: [cultivoId], references: [id])
-  tipoDesecho    TipoDesecho @relation(fields: [tipoDesechoId], references: [id])
+  cultivo     Cultivo     @relation(fields: [cultivoId], references: [id])
+  tipoDesecho TipoDesecho @relation(fields: [tipoDesechoId], references: [id])
 }
 
 model TipoDesecho {
-  id         Int        @id @default(autoincrement())
-  nombre     String
+  id          Int    @id @default(autoincrement())
+  nombre      String
   descripcion String
 
-  desechos   Desecho[]
+  desechos Desecho[]
 }
 
 model Pasante {
-  id                   Int      @id @default(autoincrement())
-  usuarioId            Int
+  id                  Int      @id @default(autoincrement())
+  usuarioId           Int
   fechaInicioPasantia DateTime
   fechaFinalizacion   DateTime
   salarioHora         Int
   area                String
 
-  usuario             Usuario  @relation(fields: [usuarioId], references: [identificacion])
-  horasMensuales      HoraMensual[]
+  usuario        Usuario       @relation(fields: [usuarioId], references: [identificacion])
+  horasMensuales HoraMensual[]
 }
 
 model HoraMensual {
-  id          Int      @id @default(autoincrement())
-  pasanteId   Int
-  minutos     Int
-  salario     Int
-  mes         String
+  id        Int    @id @default(autoincrement())
+  pasanteId Int
+  minutos   Int
+  salario   Int
+  mes       String
 
-  pasante     Pasante  @relation(fields: [pasanteId], references: [id])
+  pasante Pasante @relation(fields: [pasanteId], references: [id])
 }
 
 model UsoHerramienta {
-  id             Int      @id @default(autoincrement())
-  herramientaId  Int
-  actividadId    Int
+  id            Int @id @default(autoincrement())
+  herramientaId Int
+  actividadId   Int
 
-  herramienta    Herramienta @relation(fields: [herramientaId], references: [id])
-  actividad      Actividad    @relation(fields: [actividadId], references: [id])
+  herramienta Herramienta @relation(fields: [herramientaId], references: [id])
+  actividad   Actividad   @relation(fields: [actividadId], references: [id])
 }
 
 model UsoProducto {
-  id               Int      @id @default(autoincrement())
+  id               Int @id @default(autoincrement())
   insumoId         Int
   actividadId      Int
   cantidadProducto Int
 
-  insumo           Insumo   @relation(fields: [insumoId], references: [id])
-  actividad        Actividad @relation(fields: [actividadId], references: [id])
+  insumo    Insumo    @relation(fields: [insumoId], references: [id])
+  actividad Actividad @relation(fields: [actividadId], references: [id])
 }
 
 model Insumo {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   nombre      String
   descripcion String
   precio      Int
   unidades    Int
 
-  usos        UsoProducto[]
+  usos UsoProducto[]
 }
 
 model Herramienta {
-  id          Int     @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   loteId      Int
   nombre      String
   descripcion String
   unidades    Int
 
-  lote        Lote      @relation(fields: [loteId], references: [id])
-  usos        UsoHerramienta[]
+  lote Lote             @relation(fields: [loteId], references: [id])
+  usos UsoHerramienta[]
 }
 
 model Lote {
-  id                   Int       @id @default(autoincrement())
-  nombre               String
-  descripcion          String
-  tamX                 Int
-  tamY                 Int
-  estado               Boolean   @default(true)
-  posX                 Float
-  posY                 Float
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  descripcion String
+  tamX        Int
+  tamY        Int
+  estado      Boolean @default(true)
+  posX        Float
+  posY        Float
 
   eras                 Era[]
   herramientas         Herramienta[]
@@ -207,18 +208,17 @@ model Lote {
 }
 
 model Era {
-  id      Int     @id @default(autoincrement())
-  loteId  Int
-  tamX    Float
-  tamY    Float
-  posX    Float
-  posY    Float
-  estado  Boolean @default(true)
+  id     Int     @id @default(autoincrement())
+  loteId Int
+  tamX   Float
+  tamY   Float
+  posX   Float
+  posY   Float
+  estado Boolean @default(true)
 
-  lote    Lote    @relation(fields: [loteId], references: [id])
-  sensores Sensor[]
-  plantaciones         Plantacion[]
-
+  lote         Lote         @relation(fields: [loteId], references: [id])
+  sensores     Sensor[]
+  plantaciones Plantacion[]
 }
 
 model Plantacion {
@@ -226,21 +226,21 @@ model Plantacion {
   cultivoId Int
   eraId     Int
 
-  cultivo   Cultivo @relation(fields: [cultivoId], references: [id])
-  era       Era     @relation(fields: [eraId], references: [id])
+  cultivo    Cultivo    @relation(fields: [cultivoId], references: [id])
+  era        Era        @relation(fields: [eraId], references: [id])
   afecciones Afeccion[]
 }
 
 model Afeccion {
-  id              Int @id @default(autoincrement())
-  plantacionId    Int
-  plagaId         Int
-  fechaEncuentro  DateTime
-  estado          EstadoAfeccion @default(SINTRATAMIENTO)
+  id             Int            @id @default(autoincrement())
+  plantacionId   Int
+  plagaId        Int
+  fechaEncuentro DateTime
+  estado         EstadoAfeccion @default(SINTRATAMIENTO)
 
-  plantacion      Plantacion @relation(fields: [plantacionId], references: [id])
-  plaga           Plaga      @relation(fields: [plagaId], references: [id])
-  controles       Control[]
+  plantacion Plantacion @relation(fields: [plantacionId], references: [id])
+  plaga      Plaga      @relation(fields: [plagaId], references: [id])
+  controles  Control[]
 }
 
 enum EstadoAfeccion {
@@ -250,14 +250,14 @@ enum EstadoAfeccion {
 }
 
 model Plaga {
-  id           Int    @id @default(autoincrement())
-  tipoPlagaId  Int
-  nombre       String
-  descripcion  String
-  img          String?
+  id          Int     @id @default(autoincrement())
+  tipoPlagaId Int
+  nombre      String
+  descripcion String
+  img         String?
 
-  tipoPlaga    TipoPlaga @relation(fields: [tipoPlagaId], references: [id])
-  afecciones   Afeccion[]
+  tipoPlaga  TipoPlaga  @relation(fields: [tipoPlagaId], references: [id])
+  afecciones Afeccion[]
 }
 
 model TipoPlaga {
@@ -266,18 +266,18 @@ model TipoPlaga {
   descripcion String
   img         String
 
-  plagas      Plaga[]
+  plagas Plaga[]
 }
 
 model Control {
-  id           Int     @id @default(autoincrement())
-  afeccionId   Int
+  id            Int      @id @default(autoincrement())
+  afeccionId    Int
   tipoControlId Int
-  descripcion  String
-  fechaControl DateTime
+  descripcion   String
+  fechaControl  DateTime
 
-  afeccion     Afeccion     @relation(fields: [afeccionId], references: [id])
-  tipoControl  TipoControl  @relation(fields: [tipoControlId], references: [id])
+  afeccion             Afeccion             @relation(fields: [afeccionId], references: [id])
+  tipoControl          TipoControl          @relation(fields: [tipoControlId], references: [id])
   usosProductosControl UsoProductoControl[]
 }
 
@@ -286,7 +286,7 @@ model TipoControl {
   nombre      String
   descripcion String
 
-  controles   Control[]
+  controles Control[]
 }
 
 model ProductoControl {
@@ -299,30 +299,30 @@ model ProductoControl {
   tipoContenido   String
   unidades        Int
 
-  usosProducto    UsoProductoControl[]
+  usosProducto UsoProductoControl[]
 }
 
 model UsoProductoControl {
-  id             Int    @id @default(autoincrement())
-  productoId     Int
-  controlId      Int
+  id               Int @id @default(autoincrement())
+  productoId       Int
+  controlId        Int
   cantidadProducto Int
 
-  producto       ProductoControl @relation(fields: [productoId], references: [id])
-  control        Control         @relation(fields: [controlId], references: [id])
+  producto ProductoControl @relation(fields: [productoId], references: [id])
+  control  Control         @relation(fields: [controlId], references: [id])
 }
 
 model Sensor {
-  id          Int    @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   tipoSensor  TipoSensor
   datosSensor Float
-  fecha       DateTime @default(now())
+  fecha       DateTime   @default(now())
   eraId       Int?
   loteId      Int?
 
-  lote        Lote? @relation(fields: [loteId], references: [id])
-  era         Era?  @relation(fields: [eraId], references: [id])
-  umbrales    Umbral[]
+  lote     Lote?    @relation(fields: [loteId], references: [id])
+  era      Era?     @relation(fields: [eraId], references: [id])
+  umbrales Umbral[]
 }
 
 enum TipoSensor {
@@ -336,30 +336,30 @@ enum TipoSensor {
 }
 
 model Umbral {
-  id          Int    @id @default(autoincrement())
+  id          Int   @id @default(autoincrement())
   sensorId    Int
   valorMinimo Float
   valorMaximo Float
 
-  sensor      Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
+  sensor Sensor @relation(fields: [sensorId], references: [id], onDelete: Cascade)
 }
 
 model Precipitacion {
-  id       Int     @id @default(autoincrement())
-  loteId   Int
-  fecha   DateTime
-  mm      Int
+  id     Int      @id @default(autoincrement())
+  loteId Int
+  fecha  DateTime
+  mm     Int
 
-  lote     Lote    @relation(fields: [loteId], references: [id])
+  lote Lote @relation(fields: [loteId], references: [id])
 }
 
 model Evapotranspiracion {
-  id               Int     @id @default(autoincrement())
-  loteId           Int
-  fecha            DateTime
+  id                  Int      @id @default(autoincrement())
+  loteId              Int
+  fecha               DateTime
   milimetrosMCuadrado Int
 
-  lote             Lote    @relation(fields: [loteId], references: [id])
+  lote Lote @relation(fields: [loteId], references: [id])
 }
 
 model UnidadMedida {
@@ -368,20 +368,20 @@ model UnidadMedida {
 }
 
 model Venta {
-  id            Int     @id @default(autoincrement())
-  cosechaId     Int
+  id             Int      @id @default(autoincrement())
+  cosechaId      Int
   precioUnitario Int
-  fecha         DateTime
+  fecha          DateTime
 
-  cosecha       Cosecha @relation(fields: [cosechaId], references: [id])
+  cosecha Cosecha @relation(fields: [cosechaId], references: [id])
 }
 
 model Cosecha {
-  id         Int     @id @default(autoincrement())
-  cultivoId  Int
-  unidades   Int
-  fecha      DateTime
+  id        Int      @id @default(autoincrement())
+  cultivoId Int
+  unidades  Int
+  fecha     DateTime
 
-  cultivo    Cultivo @relation(fields: [cultivoId], references: [id])
-  ventas     Venta[]
+  cultivo Cultivo @relation(fields: [cultivoId], references: [id])
+  ventas  Venta[]
 }

@@ -1,56 +1,54 @@
 import pool from "../db.js"
 
-export const getAllDesechos = async (req,res) => {
-    try{
-        const sql = `SELECT * FROM desechos`
-        const [rows] = await pool.query(sql)
-        if (rows.length > 0){
-            return res.status(200).json(rows)
-        }
-        else{
-            return res.status(404).json({msg : "No se encontraron datos de desechos."})
+export const getAllDesechos = async (req, res) => {
+    try {
+        const sql = await pool.desecho.findMany({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json(sql)
         }
     }
-    catch(error){
-
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
 
-export const createDesechos = async (req,res) => {
-    try{
-        const {fk_Cultivos,fk_TiposDesecho,nombre,descripcion}=req.body
-        const sql = "INSERT INTO desechos (fk_Cultivos,fk_TiposDesecho,nombre,descripcion) VALUES (?,?,?,?)"
-        const [rows] = await pool.query(sql,[fk_Cultivos,fk_TiposDesecho,nombre,descripcion])
-        if (rows.affectedRows > 0){
-            return res.status(200).json({msg : "El desecho fue registrado exitosamente"})
-        }
-        else{
-            return res.status(400).json({msg : "Error al registrar el desecho"})
+export const createDesechos = async (req, res) => {
+    try {
+        const sql = await pool.desecho.create({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(201).json({ msg: "Se creo correctamente" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
 
-export const updateDesechos = async (req,res) => {
-    try{
-        const id =req.params.id
-        const {fk_Cultivos,fk_TiposDesecho,nombre,descripcion}=req.body
-        const sql = `UPDATE desechos SET fk_Cultivos=?,fk_TiposDesecho=?,nombre=?,descripcion=? WHERE id=${id}`
-        const [rows] = await pool.query(sql,[fk_Cultivos,fk_TiposDesecho,nombre,descripcion])
-        if (rows.affectedRows > 0){
-            return res.status(200).json({msg : "El desecho fue actualizado exitosamente"})
+export const updateDesechos = async (req, res) => {
+    try {
+        const id = req.params.id
+        const sql = await pool.desecho.update({
+            where: { id: parseInt(id) },
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
         }
-        else{
-            return res.status(400).json({msg : "Error al actualizar el desecho"})
+        else {
+            return res.status(404).json({ msg: "No se encontro el ID" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        if (error.code == "P2025") {
+            return res.status(404).json({ msg: "No se encontro el ID" })
+        }
+        return res.status(500).json({ msg: "Error en el servidor" })
     }
 }

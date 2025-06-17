@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { createUsosProductos, getAllUsosProductos, updateUsosProductos } from '../controllers/usosProductos.controller.js';
+import { createUsoInsumos, getAllUsoInsumos, updateUsoInsumos } from '../controllers/usosProductos.controller.js';
 import verifyJWT from "../middlewares/verifyJWT.middleware.js";
 
 const usosProductos = Router();
 
-usosProductos.get('/usosProductos',verifyJWT,getAllUsosProductos);
-usosProductos.post('/usosProductos',verifyJWT,createUsosProductos);
-usosProductos.patch('/usosProductos/:id',verifyJWT,updateUsosProductos);
+usosProductos.get('/usosProductos',verifyJWT,getAllUsoInsumos);
+usosProductos.post('/usosProductos',verifyJWT,createUsoInsumos);
+usosProductos.patch('/usosProductos/:id',verifyJWT,updateUsoInsumos);
 
 export default usosProductos;

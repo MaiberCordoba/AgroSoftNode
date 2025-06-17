@@ -1,61 +1,54 @@
 import pool from "../db.js"
 
-export const getAllCosechas = async (req,res) => {
-    try{
-        const sql = `SELECT * FROM cosechas`
-        const [rows] = await pool.query(sql)
-        if (rows.length > 0){
-
-            const cosechasFormateadas = rows.map((cosecha)=>({
-                ...cosecha,
-                fecha:cosecha.fecha.toISOString().split("T")[0],
-            }))
-            return res.status(200).json({rows:cosechasFormateadas})
-        }
-        else{
-            return res.status(404).json({msg : "No se encontraron datos de cosechas."})
+export const getAllCosechas = async (req, res) => {
+    try {
+        const sql = await pool.cosecha.findMany({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json(sql)
         }
     }
-    catch(error){
-
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
 
-export const createCosechas = async (req,res) => {
-    try{
-        const {fk_Cultivos,unidades,fecha}=req.body
-        const sql = "INSERT INTO cosechas (fk_Cultivos,unidades,fecha) VALUES (?,?,?)"
-        const [rows] = await pool.query(sql,[fk_Cultivos,unidades,fecha])
-        if (rows.affectedRows > 0){
-            return res.status(200).json({msg : "La cosecha fue registrada exitosamente"})
-        }
-        else{
-            return res.status(400).json({msg : "Error al registrar la cosecha"})
+export const createCosechas = async (req, res) => {
+    try {
+        const sql = await pool.cosecha.create({
+            data: req.body
+        })
+        if (sql) {
+            return res.status(201).json({ msg: "Se creo Correctamente" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        return res.status(500).json({ msg: "Internal server error" })
     }
 }
 
-export const updateCosechas = async (req,res) => {
-    try{
-        const id =req.params.id
-        const {fk_Cultivos,unidades,fecha}=req.body
-        const sql = `UPDATE cosechas SET fk_Cultivos=?,unidades=?,fecha=? WHERE id=${id}`
-        const [rows] = await pool.query(sql,[fk_Cultivos,unidades,fecha])
-        if (rows.affectedRows > 0){
-            return res.status(200).json({msg : "La cosecha fue actualizada exitosamente"})
+export const updateCosechas = async (req, res) => {
+    try {
+        const id = req.params.id
+        const sql = await pool.cosecha.update({
+            where: { id: parseInt(id) },
+            data: req.body
+        })
+        if (sql) {
+            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
         }
-        else{
-            return res.status(400).json({msg : "Error al actualizar la cosecha"})
+        else {
+            return res.status(404).json({ msg: "No se encontro el ID" })
         }
     }
-    catch(error){
+    catch (error) {
         console.error(error)
-        return res.status(500).json({msg : "Internal server error"})
+        if (error.code == "P2025") {
+            return res.status(404).json({ msg: "No se encontro el ID" })
+        }
+        return res.status(500).json({ msg: "Error en el servidor" })
     }
 }
