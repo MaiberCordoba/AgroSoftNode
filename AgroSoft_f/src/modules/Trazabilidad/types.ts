@@ -62,7 +62,7 @@ export interface Eras {
 
 export interface Plantaciones {
   id: number;
-  Cultivos?: Cultivos;
+  cultivos?: Cultivos;
   fk_Cultivos: number;
   Eras?: Eras;
   fk_Eras: number;
