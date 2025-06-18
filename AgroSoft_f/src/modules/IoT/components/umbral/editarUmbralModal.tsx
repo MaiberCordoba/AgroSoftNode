@@ -3,7 +3,7 @@ import ModalComponent from "@/components/Modal";
 import { Input } from "@heroui/react";
 import { addToast } from "@heroui/toast";
 import { Umbral } from "../../types/sensorTypes";
-import { usePatchUmbral } from "../../hooks/umbral/usePachtUmbral"; // 👈 tu hook personalizado
+import { usePatchUmbral } from "../../hooks/umbral/usePachtUmbral";
 
 interface EditarUmbralModalProps {
   umbral: Umbral;
@@ -11,8 +11,8 @@ interface EditarUmbralModalProps {
 }
 
 const EditarUmbralModal: React.FC<EditarUmbralModalProps> = ({ umbral, onClose }) => {
-  const [valorMinimo, setValorMinimo] = useState<number>(umbral.valor_minimo);
-  const [valorMaximo, setValorMaximo] = useState<number>(umbral.valor_maximo);
+  const [valorMinimo, setValorMinimo] = useState<number>(umbral.valorMinimo);
+  const [valorMaximo, setValorMaximo] = useState<number>(umbral.valorMaximo);
 
   const { mutate, isPending } = usePatchUmbral();
 
@@ -30,8 +30,8 @@ const EditarUmbralModal: React.FC<EditarUmbralModalProps> = ({ umbral, onClose }
       {
         id: umbral.id,
         data: {
-          valor_minimo: valorMinimo,
-          valor_maximo: valorMaximo,
+          valorMinimo,  // Actualizado a camelCase
+          valorMaximo,  // Actualizado a camelCase
         },
       },
       {
@@ -43,10 +43,10 @@ const EditarUmbralModal: React.FC<EditarUmbralModalProps> = ({ umbral, onClose }
           });
           onClose();
         },
-        onError: () => {
+        onError: (error) => {  // Mejorado para mostrar el mensaje real
           addToast({
             title: "Error",
-            description: "Ocurrió un error al actualizar el umbral.",
+            description: error.message || "Ocurrió un error al actualizar el umbral.",
             color: "danger",
           });
         },

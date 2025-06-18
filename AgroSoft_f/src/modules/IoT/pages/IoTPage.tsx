@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, addToast } from "@heroui/react";
+import { Button, Input } from "@heroui/react";
 import {
   WiStrongWind,
   WiThermometer,
@@ -16,7 +16,6 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Umbral } from "../types/sensorTypes";
 import ReporteModal from "../components/sensor/ReporteModal";
-import "./IoTPages.css"; // Archivo CSS adicional
 
 export default function IoTPages() {
   const navigate = useNavigate();
@@ -44,12 +43,11 @@ export default function IoTPages() {
   const normalizar = (str: string) => str.toLowerCase().replace(/\s/g, "");
 
   const mostrarAlerta = (mensaje: string) => {
-    addToast({
-      title: "🚨 Alerta de Sensor",
-      description: mensaje,
-      variant: "flat",
-      color: "danger",
-    });
+    // Esta función parece no estar implementada correctamente
+    // addToast no es una función importada directamente, debería ser un hook
+    console.warn("Alerta de sensor:", mensaje);
+    // Implementación alternativa:
+    alert(`🚨 Alerta de Sensor: ${mensaje}`);
   };
 
   useEffect(() => {
@@ -83,13 +81,13 @@ export default function IoTPages() {
           }));
 
           const umbral = umbrales.find((u) =>
-            u.tipo_sensor && normalizar(u.tipo_sensor) === normalizar(sensor)
+            u.tipoSensor && normalizar(u.tipoSensor) === normalizar(sensor)
           );
 
           if (umbral) {
-            if (valor < umbral.valor_minimo || valor > umbral.valor_maximo) {
+            if (valor < umbral.valorMinimo || valor > umbral.valorMaximo) {
               mostrarAlerta(
-                `${sensor.toUpperCase()} fuera de umbral.\nValor actual: ${valor}\nRango permitido: ${umbral.valor_minimo} - ${umbral.valor_maximo}`
+                `${sensor.toUpperCase()} fuera de umbral.\nValor actual: ${valor}\nRango permitido: ${umbral.valorMinimo} - ${umbral.valorMaximo}`
               );
             }
           }
@@ -131,7 +129,7 @@ export default function IoTPages() {
     <div className="relative">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-20 sm:gap-12 justify-center items-center w-full max-w-6xl mx-auto">
         <div className="flex gap-4 items-center w-full mb-8">
-          <div className="flex-1 min-w-[200px] max-w-sm"> {/* Mínimo y máximo */}
+          <div className="flex-1 min-w-[200px] max-w-sm">
             <Input
               placeholder="Filtrar Sensores..."
               type="text"
@@ -148,7 +146,7 @@ export default function IoTPages() {
           >
             Generar Reporte
           </Button>
-</div>
+        </div>
         <div className="h-8" />
         <div className="grid grid-cols-3 flex flex-wrap gap-4 justify-center items-center w-full max-w-6xl mx-auto col-span-full">
           {sensoresFiltrados.length > 0 ? (
@@ -167,7 +165,7 @@ export default function IoTPages() {
         </div>
         <div className="h-8" />
         <div className="mt-12 text-center col-span-full">
-          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista sensores</h2>
+          <h2 className="text-3xl font-semibold text-gray-800 mb-4">Lista de sensores</h2>
           <SensorLista />
         </div>
         <div className="h-8" />

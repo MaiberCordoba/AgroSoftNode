@@ -3,35 +3,65 @@ import pool from './src/db.js';
 
 const wss = new WebSocketServer({ port: 8080 });
 
-wss.on('connection', (ws) => {
-  console.log('Cliente conectado al WebSocket');
+// Mapa para convertir rutas a tipos de sensor en formato ENUM
+const sensorTypeMap = {
+  viento: 'VIENTO',
+  temperatura: 'TEMPERATURA',
+  luzSolar: 'ILUMINACION',
+  humedad: 'HUMEDAD_TERRENO',
+  humedadAmbiente: 'HUMEDAD_AMBIENTAL',
+  lluvia: 'LLUVIA'
+};
+
+wss.on('connection', (ws, req) => {
+  // Extraer el tipo de sensor de la URL
+  const sensorType = req.url?.split('/')[1] || '';
+  const sensorTypeDB = sensorTypeMap[sensorType] || sensorType.toUpperCase();
+  
+  console.log(`Cliente conectado al WebSocket para ${sensorTypeDB}`);
 
   const sendSensorData = async () => {
     try {
-      const [sensores] = await pool.query('SELECT * FROM sensores');
-      if (sensores.length === 0) return;
+      // Obtener sensores del tipo específico
+      const sensores = await pool.sensores.findMany({
+        where: {
+          tipoSensor: sensorTypeDB
+        }
+      });
+      
+      if (sensores.length === 0) {
+        console.warn(`No hay sensores de tipo ${sensorTypeDB}`);
+        return;
+      }
 
       const sensor = sensores[Math.floor(Math.random() * sensores.length)];
       const randomValue = parseFloat((Math.random() * 100).toFixed(2));
       const fecha = new Date();
 
-      await pool.query(
-        'UPDATE sensores SET datos_sensor = ?, fecha = ? WHERE id = ?',
-        [randomValue, fecha, sensor.id]
-      );
+      // Actualizar el sensor en la base de datos
+      await pool.sensores.update({
+        where: { id: sensor.id },
+        data: {
+          datosSensor: randomValue,
+          fecha: fecha
+        }
+      });
 
-      const [umbral] = await pool.query('SELECT * FROM umbrales WHERE sensor_id = ?', [sensor.id]);
+      // Obtener umbrales para este sensor
+      const umbrales = await pool.umbrales.findMany({
+        where: { sensorId: sensor.id }
+      });
 
-      const alerta = umbral.length > 0 &&
-        (randomValue < umbral[0].valor_minimo || randomValue > umbral[0].valor_maximo);
+      const alerta = umbrales.length > 0 &&
+        (randomValue < umbrales[0].valorMinimo || randomValue > umbrales[0].valorMaximo);
 
+      // Preparar datos para enviar
       const data = {
         id: sensor.id,
-        tipo_sensor: sensor.tipo_sensor,
+        tipoSensor: sensor.tipoSensor,
         valor: randomValue,
-        unidad: sensor.unidad || '',
         alerta,
-        fecha,
+        fecha: fecha.toISOString()
       };
 
       ws.send(JSON.stringify(data));
@@ -44,7 +74,7 @@ wss.on('connection', (ws) => {
 
   ws.on('close', () => {
     clearInterval(interval);
-    console.log('Cliente desconectado');
+    console.log(`Cliente desconectado de ${sensorTypeDB}`);
   });
 });
 

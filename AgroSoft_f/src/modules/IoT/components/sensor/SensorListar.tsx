@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"; // Importamos useNavigate
+import { useNavigate } from "react-router-dom";
 import { useGetSensor } from "../../hooks/sensor/useGetSensor";
 import { useEditarSensor } from "../../hooks/sensor/useEditarSensor";
 import { useCrearSensor } from "../../hooks/sensor/useCrearSensor";
@@ -10,20 +10,22 @@ import { CrearSensorModal } from "./CrearSensorModal";
 import EliminarSensorModal from "./EliminarSensorModal";
 import { Sensor } from "../../types/sensorTypes";
 
+// Actualizado para usar los valores completos de SensorType
 const SENSOR_TYPES = [
-  { key: "TEM", label: "Temperatura" },
-  { key: "HUM", label: "Humedad" },
-  { key: "LUM", label: "Luz Solar" },
-  { key: "HUMA", label: "Humedad Ambiente" },
-  { key: "VIE", label: "Viento" },
-  { key: "LLA", label: "Lluvia" },
+  { key: "Temperatura", label: "Temperatura" },
+  { key: "Iluminación", label: "Iluminación" },
+  { key: "Humedad Ambiental", label: "Humedad Ambiental" },
+  { key: "Humedad del Terreno", label: "Humedad del Terreno" },
+  { key: "Nivel de PH", label: "Nivel de PH" },
+  { key: "Viento", label: "Viento" },
+  { key: "Lluvia", label: "Lluvia" },
 ];
 
 export function SensorLista() {
-  const navigate = useNavigate(); // Obtenemos la función de navegación
+  const navigate = useNavigate();
   const { data, isLoading, error } = useGetSensor();
 
-  console.log("Sensores:", data); // 🔍 Verifica qué está llegando
+  console.log("Sensores:", data);
 
   const {
     isOpen: isEditModalOpen,
@@ -48,56 +50,43 @@ export function SensorLista() {
   const handleCrearNuevo = () => {
     handleCrear({
       id: 0,
-      tipo_sensor: "TEM",
-      datos_sensor: 0,
+      tipoSensor: "Temperatura", // Valor por defecto
+      datosSensor: 0,
       fecha: new Date().toISOString(),
-      lote_id: null,
-      era_id: null,
+      loteId: null,
+      eraId: null,
     });
   };
 
-  const getSensorLabel = (tipo_sensor: string) => {
-    const sensor = SENSOR_TYPES.find(
-      s => s.key.toLowerCase() === tipo_sensor.toLowerCase()
-    );
-    return sensor ? sensor.label : tipo_sensor;
+  const getSensorLabel = (tipoSensor: string) => {
+    const sensor = SENSOR_TYPES.find(s => s.key === tipoSensor);
+    return sensor ? sensor.label : tipoSensor;
   };
 
   const columnas = [
     { name: "Fecha", uid: "fecha", sortable: true },
-    { name: "Tipo de Sensor", uid: "tipo_sensor" },
-    { name: "Valor", uid: "datos_sensor" },
-    { name: "Acciones", uid: "acciones" },
+    { name: "Tipo de Sensor", uid: "tipoSensor" },
+    { name: "Valor", uid: "datosSensor" },
   ];
 
   const handleRowClick = (sensorId: number) => {
-    // Navegamos a la ruta de detalle del sensor
     navigate(`/sensores/${sensorId}`);
   };
 
   const renderCell = (item: Sensor, columnKey: React.Key) => {
-    // Generamos el contenido de la celda según la columna
     const cellContent = (() => {
       switch (columnKey) {
         case "fecha":
           return <span>{new Date(item.fecha).toLocaleString()}</span>;
-        case "tipo_sensor":
-          return <span>{getSensorLabel(item.tipo_sensor)}</span>;
-        case "datos_sensor":
-          return <span>{item.datos_sensor}</span>;
-        case "acciones":
-          return (
-            <AccionesTabla
-              onEditar={() => handleEditar(item)}
-              onEliminar={() => handleEliminar(item)}
-            />
-          );
+        case "tipoSensor":
+          return <span>{getSensorLabel(item.tipoSensor)}</span>;
+        case "datosSensor":
+          return <span>{item.datosSensor}</span>;
         default:
           return <span>{String(item[columnKey as keyof Sensor])}</span>;
       }
     })();
 
-    // Si no es la columna de acciones, hacemos la celda clickeable
     if (columnKey !== "acciones") {
       return (
         <div 
@@ -120,7 +109,7 @@ export function SensorLista() {
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
-        claveBusqueda="tipo_sensor"
+        claveBusqueda="tipoSensor"
         placeholderBusqueda="Buscar por tipo"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
