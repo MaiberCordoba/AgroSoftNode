@@ -36,7 +36,7 @@ export const updateCosechas = async (req, res) => {
             data: req.body
         })
         if (sql) {
-            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
+            return res.status(200).json({ msg: "Se actualizo correctamente" })
         }
         else {
             return res.status(404).json({ msg: "No se encontro el ID" })

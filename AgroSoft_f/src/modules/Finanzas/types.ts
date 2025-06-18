@@ -4,9 +4,9 @@ import { User } from "../Users/types"
 
 export interface Actividades {
     id : number,
-    fk_Cultivos?: number,
+    fkCultivos?: number,
     cultivo?: Cultivos,
-    fk_Usuarios? : number,
+    fkUsuarios? : number,
     usuario? : User,
     titulo : string,
     descripcion : string,
@@ -16,15 +16,15 @@ export interface Actividades {
 
 export interface UsosHerramientas {
     id : number,
-    fk_Herramientas? : number,
+    fkHerramientas? : number,
     herramienta?: Herramientas,
-    fk_Actividades? : number,
+    fkActividades? : number,
     actividad? : Actividades
 }
 
 export interface Herramientas {
     id : number,
-    fk_Lotes?: number,
+    fkLotes?: number,
     lote? : Lotes ,
     nombre : string,
     descripcion : string,
@@ -40,16 +40,16 @@ export interface Insumos {
 }
 export interface UsosProductos {
     id : number,
-    fk_Insumos? : number,
+    fkInsumos? : number,
     insumo? : Insumos ,
-    fk_Actividades? : number,
+    fkActividades? : number,
     actividad? : Actividades,
     cantidadProducto : number
 }
 
 export interface Cosechas {
     id : number,
-    fk_Cultivos? : number,
+    fkCultivos? : number,
     cultivo? : Cultivos,
     unidades : number,
     fecha : string
@@ -57,16 +57,16 @@ export interface Cosechas {
 
 export interface Ventas {
     id : number,
-    fk_Cosechas? : number,
+    fkCosechas? : number,
     cosecha? : Cosechas,
     precioUnitario : number,
     fecha : string
 }
 export interface Desechos {
     id : number,
-    fk_Cultivos? : number,
+    fkCultivos? : number,
     cultivo? : Cultivos,
-    fk_TiposDesecho? : number,
+    fkTiposDesecho? : number,
     tipoDesecho? : TiposDesechos,
     nombre : string,
     descripcion : string

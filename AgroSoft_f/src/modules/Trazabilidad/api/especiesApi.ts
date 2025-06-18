@@ -3,7 +3,7 @@ import { Especies } from "../types";
 
 export const getEspecies = async ():Promise<Especies[]> => {
     const response = await apiClient.get("especies/");
-    return response.data
+    return response.data ?? []
 };
 
 export const postEspecies = async (data?:any):Promise<Especies> => {

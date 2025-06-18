@@ -14,7 +14,7 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
   const [nombre, setNombre] = useState<string>(herramienta.nombre);
   const [descripcion, setDescripcion] = useState<string>(herramienta.descripcion);
   const [unidades, setUnidades] = useState(herramienta.unidades);
-  const [fk_Lotes, setFk_Lote] = useState<number | undefined>(herramienta.fk_Lotes); // Estado para el ID del lote
+  const [fkLotes, setFk_Lote] = useState<number | undefined>(herramienta.fkLotes); // Estado para el ID del lote
 
   const { data: lotes, isLoading: isLoadingLotes } = useGetLotes(); // Obtener los lotes
   const { mutate, isPending } = usePatchHerramientas(); // Mutación para actualizar herramientas
@@ -28,7 +28,7 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
           nombre,
           descripcion,
           unidades,
-          fk_Lotes, // Envía solo el ID del lote
+          fkLotes, // Envía solo el ID del lote
         },
       },
       {
@@ -79,14 +79,14 @@ const EditarHerramientaModal: React.FC<EditarHerramientaModalProps> = ({ herrami
         <Select
           label="Lote"
           placeholder="Selecciona un lote"
-          selectedKeys={fk_Lotes ? [fk_Lotes.toString()] : []} // HeroUI espera un array de strings
+          selectedKeys={fkLotes ? [fkLotes.toString()] : []} // HeroUI espera un array de strings
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0]; // HeroUI devuelve un Set
             setFk_Lote(selectedKey ? Number(selectedKey) : undefined); // Actualiza el estado con el nuevo ID
           }}
         >
           {(lotes || []).map((lote) => (
-            <SelectItem key={lote.id.toString()}>
+            <SelectItem key={lote.id}>
               {lote.nombre}
             </SelectItem>
           ))}

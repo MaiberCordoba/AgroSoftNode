@@ -35,7 +35,7 @@ export const updateActividad = async (req, res) => {
       data: req.body
     })
     if (sql) {
-      return res.status(200).json({ msg: "Se actualizo Correctamente" }, sql)
+      return res.status(200).json({ msg: "Se actualizo Correctamente" })
     }
   } catch (error) {
     console.error(error)

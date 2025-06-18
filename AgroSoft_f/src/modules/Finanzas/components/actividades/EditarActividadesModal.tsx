@@ -16,8 +16,8 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
   const [descripcion, setDescripcion] = useState<string>(actividad.descripcion);
   const [fecha, setFecha] = useState<string>(actividad.fecha);
   const [estado, setEstado] = useState<"Asignada" | "Completada" | "Cancelada">(actividad.estado);
-  const [fk_Cultivos, setFk_Cultivo] = useState<number | null>(actividad.fk_Cultivos || null);  
-  const [fk_Usuarios, setFk_Usuario] = useState<number | null>(actividad.fk_Usuarios || null); 
+  const [fkCultivos, setFk_Cultivo] = useState<number | null>(actividad.fkCultivos || null);  
+  const [fkUsuarios, setFk_Usuario] = useState<number | null>(actividad.fkUsuarios || null); 
 
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();
   const { data: users, isLoading: isLoadingUsers } = useGetUsers();
@@ -25,7 +25,7 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
 
   const handleSubmit = () => {
     // Verificar que todos los campos estén completos
-    if (!fk_Cultivos || !fk_Usuarios || !titulo || !descripcion || !fecha || !estado) {
+    if (!fkCultivos || !fkUsuarios || !titulo || !descripcion || !fecha || !estado) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
@@ -38,8 +38,8 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
           descripcion,
           fecha,
           estado,
-          fk_Cultivos,  
-          fk_Usuarios,  
+          fkCultivos,  
+          fkUsuarios,  
         },
       },
       {
@@ -107,14 +107,14 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fk_Cultivos ? [fk_Cultivos.toString()] : []} 
+          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []} 
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];  
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);  
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo?.id.toString()}>{cultivo.nombre}</SelectItem>
+            <SelectItem key={cultivo?.id}>{cultivo.nombre}</SelectItem>
           ))}
         </Select>
       )}
@@ -126,7 +126,7 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Usuario"
           placeholder="Selecciona un Usuario"
-          selectedKeys={fk_Usuarios ? [fk_Usuarios.toString()] : []} 
+          selectedKeys={fkUsuarios ? [fkUsuarios.toString()] : []} 
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];  
             setFk_Usuario(selectedKey ? Number(selectedKey) : null);  

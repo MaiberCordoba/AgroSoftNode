@@ -3,7 +3,7 @@ import pool from "../db.js";
 // Obtener todos los tipos de especie
 export const getAllTiposEspecie = async (req, res) => {
   try {
-    const tiposEspecie = await pool.tiposEspecie.findMany();
+    const tiposEspecie = await pool.tipoEspecie.findMany();
     if (tiposEspecie.length > 0) {
       return res.status(200).json(tiposEspecie);
     } else {

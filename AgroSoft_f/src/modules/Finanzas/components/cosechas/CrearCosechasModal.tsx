@@ -9,7 +9,7 @@ interface CrearCosechasModalProps {
 }
 
 export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
-  const [fk_Cultivos, setFk_Cultivo] = useState<number | null>(null);
+  const [fkCultivos, setFk_Cultivo] = useState<number | null>(null);
   const [unidades, setUnidades] = useState(0);  // Inicializado en 0
   const [fecha, setFecha] = useState("");
 
@@ -17,13 +17,13 @@ export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
   const { mutate, isPending } = usePostCosecha();
 
   const handleSubmit = () => {
-    if (!fk_Cultivos || unidades <= 0 || !fecha) {
+    if (!fkCultivos || unidades <= 0 || !fecha) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      {  unidades,fecha,fk_Cultivos },
+      { unidades,fecha,fkCultivos },
       {
         onSuccess: () => {
           onClose();
@@ -71,7 +71,7 @@ export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fk_Cultivos ? [fk_Cultivos.toString()] : []} 
+          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []} 
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0]; 
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);

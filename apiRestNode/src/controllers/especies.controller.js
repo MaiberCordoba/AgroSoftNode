@@ -4,7 +4,7 @@ import pool from "../db.js";
 export const getAllEspecies = async (req, res) => {
   try {
     const especies = await pool.especies.findMany();
-    if (especies.length > 0) {
+    if (especies) {
       return res.status(200).json(especies);
     } else {
       return res.status(404).json({ msg: "No se encontraron datos de especies registradas." });
