@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllVentas = async (req, res) => {
     try {
-        const sql = await pool.venta.findMany({
-            data: req.body
-        })
+        const sql = await pool.ventas.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllVentas = async (req, res) => {
 
 export const createVentas = async (req, res) => {
     try {
-        const sql = await pool.venta.create({
+        const sql = await pool.ventas.create({
             data: req.body
         })
         if (sql) {
@@ -33,7 +31,7 @@ export const createVentas = async (req, res) => {
 export const updateVentas = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.venta.update({
+        const sql = await pool.ventas.update({
             where: { id: parseInt(id) },
             data: req.body
         })

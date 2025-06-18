@@ -2,8 +2,6 @@ import { Router } from "express";
 import {
   createActividad,
   getAllActividad,
-  graficoActividades,
-  reporteCostoActividad,
   reporteRentabilidad,
   updateActividad,
 } from "../controllers/actividades.controller.js";
@@ -14,7 +12,5 @@ actividades.get("/actividades", verifyJWT, getAllActividad);
 actividades.post("/actividades", verifyJWT, createActividad);
 actividades.patch("/actividades/:id",verifyJWT, updateActividad);
 actividades.get("/reporteRentabilidad", reporteRentabilidad);
-actividades.get("/graficoActividades", graficoActividades);
-actividades.get("/reporteCostoActividad", reporteCostoActividad);
 
 export default actividades;

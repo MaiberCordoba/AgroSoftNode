@@ -3,7 +3,7 @@ import prisma from "../db.js";
 // ✅ LISTAR AFECCIONES
 export const listarAfecciones = async (req, resp) => {
   try {
-    const afecciones = await prisma.afeccion.findMany({
+    const afecciones = await prisma.afecciones.findMany({
       include: {
         plaga: {
           include: {
@@ -89,7 +89,7 @@ export const actualizarAfecciones = async (req, resp) => {
     const id = parseInt(req.params.id);
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
 
-    await prisma.afeccion.update({
+    await prisma.afecciones.update({
       where: { id },
       data: {
         fechaEncuentro,
@@ -115,7 +115,7 @@ export const eliminarAfecciones = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    await prisma.afeccion.delete({
+    await prisma.afecciones.delete({
       where: { id }
     });
 
@@ -131,7 +131,7 @@ export const buscarAfecciones = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    const a = await prisma.afeccion.findUnique({
+    const a = await prisma.afecciones.findUnique({
       where: { id },
       include: {
         plaga: {

@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllHerramientas = async (req, res) => {
     try {
-        const sql = await pool.herramienta.findMany({
-            data: req.body
-        })
+        const sql = await pool.herramientas.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllHerramientas = async (req, res) => {
 
 export const createHerramientas = async (req, res) => {
     try {
-        const sql = await pool.herramienta.create({
+        const sql = await pool.herramientas.create({
             data: req.body
         })
         if (sql) {
@@ -33,7 +31,7 @@ export const createHerramientas = async (req, res) => {
 export const updateHerramientas = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.herramienta.update({
+        const sql = await pool.herramientas.update({
             where: { id: parseInt(id) },
             data: req.body
         })

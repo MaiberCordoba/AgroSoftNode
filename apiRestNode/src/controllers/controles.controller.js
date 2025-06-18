@@ -3,7 +3,7 @@ import pool from "../db.js";
 // ✅ LISTAR CONTROLES
 export const listarControles = async (req, resp) => {
   try {
-    const controles = await pool.control.findMany({
+    const controles = await pool.controles.findMany({
       include: {
         tipoControl: true,
         afeccion: {
@@ -82,7 +82,7 @@ export const registrarControles = async (req, resp) => {
   try {
     const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } = req.body;
 
-    await pool.control.create({
+    await pool.controles.create({
       data: {
         fk_Afecciones: fk_Afeccion,
         fk_TiposControl: fk_TipoControl,
@@ -104,7 +104,7 @@ export const actualizarControles = async (req, resp) => {
     const id = parseInt(req.params.id);
     const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } = req.body;
 
-    await pool.control.update({
+    await pool.controles.update({
       where: { id },
       data: {
         fk_Afecciones: fk_Afeccion,
@@ -126,7 +126,7 @@ export const eliminarControles = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    await pool.control.delete({
+    await pool.controles.delete({
       where: { id },
     });
 

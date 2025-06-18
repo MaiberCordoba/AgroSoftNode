@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllInsumos = async (req, res) => {
     try {
-        const sql = await pool.insumo.findMany({
-            data: req.body
-        })
+        const sql = await pool.insumos.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllInsumos = async (req, res) => {
 
 export const createInsumos = async (req, res) => {
     try {
-        const sql = await pool.insumo.create({
+        const sql = await pool.insumos.create({
             data: req.body
         })
         if (sql) {
@@ -33,7 +31,7 @@ export const createInsumos = async (req, res) => {
 export const updateInsumos = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.insumo.update({
+        const sql = await pool.insumos.update({
             where: { id: parseInt(id) },
             data: req.body
         })

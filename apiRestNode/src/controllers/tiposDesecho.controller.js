@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllTipoDesechos = async (req, res) => {
     try {
-        const sql = await pool.tipoDesecho.findMany({
-            data: req.body
-        })
+        const sql = await pool.tiposDesecho.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllTipoDesechos = async (req, res) => {
 
 export const createTipoDesechos = async (req, res) => {
     try {
-        const sql = await pool.tipoDesecho.create({
+        const sql = await pool.tiposDesecho.create({
             data: req.body
         })
         if (sql) {
@@ -33,7 +31,7 @@ export const createTipoDesechos = async (req, res) => {
 export const updateTipoDesechos = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.tipoDesecho.update({
+        const sql = await pool.tiposDesecho.update({
             where: { id: parseInt(id) },
             data: req.body
         })

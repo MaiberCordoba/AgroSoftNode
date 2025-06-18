@@ -3,7 +3,7 @@ import pool from "../db.js";
 // Obtener todos los tipos de especie
 export const getAllTiposEspecie = async (req, res) => {
   try {
-    const tiposEspecie = await pool.tipoEspecie.findMany();
+    const tiposEspecie = await pool.tiposEspecie.findMany();
     if (tiposEspecie.length > 0) {
       return res.status(200).json(tiposEspecie);
     } else {
@@ -20,7 +20,7 @@ export const createTiposEspecie = async (req, res) => {
   try {
     const { nombre, descripcion, img } = req.body;
 
-    const nuevoTipoEspecie = await pool.tipoEspecie.create({
+    const nuevoTipoEspecie = await pool.tiposEspecie.create({
       data: {
         nombre,
         descripcion,
@@ -45,7 +45,7 @@ export const updateTiposEspecie = async (req, res) => {
     const id = parseInt(req.params.id);
     const { nombre, descripcion, img } = req.body;
 
-    const updatedTipoEspecie = await pool.tipoEspecie.update({
+    const updatedTipoEspecie = await pool.tiposEspecie.update({
       where: { id },
       data: {
         nombre,
@@ -73,7 +73,7 @@ export const deleteTiposEspecie = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const deletedTipoEspecie = await pool.tipoEspecie.delete({
+    const deletedTipoEspecie = await pool.tiposEspecie.delete({
       where: { id },
     });
 

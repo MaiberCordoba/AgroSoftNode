@@ -2,7 +2,7 @@ import pool from "../db.js";
 
 export const getCultivos = async (req, res) => {
   try {
-    const cultivos = await pool.cultivo.findMany();
+    const cultivos = await pool.cultivos.findMany();
     return res.status(200).json(cultivos);
   } catch (error) {
     console.error(error);

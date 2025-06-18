@@ -2,7 +2,7 @@ import pool from "../db.js";
 
 export const getAllSemilleros = async (req, res) => {
   try {
-    const semilleros = await pool.semillero.findMany();
+    const semilleros = await pool.semilleros.findMany();
     return res.status(200).json(semilleros);
   } catch (error) {
     console.error(error);
@@ -14,7 +14,7 @@ export const createSemilleros = async (req, res) => {
   try {
     const { fk_Especies, unidades, fechaSiembra, fechaEstimada } = req.body;
 
-    const nuevoSemillero = await pool.semillero.create({
+    const nuevoSemillero = await pool.semilleros.create({
       data: {
         fk_Especies: parseInt(fk_Especies),
         unidades: parseInt(unidades),
@@ -49,7 +49,7 @@ export const patchSemillero = async (req, res) => {
       return res.status(400).json({ msg: "No se proporcionaron campos para actualizar" });
     }
 
-    const updatedSemillero = await pool.semillero.update({
+    const updatedSemillero = await pool.semilleros.update({
       where: { id },
       data,
     });
@@ -68,7 +68,7 @@ export const deleteSemillero = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    await pool.semillero.delete({
+    await pool.semilleros.delete({
       where: { id },
     });
 
