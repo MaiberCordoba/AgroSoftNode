@@ -17,7 +17,17 @@ const fetchSensores = async (): Promise<Sensor[]> => {
     },
   });
   if (!res.ok) throw new Error("Error al obtener los sensores");
-  return res.json();
+  
+  // Transformar a camelCase si el backend devuelve snake_case
+  const data = await res.json();
+  return data.map((sensor: any) => ({
+    id: sensor.id,
+    tipoSensor: sensor.tipo_sensor || sensor.tipoSensor,
+    datosSensor: sensor.datos_sensor || sensor.datosSensor,
+    fecha: sensor.fecha,
+    loteId: sensor.lote_id || sensor.loteId,
+    eraId: sensor.era_id || sensor.eraId
+  }));
 };
 
 export const CrearUmbralModal = ({ onClose }: CrearUmbralModalProps) => {
@@ -69,9 +79,9 @@ export const CrearUmbralModal = ({ onClose }: CrearUmbralModalProps) => {
     }
 
     mutation.mutate({
-      sensor_id: sensorId,
-      valor_minimo: valorMinimo,
-      valor_maximo: valorMaximo,
+      sensorId: sensorId,
+      valorMinimo: valorMinimo,
+      valorMaximo: valorMaximo,
     });
   };
 
@@ -109,7 +119,7 @@ export const CrearUmbralModal = ({ onClose }: CrearUmbralModalProps) => {
       >
         {sensores.map((sensor) => (
           <SelectItem key={String(sensor.id)}>
-            {sensor.tipo_sensor} (ID {sensor.id})
+            {sensor.tipoSensor} (ID {sensor.id})
           </SelectItem>
         ))}
       </Select>

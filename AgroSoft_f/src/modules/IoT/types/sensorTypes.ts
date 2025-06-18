@@ -1,21 +1,46 @@
+export type SensorType = 
+  | 'Temperatura' 
+  | 'Iluminación' 
+  | 'Humedad Ambiental' 
+  | 'Humedad del Terreno' 
+  | 'Nivel de PH' 
+  | 'Viento' 
+  | 'Lluvia';
+
 export interface Sensor {
   id: number;  
-  tipo_sensor: string;         
-  datos_sensor: number;        
+  tipoSensor: SensorType;         
+  datosSensor: number;        
   fecha: string;               
-  lote_id: number | null;
-  era_id: number | null;        
+  loteId: number | null;
+  eraId: number | null;        
 }
 
-export interface SensorConExtras extends Sensor {
+export interface SensorConExtras extends Omit<Sensor, 'tipoSensor'> {
+  tipoSensor: string;
   unidad: string;              
-  alerta: boolean;              
+  alerta?: boolean;            
+}
+
+export interface SensorHistorico {
+  id: number;
+  tipoSensor: string;
+  datosSensor: number;
+  fecha: string;
+  unidad: string;
 }
 
 export interface Umbral {
   id: number;
-  sensor_id: number;
-  valor_minimo: number;
-  valor_maximo: number;
-  tipo_sensor?: string; 
+  sensorId: number;
+  valorMinimo: number;
+  valorMaximo: number;
+  tipoSensor?: string;
+}
+
+export interface UmbralResponse extends Umbral {
+  sensor?: {
+    id: number;
+    tipoSensor: string;
+  };
 }

@@ -26,41 +26,41 @@ export function UmbralLista() {
   } = useCrearUmbral();
 
   const {
-      isOpen: isDeleteModalOpen,
-      closeModal: closeDeleteModal,
-      umbralEliminado,
-      handleEliminar,
-    } = useEliminarUmbral();
+    isOpen: isDeleteModalOpen,
+    closeModal: closeDeleteModal,
+    umbralEliminado,
+    handleEliminar,
+  } = useEliminarUmbral();
 
   const handleCrearNuevo = () => {
     handleCrear({
       id: 0,
-      sensor_id: 1,
-      valor_minimo: 0,
-      valor_maximo: 100,
+      sensorId: 1, // Actualizado a camelCase
+      valorMinimo: 0, // Actualizado a camelCase
+      valorMaximo: 100, // Actualizado a camelCase
     });
   };
 
   const columnas = [
-    { name: "Sensor ID", uid: "sensor_id" },
-    { name: "Mínimo", uid: "valor_minimo" },
-    { name: "Máximo", uid: "valor_maximo" },
+    { name: "Sensor ID", uid: "sensorId" }, // Actualizado a camelCase
+    { name: "Mínimo", uid: "valorMinimo" }, // Actualizado a camelCase
+    { name: "Máximo", uid: "valorMaximo" }, // Actualizado a camelCase
     { name: "Acciones", uid: "acciones" },
   ];
 
   const renderCell = (item: Umbral, columnKey: React.Key) => {
     switch (columnKey) {
-      case "sensor_id":
-        return <span>{item.sensor_id}</span>;
-      case "valor_minimo":
-        return <span>{item.valor_minimo}</span>;
-      case "valor_maximo":
-        return <span>{item.valor_maximo}</span>;
+      case "sensorId": // Actualizado a camelCase
+        return <span>{item.sensorId}</span>;
+      case "valorMinimo": // Actualizado a camelCase
+        return <span>{item.valorMinimo}</span>;
+      case "valorMaximo": // Actualizado a camelCase
+        return <span>{item.valorMaximo}</span>;
       case "acciones":
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
+            //onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -76,7 +76,7 @@ export function UmbralLista() {
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
-        claveBusqueda="sensor_id"
+        claveBusqueda="sensorId" // Actualizado a camelCase
         placeholderBusqueda="Buscar por Sensor ID"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}

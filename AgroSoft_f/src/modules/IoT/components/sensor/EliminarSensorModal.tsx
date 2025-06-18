@@ -24,6 +24,10 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
         onSuccess: () => {
           onClose();
         },
+        onError: (error) => {
+          console.error("Error al eliminar sensor:", error);
+          // Podrías agregar un toast de error aquí si lo deseas
+        }
       }
     );
   };
@@ -48,7 +52,7 @@ const EliminarSensorModal: React.FC<EliminarSensorModalProps> = ({
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
-          ¿Eliminar el sensor "{sensor.tipo_sensor}"?
+          ¿Eliminar el sensor "{sensor.tipoSensor}"?
         </h3>
 
         <p className="text-gray-500 mb-4 max-w-md">

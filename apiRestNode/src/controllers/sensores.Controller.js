@@ -1,126 +1,139 @@
-import pool from '../db.js'
+import pool from '../db.js';
 
-export const ListarSensores= async (req, res) => {
+// Controlador para sensores
+export const ListarSensores = async (req, res) => {
     try {
-        const sql = `SELECT * FROM sensores`
-        const [result] = await pool.query(sql)
-        return res.status(200).json(result);
+        const sensores = await pool.sensores.findMany();
+        return res.status(200).json(sensores);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ "message": "Error al listar los sensores" });
     }
 }
+
 export const RegistrarSensor = async (req, res) => {
     try {
-        const { tipo_sensor, datos_sensor, fecha, era_id, lote_id } = req.body;
+        const { tipoSensor, datosSensor, fecha, eraId, loteId } = req.body;
 
-        let unidad = '';
-        switch (tipo_sensor) {
-            case 'Temperatura':
-                unidad = '°C';
-                break;
-            case 'Iluminación':
-                unidad = 'lux';
-                break;
-            case 'Humedad Ambiental':
-            case 'Humedad del Terreno':
-                unidad = '%';
-                break;
-            case 'Nivel de PH':
-                unidad = 'pH';
-                break;
-            case 'Viento':
-                unidad = 'km/h';
-                break;
-            case 'Lluvia':
-                unidad = 'mm';
-                break;
-            default:
-                if(tipo_sensor == tipo_sensor){
-                    return res.status(500).json({ message: "no existe ese tipo de sensor en tipo de sensor. Para los lotes estan los tipos 'Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia' y para las eras los tipos 'Humedad del Terreno', 'Nivel de PH' " });
-                }
-                return res.status(400).json({ message: "Tipo de sensor inválido." });
+        // Mapeo corregido
+        const tipoSensorMap = {
+            'Temperatura': 'Temperatura',
+            'Iluminación': 'Iluminación',
+            'Humedad Ambiental': 'Humedad_Ambiental',
+            'Humedad del Terreno': 'Humedad_del_Terreno',
+            'Nivel de PH': 'Nivel_de_PH',
+            'Viento': 'Viento',
+            'Lluvia': 'Lluvia'
+        };
+
+        const tipoSensorEnum = tipoSensorMap[tipoSensor];
+        if (!tipoSensorEnum) {
+            return res.status(400).json({ message: "Tipo de sensor inválido." });
         }
 
+        // Validación de ubicación
         const sensoresLote = ['Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia'];
         const sensoresEra  = ['Humedad del Terreno', 'Nivel de PH'];
         
-        if (sensoresLote.includes(tipo_sensor) && !lote_id) {
-            return res.status(400).json({ message: `El sensor tipo '${tipo_sensor}' debe registrarse en un lote.` });
+        if (sensoresLote.includes(tipoSensor) && !loteId) {
+            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' requiere un loteId` });
         }
 
-        if (sensoresEra.includes(tipo_sensor) && !era_id) {
-            return res.status(400).json({ message: `El sensor tipo '${tipo_sensor}' debe registrarse en una era.` });
+        if (sensoresEra.includes(tipoSensor) && !eraId) {
+            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' requiere un eraId` });
         }
 
-
-        const sql = `INSERT INTO sensores (tipo_sensor, datos_sensor, fecha, era_id, lote_id) VALUES (?, ?, ?, ?, ?)`;
-        const [rows] = await pool.query(sql, [tipo_sensor, datos_sensor, fecha, era_id || null, lote_id || null]);
+        // USAR NOMBRES CAMEL CASE COMO EN EL MODELO PRISMA
+        const sensor = await pool.sensores.create({
+            data: {
+                tipoSensor: tipoSensorEnum,  // camelCase
+                datosSensor: datosSensor,     // camelCase
+                fecha: fecha ? new Date(fecha) : new Date(),
+                eraId: eraId || null,
+                loteId: loteId || null
+            }
+        });
 
         return res.status(201).json({ 
             message: "Sensor registrado correctamente",
-            unidad: unidad 
+            sensor: sensor
         });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error al registrar el sensor" });
+        console.error("Error detallado:", error);
+        return res.status(500).json({ 
+            message: "Error al registrar el sensor",
+            error: error.message
+        });
     }
 }
+
 export const ActualizarSensor = async (req, res) => {
     try {
         const { id } = req.params;
-        const { tipo_sensor, datos_sensor, fecha, era_id, lote_id } = req.body;
+        const { tipoSensor, datosSensor, fecha, eraId, loteId } = req.body;
 
-        // Validación de tipo y ubicación
+        // Validar que existe el sensor
+        const sensorExistente = await pool.sensores.findUnique({
+            where: { id: parseInt(id) }
+        });
+
+        if (!sensorExistente) {
+            return res.status(404).json({ message: "Sensor no encontrado" });
+        }
+
+        // Mapeo de tipos de sensor
+        const tipoSensorMap = {
+            'Temperatura': 'TEMPERATURA',
+            'Iluminación': 'ILUMINACION',
+            'Humedad Ambiental': 'HUMEDAD_AMBIENTAL',
+            'Humedad del Terreno': 'HUMEDAD_TERRENO',
+            'Nivel de PH': 'PH',
+            'Viento': 'VIENTO',
+            'Lluvia': 'LLUVIA'
+        };
+
+        let tipoSensorEnum;
+        if (tipoSensor) {
+            tipoSensorEnum = tipoSensorMap[tipoSensor];
+            if (!tipoSensorEnum) {
+                return res.status(400).json({ message: "Tipo de sensor inválido." });
+            }
+        }
+
         const sensoresLote = ['Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia'];
         const sensoresEra  = ['Humedad del Terreno', 'Nivel de PH'];
 
-        if (sensoresLote.includes(tipo_sensor) && !lote_id) {
-            return res.status(400).json({ message: `El sensor tipo '${tipo_sensor}' debe registrarse en un lote.` });
+        if (tipoSensor) {
+            if (sensoresLote.includes(tipoSensor) && !loteId) {
+                return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' debe registrarse en un lote.` });
+            }
+
+            if (sensoresEra.includes(tipoSensor) && !eraId) {
+                return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' debe registrarse en una era.` });
+            }
         }
 
-        if (sensoresEra.includes(tipo_sensor) && !era_id) {
-            return res.status(400).json({ message: `El sensor tipo '${tipo_sensor}' debe registrarse en una era.` });
-        }
+        const sensorActualizado = await pool.sensor.update({
+            where: { id: parseInt(id) },
+            data: {
+                tipoSensor: tipoSensor ? tipoSensorEnum : sensorExistente.tipoSensor,
+                datosSensor: datosSensor !== undefined ? datosSensor : sensorExistente.datosSensor,
+                fecha: fecha ? new Date(fecha) : sensorExistente.fecha,
+                eraId: eraId !== undefined ? (eraId || null) : sensorExistente.eraId,
+                loteId: loteId !== undefined ? (loteId || null) : sensorExistente.loteId
+            }
+        });
 
-        if (era_id && lote_id) {
-            return res.status(400).json({ message: "Un sensor no puede estar en una era y lote al mismo tiempo." });
-        }
-
-        // Validar que el tipo de sensor sea válido
-        const tiposValidos = [...sensoresLote, ...sensoresEra];
-        if (!tiposValidos.includes(tipo_sensor)) {
-            return res.status(400).json({
-                message: "Tipo de sensor inválido. Para los lotes: 'Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia'. Para las eras: 'Humedad del Terreno', 'Nivel de PH'."
-            });
-        }
-
-        // Obtener datos actuales si no se envía datos_sensor
-        const [rows] = await pool.query("SELECT datos_sensor FROM sensores WHERE id = ?", [id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: "Sensor no encontrado" });
-        }
-
-        const datosSensorFinal = datos_sensor !== undefined ? datos_sensor : rows[0].datos_sensor;
-
-        const sql = `UPDATE sensores SET tipo_sensor = ?, datos_sensor = ?, fecha = ?, era_id = ?, lote_id = ? WHERE id = ?`;
-        const [result] = await pool.query(sql, [
-            tipo_sensor,
-            datosSensorFinal,
-            fecha,
-            era_id || null,
-            lote_id || null,
-            id,
-        ]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Sensor no encontrado" });
-        }
-
-        return res.status(200).json({ message: "Sensor actualizado correctamente" });
+        return res.status(200).json({ 
+            message: "Sensor actualizado correctamente",
+            sensor: sensorActualizado
+        });
     } catch (error) {
         console.error("Error al actualizar sensor:", error);
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: "Sensor no encontrado" });
+        }
         return res.status(500).json({ message: "Error al actualizar el sensor" });
     }
 }
@@ -128,63 +141,79 @@ export const ActualizarSensor = async (req, res) => {
 export const EliminarSensor = async (req, res) => {
     try {
         const { id } = req.params;
-        const sql = `DELETE FROM sensores WHERE id = ?`;
-        const [result] = await pool.query(sql, [id]);
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: "Sensor no encontrado" });
-        }
+        await pool.sensores.delete({
+            where: { id: parseInt(id) }
+        });
 
         return res.status(200).json({ message: "Sensor eliminado correctamente" });
     } catch (error) {
         console.error(error);
+        if (error.code === 'P2025') {
+            return res.status(404).json({ message: "Sensor no encontrado" });
+        }
         return res.status(500).json({ message: "Error al eliminar el sensor" });
     }
 }
+
 export const ObtenerSensorPorId = async (req, res) => {
     try {
         const { id } = req.params;
-        const sql = `SELECT * FROM sensores WHERE id = ?`;
-        const [rows] = await pool.query(sql, [id]);
+        const sensor = await pool.sensores.findUnique({
+            where: { id: parseInt(id) }
+        });
 
-        if (rows.length === 0) {
+        if (!sensor) {
             return res.status(404).json({ message: "Sensor no encontrado" });
         }
 
-        return res.status(200).json(rows[0]);
+        return res.status(200).json(sensor);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Error al obtener el sensor" });
     }
 }
 
-// En tu controlador de sensores
 export const ObtenerHistoricoSensor = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { fechaInicio, fechaFin } = req.query;
+    try {
+        const { id } = req.params;
+        const { fechaInicio, fechaFin } = req.query;
 
-    const sql = `
-      SELECT id, tipo_sensor, datos_sensor, fecha, 
-             CASE 
-               WHEN tipo_sensor = 'Temperatura' THEN '°C'
-               WHEN tipo_sensor = 'Iluminación' THEN 'lux'
-               WHEN tipo_sensor IN ('Humedad Ambiental', 'Humedad del Terreno') THEN '%'
-               WHEN tipo_sensor = 'Nivel de PH' THEN 'pH'
-               WHEN tipo_sensor = 'Viento' THEN 'km/h'
-               WHEN tipo_sensor = 'Lluvia' THEN 'mm'
-               ELSE ''
-             END AS unidad
-      FROM sensores 
-      WHERE id = ? 
-        AND fecha BETWEEN ? AND ?
-      ORDER BY fecha ASC
-    `;
+        const historico = await pool.sensores.findMany({
+            where: {
+                id: parseInt(id),
+                fecha: {
+                    gte: new Date(fechaInicio),
+                    lte: new Date(fechaFin)
+                }
+            },
+            orderBy: {
+                fecha: 'asc'
+            }
+        });
 
-    const [result] = await pool.query(sql, [id, fechaInicio, fechaFin]);
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Error al obtener histórico del sensor" });
-  }
+        // Mapear para agregar unidad
+        const historicoConUnidad = historico.map(registro => {
+            let unidad = '';
+            switch (registro.tipoSensor) {
+                case 'TEMPERATURA': unidad = '°C'; break;
+                case 'ILUMINACION': unidad = 'lux'; break;
+                case 'HUMEDAD_AMBIENTAL':
+                case 'HUMEDAD_TERRENO': unidad = '%'; break;
+                case 'PH': unidad = 'pH'; break;
+                case 'VIENTO': unidad = 'km/h'; break;
+                case 'LLUVIA': unidad = 'mm'; break;
+                default: unidad = '';
+            }
+            return {
+                ...registro,
+                unidad
+            };
+        });
+
+        return res.status(200).json(historicoConUnidad);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error al obtener histórico del sensor" });
+    }
 };
