@@ -108,6 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         "Actividades",
         "Herramientas",
         "Insumos",
+        "Usos productos",
         "Usos herramientas"
       ],
       restricted: ["visitante"],
