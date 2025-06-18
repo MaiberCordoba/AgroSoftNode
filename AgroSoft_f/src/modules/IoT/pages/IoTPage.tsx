@@ -24,7 +24,7 @@ export default function IoTPages() {
   const [sensoresData, setSensoresData] = useState<Record<string, string>>({
     viento: "Cargando...",
     temperatura: "Cargando...",
-    luzSolar: "Cargando...",
+    Iluminación: "Cargando...",
     humedad: "Cargando...",
     humedadAmbiente: "Cargando...",
     lluvia: "Cargando...",
@@ -56,7 +56,7 @@ export default function IoTPages() {
     const sensores = [
       "viento",
       "temperatura",
-      "luzSolar",
+      "Iluminación",
       "humedad",
       "humedadAmbiente",
       "lluvia",
@@ -115,7 +115,7 @@ export default function IoTPages() {
   const sensoresList = [
     { id: "viento", title: "Viento", icon: <WiStrongWind size={32} style={{ color: "#5DADE2" }}/> },
     { id: "temperatura", title: "Temperatura", icon: <WiThermometer size={32} style={{ color: "#E74C3C" }} /> },
-    { id: "luzSolar", title: "Luz Solar", icon: <WiDayCloudy size={32} style={{ color: "#F1C40F" }} /> },
+    { id: "Iluminación", title: "Luz Solar", icon: <WiDayCloudy size={32} style={{ color: "#F1C40F" }} /> },
     { id: "humedad", title: "Humedad", icon: <WiRaindrop size={32} style={{ color: "#3498DB" }} /> },
     { id: "humedadAmbiente", title: "H. Ambiente", icon: <WiHumidity size={32} style={{ color: "#76D7C4" }} /> },
     { id: "lluvia", title: "Lluvia", icon: <WiRain size={32} style={{ color: "#2980B9" }} /> },

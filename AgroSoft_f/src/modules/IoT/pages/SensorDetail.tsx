@@ -16,18 +16,30 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  ResponsiveContainer
+  ResponsiveContainer,
+  Legend
 } from "recharts";
 
-interface SensorData {
-  timestamp: string;
-  valor: number;
+interface SensorDataPoint {
+  valor: number;        // Cambiado de datosSensor a valor
+  fecha: string;
+  unidad: string;       // Nueva propiedad
 }
 
 export default function SensorDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [sensorData, setSensorData] = useState<SensorData[]>([]);
+  const [sensorData, setSensorData] = useState<SensorDataPoint[]>([]);
+
+  // Cargar datos guardados al iniciar
+  useEffect(() => {
+    if (!id) return;
+    
+    const savedData = localStorage.getItem(`sensorData_${id}`);
+    if (savedData) {
+      setSensorData(JSON.parse(savedData));
+    }
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
@@ -43,12 +55,21 @@ export default function SensorDetail() {
         const data = JSON.parse(event.data);
         const timestamp = new Date().toLocaleTimeString();
 
-        const newEntry: SensorData = {
-          valor: parseFloat(data.valor),
-          timestamp,
+        const newEntry: SensorDataPoint = {
+          valor: parseFloat(data.valor),  // Cambiado a 'valor'
+          fecha: timestamp,
+          unidad: data.unidad || ''       // Nueva propiedad
         };
 
-        setSensorData((prev) => [...prev.slice(-9), newEntry]);
+        setSensorData((prev) => {
+          // Mantener solo los últimos 50 puntos para no sobrecargar
+          const newData = [...prev.slice(-49), newEntry];
+          
+          // Guardar en localStorage para persistencia
+          localStorage.setItem(`sensorData_${id}`, JSON.stringify(newData));
+          
+          return newData;
+        });
       } catch (error) {
         console.error(`❌ Error en mensaje WebSocket (${id}):`, error);
       }
@@ -78,10 +99,18 @@ export default function SensorDetail() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={sensorData}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="timestamp" />
+            <XAxis dataKey="fecha" />
             <YAxis />
             <Tooltip />
-            <Line type="monotone" dataKey="valor" stroke="green" strokeWidth={2} />
+            <Legend />
+            {/* Cambiado dataKey de "valor" a "valor" */}
+            <Line 
+              type="monotone" 
+              dataKey="valor" 
+              stroke="green" 
+              strokeWidth={2}
+              name={id} 
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -92,12 +121,14 @@ export default function SensorDetail() {
           <TableHeader>
             <TableColumn>Tiempo</TableColumn>
             <TableColumn>Valor</TableColumn>
+            <TableColumn>Unidad</TableColumn>
           </TableHeader>
           <TableBody>
             {sensorData.map((item, index) => (
               <TableRow key={index}>
-                <TableCell>{item.timestamp}</TableCell>
+                <TableCell>{item.fecha}</TableCell>
                 <TableCell>{item.valor}</TableCell>
+                <TableCell>{item.unidad}</TableCell>
               </TableRow>
             ))}
           </TableBody>
