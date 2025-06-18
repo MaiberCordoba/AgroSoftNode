@@ -10,24 +10,33 @@ interface CrearAfeccionCultivoModalProps {
   onClose: () => void;
 }
 
-export const CrearAfeccionCultivoModal = ({ onClose }: CrearAfeccionCultivoModalProps) => {
+export const CrearAfeccionCultivoModal = ({
+  onClose,
+}: CrearAfeccionCultivoModalProps) => {
   const [fk_Plantaciones, setFk_Plantaciones] = useState<number | null>(null);
   const [fk_Plagas, setFk_Plagas] = useState<number | null>(null);
   const [fechaEncuentro, setFechaEncuentro] = useState<string>("");
-  const [estado, setEstado] = useState<EstadoAfeccion | "">(EstadoAfeccion.Detectado);
+  const [estado, setEstado] = useState<EstadoAfeccion | "">(
+    EstadoAfeccion.Detectado
+  );
 
-  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } = useGetAfecciones();
-  const { data: plantaciones, isLoading: isLoadingPlantaciones } = useGetPlantaciones();
+  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } =
+    useGetAfecciones();
+  const { data: plantaciones, isLoading: isLoadingPlantaciones } =
+    useGetPlantaciones();
   const { mutate, isPending } = usePostAfeccionCultivo();
 
+  // Convertir fecha a formato ISO
+
   const handleSubmit = () => {
+    const fechaISO = new Date(fechaEncuentro).toISOString();
     if (!fk_Plantaciones || !fk_Plagas || !estado || !fechaEncuentro) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fk_Plantaciones, fk_Plagas, estado, fechaEncuentro },
+      { fk_Plantaciones, fk_Plagas, estado, fechaEncuentro: fechaISO },
       {
         onSuccess: () => {
           onClose();
@@ -35,7 +44,7 @@ export const CrearAfeccionCultivoModal = ({ onClose }: CrearAfeccionCultivoModal
           setFk_Plagas(null);
           setEstado(EstadoAfeccion.Detectado);
           setFechaEncuentro("");
-        }
+        },
       }
     );
   };
@@ -67,8 +76,8 @@ export const CrearAfeccionCultivoModal = ({ onClose }: CrearAfeccionCultivoModal
           }}
         >
           {(plantaciones || []).map((plantacion) => (
-            <SelectItem 
-              key={plantacion.id.toString()} 
+            <SelectItem
+              key={plantacion.id.toString()}
               textValue={plantacion.id.toString()} // AQUI VA EL textValue
             >
               {plantacion.id}
@@ -90,9 +99,9 @@ export const CrearAfeccionCultivoModal = ({ onClose }: CrearAfeccionCultivoModal
           }}
         >
           {(tiposPlaga || []).map((tipo) => (
-            <SelectItem 
-              key={tipo.id.toString()} 
-              textValue={tipo.nombre}  // AQUI VA EL textValue correcto
+            <SelectItem
+              key={tipo.id.toString()}
+              textValue={tipo.nombre} // AQUI VA EL textValue correcto
             >
               {tipo.nombre}
             </SelectItem>
@@ -110,9 +119,9 @@ export const CrearAfeccionCultivoModal = ({ onClose }: CrearAfeccionCultivoModal
         }}
       >
         {Object.values(EstadoAfeccion).map((estado) => (
-          <SelectItem 
-            key={estado} 
-            textValue={estado}  // AQUI VA EL textValue
+          <SelectItem
+            key={estado}
+            textValue={estado} // AQUI VA EL textValue
           >
             {estado}
           </SelectItem>

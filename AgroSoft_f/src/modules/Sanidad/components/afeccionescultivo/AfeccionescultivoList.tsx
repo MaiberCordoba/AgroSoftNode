@@ -11,28 +11,33 @@ import { AfeccionesCultivo } from "../../types";
 
 export function AfeccionesCultivoList() {
   const { data, isLoading, error } = useGetAfeccionesCultivo();
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    afeccionCultivoEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    afeccionCultivoEditada,
+    handleEditar,
   } = useEditarAfeccionCultivo();
-  
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearAfeccionCultivo();
-  
+
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     afeccionCultivoEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarAfeccionCultivo();
 
   const handleCrearNuevo = () => {
-    handleCrear({ fk_Plantacion: 0, fk_Plaga: 0, fechaEncuentro: "", estado: "" });
+    handleCrear({
+      fk_Plantacion: 0,
+      fk_Plaga: 0,
+      fechaEncuentro: "",
+      estado: "",
+    });
   };
 
   const columnas = [
@@ -46,22 +51,19 @@ export function AfeccionesCultivoList() {
   const renderCell = (item: AfeccionesCultivo, columnKey: React.Key) => {
     switch (columnKey) {
       case "fk_Plantacion":
-        return <span>{item.fk_Plantacion || "No definido"}</span>;
+        return <span>{item.fk_Plantaciones || "No definido"}</span>;
       case "fk_Plaga":
-        return <span>{item.fk_Plaga || "No definido"}</span>;
+        return <span>{item.fk_Plagas || "No definido"}</span>;
       case "fechaEncuentro":
         return <span>{item.fechaEncuentro}</span>;
       case "estado":
         return <span>{item.estado}</span>;
       case "acciones":
-        return (
-          <AccionesTabla
-            onEditar={() => handleEditar(item)}
-            
-          />
-        );
+        return <AccionesTabla onEditar={() => handleEditar(item)} />;
       default:
-        return <span>{String(item[columnKey as keyof AfeccionesCultivo])}</span>;
+        return (
+          <span>{String(item[columnKey as keyof AfeccionesCultivo])}</span>
+        );
     }
   };
 
@@ -81,20 +83,18 @@ export function AfeccionesCultivoList() {
 
       {isEditModalOpen && afeccionCultivoEditada && (
         <EditarAfeccionCultivoModal
-        afeccionCultivo={afeccionCultivoEditada}
+          afeccionCultivo={afeccionCultivoEditada}
           onClose={closeEditModal}
         />
       )}
 
       {isCreateModalOpen && (
-        <CrearAfeccionCultivoModal
-          onClose={closeCreateModal}
-        />
+        <CrearAfeccionCultivoModal onClose={closeCreateModal} />
       )}
 
       {isDeleteModalOpen && afeccionCultivoEliminada && (
         <EliminarAfeccionCultivoModal
-        afeccioncultivo={afeccionCultivoEliminada}
+          afeccioncultivo={afeccionCultivoEliminada}
           isOpen={isDeleteModalOpen}
           onClose={closeDeleteModal}
         />

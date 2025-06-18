@@ -1,6 +1,5 @@
 import prisma from "../db.js";
 
-// ✅ LISTAR AFECCIONES
 export const listarAfecciones = async (req, resp) => {
   try {
     const afecciones = await prisma.afecciones.findMany({
@@ -23,42 +22,13 @@ export const listarAfecciones = async (req, resp) => {
       },
     });
 
-    const resultado = afecciones.map((a) => ({
-      id: a.id,
-      fechaEncuentro: a.fechaEncuentro,
-      estado: a.estado,
-      fk_Plagas: {
-        idPlaga: a.plagas.id,
-        nombre: a.plagas.nombre,
-      },
-      fk_Plantaciones: {
-        id: a.plantaciones.id,
-        fk_cultivo: {
-          id_cultivo: a.plantaciones.cultivo.id,
-          nombre: a.plantaciones.cultivo.nombre,
-          unidades: a.plantaciones.cultivo.unidades,
-        },
-        fk_era: {
-          id: a.plantaciones.eras.id,
-          posX: a.plantaciones.eras.posX,
-          posY: a.plantaciones.eras.posY,
-          fk_lote: {
-            id: a.plantaciones.eras.lote.id,
-            posX: a.plantaciones.eras.lote.posX,
-            posY: a.plantaciones.eras.lote.posY,
-          },
-        },
-      },
-    }));
-
-    return resp.status(200).json(resultado);
+    return resp.status(200).json(afecciones);
   } catch (error) {
     console.error("🔥 Error al listar afecciones:", error);
     return resp.status(500).json({ message: "error en el sistema" });
   }
 };
 
-// ✅ REGISTRAR AFECCION
 export const registrarAfecciones = async (req, resp) => {
   try {
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
@@ -83,7 +53,6 @@ export const registrarAfecciones = async (req, resp) => {
   }
 };
 
-// ✅ ACTUALIZAR AFECCION
 export const actualizarAfecciones = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);

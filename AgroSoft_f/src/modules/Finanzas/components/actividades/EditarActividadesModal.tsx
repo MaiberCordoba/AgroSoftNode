@@ -1,31 +1,50 @@
-import React, { useState } from 'react';
-import ModalComponent from '@/components/Modal';
-import { usePatchActividades } from '../../hooks/actividades/usePatchActividades'; // Hook para actualizar actividades
-import { Actividades } from '../../types';
-import { Input, Textarea, Select, SelectItem } from '@heroui/react';
-import { useGetCultivos } from '@/modules/Trazabilidad/hooks/cultivos/useGetCultivos'; 
-import { useGetUsers } from '@/modules/Users/hooks/useGetUsers';
+import React, { useState } from "react";
+import ModalComponent from "@/components/Modal";
+import { usePatchActividades } from "../../hooks/actividades/usePatchActividades"; // Hook para actualizar actividades
+import { Actividades } from "../../types";
+import { Input, Textarea, Select, SelectItem } from "@heroui/react";
+import { useGetCultivos } from "@/modules/Trazabilidad/hooks/cultivos/useGetCultivos";
+import { useGetUsers } from "@/modules/Users/hooks/useGetUsers";
 
 interface EditarActividadesModalProps {
   actividad: Actividades; // La actividad que se está editando
   onClose: () => void; // Función para cerrar el modal
 }
 
-const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ actividad, onClose }) => {
+const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({
+  actividad,
+  onClose,
+}) => {
   const [titulo, setTitulo] = useState<string>(actividad.titulo);
   const [descripcion, setDescripcion] = useState<string>(actividad.descripcion);
   const [fecha, setFecha] = useState<string>(actividad.fecha);
-  const [estado, setEstado] = useState<"Asignada" | "Completada" | "Cancelada">(actividad.estado);
-  const [fkCultivos, setFk_Cultivo] = useState<number | null>(actividad.fkCultivos || null);  
-  const [fkUsuarios, setFk_Usuario] = useState<number | null>(actividad.fkUsuarios || null); 
+  const [estado, setEstado] = useState<"Asignada" | "Completada" | "Cancelada">(
+    actividad.estado
+  );
+  const [fkCultivos, setFk_Cultivo] = useState<number | null>(
+    actividad.fkCultivos || null
+  );
+  const [fkUsuarios, setFk_Usuario] = useState<number | null>(
+    actividad.fkUsuarios || null
+  );
 
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();
   const { data: users, isLoading: isLoadingUsers } = useGetUsers();
-  const { mutate, isPending } = usePatchActividades();  
+  const { mutate, isPending } = usePatchActividades();
+
+  // Convertir fecha a formato ISO
+  const fechaISO = new Date(fecha).toISOString();
 
   const handleSubmit = () => {
     // Verificar que todos los campos estén completos
-    if (!fkCultivos || !fkUsuarios || !titulo || !descripcion || !fecha || !estado) {
+    if (
+      !fkCultivos ||
+      !fkUsuarios ||
+      !titulo ||
+      !descripcion ||
+      !fecha ||
+      !estado
+    ) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
@@ -36,15 +55,15 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         data: {
           titulo,
           descripcion,
-          fecha,
+          fecha: fechaISO,
           estado,
-          fkCultivos,  
-          fkUsuarios,  
+          fkCultivos,
+          fkUsuarios,
         },
       },
       {
         onSuccess: () => {
-          onClose();  
+          onClose();
         },
       }
     );
@@ -57,9 +76,9 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
       title="Editar Actividad"
       footerButtons={[
         {
-          label: isPending ? 'Guardando...' : 'Guardar',
-          color: 'success',
-          variant: 'light',
+          label: isPending ? "Guardando..." : "Guardar",
+          color: "success",
+          variant: "light",
           onClick: handleSubmit,
         },
       ]}
@@ -90,7 +109,10 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         label="Estado"
         value={estado}
         onSelectionChange={(keys) => {
-          const selectedKey = Array.from(keys)[0] as "Asignada" | "Completada" | "Cancelada";
+          const selectedKey = Array.from(keys)[0] as
+            | "Asignada"
+            | "Completada"
+            | "Cancelada";
           setEstado(selectedKey);
         }}
         required
@@ -107,10 +129,10 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []} 
+          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []}
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0];  
-            setFk_Cultivo(selectedKey ? Number(selectedKey) : null);  
+            const selectedKey = Array.from(keys)[0];
+            setFk_Cultivo(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(cultivos || []).map((cultivo) => (
@@ -126,14 +148,16 @@ const EditarActividadesModal: React.FC<EditarActividadesModalProps> = ({ activid
         <Select
           label="Usuario"
           placeholder="Selecciona un Usuario"
-          selectedKeys={fkUsuarios ? [fkUsuarios.toString()] : []} 
+          selectedKeys={fkUsuarios ? [fkUsuarios.toString()] : []}
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0];  
-            setFk_Usuario(selectedKey ? Number(selectedKey) : null);  
+            const selectedKey = Array.from(keys)[0];
+            setFk_Usuario(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(users || []).map((usuario) => (
-            <SelectItem key={usuario.identificacion.toString()}>{usuario.nombre}</SelectItem>
+            <SelectItem key={usuario.identificacion.toString()}>
+              {usuario.nombre}
+            </SelectItem>
           ))}
         </Select>
       )}

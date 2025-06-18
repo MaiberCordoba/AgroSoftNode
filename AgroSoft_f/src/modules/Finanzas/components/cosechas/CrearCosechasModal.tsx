@@ -10,7 +10,7 @@ interface CrearCosechasModalProps {
 
 export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
   const [fkCultivos, setFk_Cultivo] = useState<number | null>(null);
-  const [unidades, setUnidades] = useState(0);  // Inicializado en 0
+  const [unidades, setUnidades] = useState(0); // Inicializado en 0
   const [fecha, setFecha] = useState("");
 
   const { data: cultivos, isLoading: isLoadingCultivos } = useGetCultivos();
@@ -22,13 +22,16 @@ export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
       return;
     }
 
+    // Convertir fecha a formato ISO
+    const fechaISO = new Date(fecha).toISOString();
+
     mutate(
-      { unidades,fecha,fkCultivos },
+      { unidades, fecha: fechaISO, fkCultivos },
       {
         onSuccess: () => {
           onClose();
           setFk_Cultivo(null);
-          setUnidades(0);  // Restablecer a 0
+          setUnidades(0); // Restablecer a 0
           setFecha("");
         },
       }
@@ -53,7 +56,7 @@ export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
         label="Unidades"
         type="number"
         value={unidades.toString()}
-        onChange={(e) => setUnidades(Number(e.target.value))}  // Convertir a número
+        onChange={(e) => setUnidades(Number(e.target.value))} // Convertir a número
         required
       />
 
@@ -71,9 +74,9 @@ export const CrearCosechasModal = ({ onClose }: CrearCosechasModalProps) => {
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []} 
+          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []}
           onSelectionChange={(keys) => {
-            const selectedKey = Array.from(keys)[0]; 
+            const selectedKey = Array.from(keys)[0];
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);
           }}
         >

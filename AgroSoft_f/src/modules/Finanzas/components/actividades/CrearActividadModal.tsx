@@ -9,7 +9,9 @@ interface CrearActividadesModalProps {
   onClose: () => void;
 }
 
-export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) => {
+export const CrearActividadesModal = ({
+  onClose,
+}: CrearActividadesModalProps) => {
   const [fkCultivos, setFk_Cultivo] = useState<number | null>(null);
   const [fkUsuarios, setFk_Usuario] = useState<number | null>(null);
   const [titulo, setTitulo] = useState("");
@@ -22,13 +24,20 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
   const { mutate, isPending } = usePostActividades();
 
   const handleSubmit = () => {
-    if (!fkCultivos || !fkUsuarios || !titulo || !descripcion || !fecha || !estado) {
+    if (
+      !fkCultivos ||
+      !fkUsuarios ||
+      !titulo ||
+      !descripcion ||
+      !fecha ||
+      !estado
+    ) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fkCultivos, fkUsuarios, titulo, descripcion, fecha, estado },
+      { fkCultivos, fkUsuarios, titulo, descripcion, fecha: fechaISO, estado },
       {
         onSuccess: () => {
           onClose();
@@ -42,6 +51,9 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
       }
     );
   };
+
+  // Convertir fecha a formato ISO
+  const fechaISO = new Date(fecha).toISOString();
 
   return (
     <ModalComponent
@@ -85,7 +97,10 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
         label="Estado"
         value={estado}
         onSelectionChange={(keys) => {
-          const selectedKey = Array.from(keys)[0] as "Asignada" | "Completada" | "Cancelada";
+          const selectedKey = Array.from(keys)[0] as
+            | "Asignada"
+            | "Completada"
+            | "Cancelada";
           setEstado(selectedKey);
         }}
         required
@@ -128,7 +143,9 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
           }}
         >
           {(users || []).map((usuario) => (
-            <SelectItem key={usuario.identificacion.toString()}>{usuario.nombre}</SelectItem>
+            <SelectItem key={usuario.identificacion.toString()}>
+              {usuario.nombre}
+            </SelectItem>
           ))}
         </Select>
       )}

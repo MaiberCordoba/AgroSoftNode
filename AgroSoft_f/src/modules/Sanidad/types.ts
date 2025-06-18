@@ -63,14 +63,19 @@ export interface Controles {
 }
 
 export enum EstadoAfeccion {
-  Detectado = "Detectado",
-  EnTratamiento = "EnTratamiento",
-  Erradicado = "Erradicado",
+  Detectado = "SinTratamiento",
+  EnTratamiento = "EnControl",
+  Erradicado = "Eliminado",
 }
 
 export interface AfeccionesCultivo {
   id: number;
   fk_Plantaciones: number;
+  plantaciones: {
+    cultivos: {
+      nombre: string;
+    };
+  };
   fk_Plagas: number;
   fechaEncuentro: string;
   estado: EstadoAfeccion;

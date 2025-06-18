@@ -10,14 +10,21 @@ interface EditarVentaModalProps {
   onClose: () => void;
 }
 
-const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) => {
+const EditarVentaModal: React.FC<EditarVentaModalProps> = ({
+  venta,
+  onClose,
+}) => {
   const [precioUnitario, setPrecioUnitario] = useState(venta.precioUnitario);
   const [fecha, setFecha] = useState<string>(venta.fecha);
-  const [fkCosechas, setFk_Cosecha] = useState<number | null>(venta.fkCosechas || null);
+  const [fkCosechas, setFk_Cosecha] = useState<number | null>(
+    venta.fkCosechas || null
+  );
 
   const { mutate, isPending } = usePatchVentas();
   const { data: cosechas, isLoading: isLoadingCosechas } = useGetCosechas();
 
+  // Convertir fecha a formato ISO
+  const fechaISO = new Date(fecha).toISOString();
   const handleSubmit = () => {
     if (!precioUnitario || !fecha || !fkCosechas) {
       console.log("Todos los campos son obligatorios");
@@ -27,7 +34,7 @@ const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) =
     mutate(
       {
         id: venta.id,
-        data: { precioUnitario, fecha, fkCosechas },
+        data: { precioUnitario, fecha: fechaISO, fkCosechas },
       },
       {
         onSuccess: () => {
@@ -58,7 +65,7 @@ const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) =
         onChange={(e) => setPrecioUnitario(Number(e.target.value))}
         required
       />
-      
+
       <Input
         label="Fecha"
         type="date"
