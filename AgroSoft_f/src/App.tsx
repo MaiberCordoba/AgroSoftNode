@@ -51,6 +51,7 @@ import Testeo from "./pages/testeo";
 import { TotalUsersPage } from "./modules/Users/pages/totalUsersPage";
 import MapaEras from "./modules/Trazabilidad/pages/mapaPage";
 import { Insumos } from "./modules/Finanzas/pages/pageInsumos";
+import { UsosProductos } from "./modules/Finanzas/pages/pageUsosProductos";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,7 @@ function App() {
               <Route path="/cosechas" element={<Cosechas />} />
               <Route path="/actividades" element={<Actividades />} />
               <Route path="/usos-herramientas" element={<UsosHerramientas />} />
+              <Route path="/usos-productos" element={<UsosProductos />} />
               <Route path="/insumos" element={<Insumos />} />
 
               {/* Electronica */}

@@ -10,8 +10,8 @@ interface CrearActividadesModalProps {
 }
 
 export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) => {
-  const [fk_Cultivos, setFk_Cultivo] = useState<number | null>(null);
-  const [fk_Usuarios, setFk_Usuario] = useState<number | null>(null);
+  const [fkCultivos, setFk_Cultivo] = useState<number | null>(null);
+  const [fkUsuarios, setFk_Usuario] = useState<number | null>(null);
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [fecha, setFecha] = useState("");
@@ -22,13 +22,13 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
   const { mutate, isPending } = usePostActividades();
 
   const handleSubmit = () => {
-    if (!fk_Cultivos || !fk_Usuarios || !titulo || !descripcion || !fecha || !estado) {
+    if (!fkCultivos || !fkUsuarios || !titulo || !descripcion || !fecha || !estado) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fk_Cultivos, fk_Usuarios, titulo, descripcion, fecha, estado },
+      { fkCultivos, fkUsuarios, titulo, descripcion, fecha, estado },
       {
         onSuccess: () => {
           onClose();
@@ -102,14 +102,14 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
         <Select
           label="Cultivo"
           placeholder="Selecciona un cultivo"
-          selectedKeys={fk_Cultivos ? [fk_Cultivos.toString()] : []}
+          selectedKeys={fkCultivos ? [fkCultivos.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Cultivo(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(cultivos || []).map((cultivo) => (
-            <SelectItem key={cultivo.id.toString()}>{cultivo.nombre}</SelectItem>
+            <SelectItem key={cultivo.id}>{cultivo.nombre}</SelectItem>
           ))}
         </Select>
       )}
@@ -121,7 +121,7 @@ export const CrearActividadesModal = ({ onClose }: CrearActividadesModalProps) =
         <Select
           label="Usuario"
           placeholder="Selecciona un Usuario"
-          selectedKeys={fk_Usuarios ? [fk_Usuarios.toString()] : []}
+          selectedKeys={fkUsuarios ? [fkUsuarios.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Usuario(selectedKey ? Number(selectedKey) : null);

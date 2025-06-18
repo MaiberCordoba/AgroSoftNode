@@ -8,7 +8,7 @@ export const getTiposDesechos = async (): Promise<TiposDesechos[]> => {
 
 export const postTiposDesechos = async (TiposDesechosData: Partial<TiposDesechos>): Promise<TiposDesechos> => {
   const response = await apiClient.post("tipos-desechos/", TiposDesechosData);
-  return response.data;
+  return response.data ?? []
 };
 
 export const patchTiposDesechos = async ( id: number, data: Partial<TiposDesechos>): Promise<TiposDesechos> => {

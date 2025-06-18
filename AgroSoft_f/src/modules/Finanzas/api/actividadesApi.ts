@@ -4,7 +4,7 @@ import { Actividades } from "../types";
 export const getActividades = async (): Promise<Actividades[]> => {
   const response = await apiClient.get("actividades");
   // Aquí está el cambio clave: accedemos a response.data.rows
-  return response.data.rows;
+  return response.data ?? []
 };
 
 export const postActividad = async (actividadesData: Partial<Actividades>): Promise<Actividades> => {

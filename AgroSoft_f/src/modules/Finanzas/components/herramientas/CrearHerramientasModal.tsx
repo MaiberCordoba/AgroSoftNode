@@ -9,7 +9,7 @@ interface CrearHerramientasModalProps {
 }
 
 export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps) => {
-  const [fk_Lotes, setFk_Lote] = useState<number | null>(null);
+  const [fkLotes, setFk_Lote] = useState<number | null>(null);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [unidades, setUnidades] = useState(0);
@@ -18,13 +18,13 @@ export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps)
   const { mutate, isPending } = usePostHerramienta();
 
   const handleSubmit = () => {
-    if (!fk_Lotes || !nombre.trim() || !descripcion.trim() || unidades <= 0) {
+    if (!fkLotes || !nombre.trim() || !descripcion.trim() || unidades <= 0) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fk_Lotes, unidades, nombre, descripcion },
+      { fkLotes, unidades, nombre, descripcion },
       {
         onSuccess: () => {
           onClose();
@@ -82,14 +82,14 @@ export const CrearHerramientasModal = ({ onClose }: CrearHerramientasModalProps)
         <Select
           label="Lote"
           placeholder="Selecciona un Lote"
-          selectedKeys={fk_Lotes?.toString() ? [fk_Lotes.toString()] : []}
+          selectedKeys={fkLotes?.toString() ? [fkLotes.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Lote(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(lotes || []).map((lote) => (
-            <SelectItem key={lote?.id.toString()}>
+            <SelectItem key={lote?.id}>
               {lote.nombre}
             </SelectItem>
           ))}

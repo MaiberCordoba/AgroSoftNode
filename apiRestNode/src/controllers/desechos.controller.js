@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllDesechos = async (req, res) => {
     try {
-        const sql = await pool.desecho.findMany({
-            data: req.body
-        })
+        const sql = await pool.desechos.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllDesechos = async (req, res) => {
 
 export const createDesechos = async (req, res) => {
     try {
-        const sql = await pool.desecho.create({
+        const sql = await pool.desechos.create({
             data: req.body
         })
         if (sql) {
@@ -33,12 +31,12 @@ export const createDesechos = async (req, res) => {
 export const updateDesechos = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.desecho.update({
+        const sql = await pool.desechos.update({
             where: { id: parseInt(id) },
             data: req.body
         })
         if (sql) {
-            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
+            return res.status(200).json({ msg: "Se actualizo correctamente" })
         }
         else {
             return res.status(404).json({ msg: "No se encontro el ID" })

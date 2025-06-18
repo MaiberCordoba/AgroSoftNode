@@ -13,13 +13,13 @@ interface EditarVentaModalProps {
 const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) => {
   const [precioUnitario, setPrecioUnitario] = useState(venta.precioUnitario);
   const [fecha, setFecha] = useState<string>(venta.fecha);
-  const [fk_Cosechas, setFk_Cosecha] = useState<number | null>(venta.fk_Cosechas || null);
+  const [fkCosechas, setFk_Cosecha] = useState<number | null>(venta.fkCosechas || null);
 
   const { mutate, isPending } = usePatchVentas();
   const { data: cosechas, isLoading: isLoadingCosechas } = useGetCosechas();
 
   const handleSubmit = () => {
-    if (!precioUnitario || !fecha || !fk_Cosechas) {
+    if (!precioUnitario || !fecha || !fkCosechas) {
       console.log("Todos los campos son obligatorios");
       return;
     }
@@ -27,7 +27,7 @@ const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) =
     mutate(
       {
         id: venta.id,
-        data: { precioUnitario, fecha, fk_Cosechas },
+        data: { precioUnitario, fecha, fkCosechas },
       },
       {
         onSuccess: () => {
@@ -74,7 +74,7 @@ const EditarVentaModal: React.FC<EditarVentaModalProps> = ({ venta, onClose }) =
         <Select
           label="Cosecha"
           placeholder="Selecciona la fecha de la cosecha"
-          selectedKeys={fk_Cosechas ? [fk_Cosechas.toString()] : []}
+          selectedKeys={fkCosechas ? [fkCosechas.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
             setFk_Cosecha(selectedKey ? Number(selectedKey) : null);

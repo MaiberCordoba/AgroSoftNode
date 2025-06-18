@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllUsoInsumos = async (req, res) => {
     try {
-        const sql = await pool.usoInsumos.findMany({
-            data: req.body
-        })
+        const sql = await pool.usosProductos.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllUsoInsumos = async (req, res) => {
 
 export const createUsoInsumos = async (req, res) => {
     try {
-        const sql = await pool.usoInsumos.create({
+        const sql = await pool.usosProductos.create({
             data: req.body
         })
         if (sql) {
@@ -33,12 +31,12 @@ export const createUsoInsumos = async (req, res) => {
 export const updateUsoInsumos = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.usoInsumos.update({
+        const sql = await pool.usosProductos.update({
             where: { id: parseInt(id) },
             data: req.body
         })
         if (sql) {
-            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
+            return res.status(200).json({ msg: "Se actualizo correctamente" })
         }
         else {
             return res.status(404).json({ msg: "No se encontro el ID" })

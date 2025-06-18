@@ -2,35 +2,35 @@ import { useState } from "react";
 import { usePostUsoProducto } from "../../hooks/usosProductos/usePostUsosProductos";
 import ModalComponent from "@/components/Modal";
 import { Input, Select, SelectItem } from "@heroui/react";
-import { useGetInsumos } from "../../hooks/insumos/useGetInsumos";
 import { useGetActividades } from "../../hooks/actividades/useGetActividades";
+import { usegetInsumos } from "../../hooks/insumos/useGetInsumos";
 
 interface CrearUsosProductosModalProps {
   onClose: () => void;
 }
 
 export const CrearUsosProductosModal = ({ onClose }: CrearUsosProductosModalProps) => {
-  const [fk_Insumo, setFk_Insumo] = useState<number | null>(null);
-  const [fk_Actividad, setFk_Actividad] = useState<number | null>(null);
+  const [fkInsumos, setFkInsumo] = useState<number | null>(null);
+  const [fkActividades, setFkActividad] = useState<number | null>(null);
   const [cantidadProducto, setCantidadProducto] = useState<number>(0);
 
-  const { data: insumos, isLoading: isLoadingInsumos } = useGetInsumos();
+  const { data: insumos, isLoading: isLoadingInsumos } = usegetInsumos();
   const { data: actividades, isLoading: isLoadingActividades } = useGetActividades();
   const { mutate, isPending } = usePostUsoProducto();
 
   const handleSubmit = () => {
-    if (!fk_Insumo || !fk_Actividad || cantidadProducto <= 0) {
+    if (!fkInsumos || !fkActividades || cantidadProducto <= 0) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
 
     mutate(
-      { fk_Insumo, fk_Actividad, cantidadProducto },
+      { fkInsumos, fkActividades, cantidadProducto },
       {
         onSuccess: () => {
           onClose();
-          setFk_Insumo(null);
-          setFk_Actividad(null);
+          setFkInsumo(null);
+          setFkActividad(null);
           setCantidadProducto(0);
         },
       }
@@ -54,7 +54,7 @@ export const CrearUsosProductosModal = ({ onClose }: CrearUsosProductosModalProp
       <Input
         label="Cantidad de Producto"
         type="number"
-        value={cantidadProducto}
+        value={cantidadProducto.toString()}
         onChange={(e) => setCantidadProducto(Number(e.target.value))}
         required
       />
@@ -66,10 +66,10 @@ export const CrearUsosProductosModal = ({ onClose }: CrearUsosProductosModalProp
         <Select
           label="Insumo"
           placeholder="Selecciona un insumo"
-          selectedKeys={fk_Insumo ? [fk_Insumo.toString()] : []}
+          selectedKeys={fkInsumos ? [fkInsumos.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
-            setFk_Insumo(selectedKey ? Number(selectedKey) : null);
+            setFkInsumo(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(insumos || []).map((insumo) => (
@@ -87,10 +87,10 @@ export const CrearUsosProductosModal = ({ onClose }: CrearUsosProductosModalProp
         <Select
           label="Actividad"
           placeholder="Selecciona una actividad"
-          selectedKeys={fk_Actividad ? [fk_Actividad.toString()] : []}
+          selectedKeys={fkActividades ? [fkActividades.toString()] : []}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
-            setFk_Actividad(selectedKey ? Number(selectedKey) : null);
+            setFkActividad(selectedKey ? Number(selectedKey) : null);
           }}
         >
           {(actividades || []).map((actividad) => (

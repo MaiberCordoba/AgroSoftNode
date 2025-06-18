@@ -32,7 +32,7 @@ export function UsosProductosList() {
   } = useEliminarUsoProducto();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Insumo: 0, fk_Actividad: 0, cantidadProducto: 0 });
+    handleCrear({ id: 0, fkInsumos: 0, fkActividades: 0, cantidadProducto: 0 });
   };
 
   // Definición de columnas

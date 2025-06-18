@@ -2,9 +2,7 @@ import pool from "../db.js"
 
 export const getAllUsoHerramientas = async (req, res) => {
     try {
-        const sql = await pool.usoHerramienta.findMany({
-            data: req.body
-        })
+        const sql = await pool.usosHerramientas.findMany()
         if (sql) {
             return res.status(200).json(sql)
         }
@@ -17,7 +15,7 @@ export const getAllUsoHerramientas = async (req, res) => {
 
 export const createUsoHerramientas = async (req, res) => {
     try {
-        const sql = await pool.usoHerramienta.create({
+        const sql = await pool.usosHerramientas.create({
             data: req.body
         })
         if (sql) {
@@ -33,12 +31,12 @@ export const createUsoHerramientas = async (req, res) => {
 export const updateUsoHerramientas = async (req, res) => {
     try {
         const id = req.params.id
-        const sql = await pool.usoHerramienta.update({
+        const sql = await pool.usosHerramientas.update({
             where: { id: parseInt(id) },
             data: req.body
         })
         if (sql) {
-            return res.status(200).json({ msg: "Se actualizo correctamente" }, sql)
+            return res.status(200).json({ msg: "Se actualizo correctamente" })
         }
         else {
             return res.status(404).json({ msg: "No se encontro el ID" })

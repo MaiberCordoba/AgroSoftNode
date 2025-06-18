@@ -3,8 +3,8 @@ import ModalComponent from "@/components/Modal";
 import { usePatchUsosProductos } from "../../hooks/usosProductos/usePatchUsosProductos";
 import { UsosProductos } from "../../types";
 import { Input, Select, SelectItem } from "@heroui/react";
-import { useGetInsumos } from "../../hooks/insumos/useGetInsumos";
 import { useGetActividades } from "../../hooks/actividades/useGetActividades";
+import { usegetInsumos } from "../../hooks/insumos/useGetInsumos";
 
 interface EditarUsoProductoModalProps {
   usoProducto: UsosProductos;
@@ -13,10 +13,10 @@ interface EditarUsoProductoModalProps {
 
 const EditarUsoProductoModal: React.FC<EditarUsoProductoModalProps> = ({ usoProducto, onClose }) => {
   const [cantidadProducto, setCantidadProducto] = useState<number>(usoProducto.cantidadProducto);
-  const [fk_Insumo, setFk_Insumo] = useState<number>(usoProducto.insumo?.id || 0);
-  const [fk_Actividad, setFk_Actividad] = useState<number>(usoProducto.actividad?.id || 0);
+  const [fkInsumos, setFkInsumo] = useState<number>(usoProducto.fkInsumos|| 0);
+  const [fkActividades, setFkActividad] = useState<number>(usoProducto.fkActividades || 0);
 
-  const { data: insumos, isLoading: isLoadingInsumos } = useGetInsumos();
+  const { data: insumos, isLoading: isLoadingInsumos } = usegetInsumos();
   const { data: actividades, isLoading: isLoadingActividades } = useGetActividades();
   const { mutate, isPending } = usePatchUsosProductos();
 
@@ -26,8 +26,8 @@ const EditarUsoProductoModal: React.FC<EditarUsoProductoModalProps> = ({ usoProd
         id: usoProducto.id,
         data: {
           cantidadProducto,
-          fk_Insumo,
-          fk_Actividad,
+          fkInsumos,
+          fkActividades,
         },
       },
       {
@@ -53,7 +53,7 @@ const EditarUsoProductoModal: React.FC<EditarUsoProductoModalProps> = ({ usoProd
       ]}
     >
       <Input
-        value={cantidadProducto}
+        value={cantidadProducto.toString()}
         label="Cantidad del Producto"
         type="number"
         onChange={(e) => setCantidadProducto(Number(e.target.value))}
@@ -65,10 +65,10 @@ const EditarUsoProductoModal: React.FC<EditarUsoProductoModalProps> = ({ usoProd
         <Select
           label="Insumo"
           placeholder="Selecciona un insumo"
-          selectedKeys={[fk_Insumo.toString()]}
+          selectedKeys={[fkInsumos.toString()]}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
-            setFk_Insumo(Number(selectedKey));
+            setFkInsumo(Number(selectedKey));
           }}
         >
           {(insumos || []).map((insumo) => (
@@ -85,10 +85,10 @@ const EditarUsoProductoModal: React.FC<EditarUsoProductoModalProps> = ({ usoProd
         <Select
           label="Actividad"
           placeholder="Selecciona una actividad"
-          selectedKeys={[fk_Actividad.toString()]}
+          selectedKeys={[fkActividades.toString()]}
           onSelectionChange={(keys) => {
             const selectedKey = Array.from(keys)[0];
-            setFk_Actividad(Number(selectedKey));
+            setFkActividad(Number(selectedKey));
           }}
         >
           {(actividades || []).map((actividad) => (
