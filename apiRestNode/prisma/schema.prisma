@@ -290,7 +290,7 @@ model TiposPlaga {
   id          Int     @id @default(autoincrement())
   nombre      String  @map("nombre")
   descripcion String  @map("descripcion") @db.Text
-  img         String  @map("img")
+  img         String?  @map("img")
 
   plagas      Plagas[]
   @@map("tiposplaga")

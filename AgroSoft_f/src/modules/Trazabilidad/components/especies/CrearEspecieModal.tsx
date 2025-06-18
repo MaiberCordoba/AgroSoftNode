@@ -11,7 +11,6 @@ interface CrearEspecieModalProps {
 export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [img, setImg] = useState("");
   const [tiempoCrecimiento, settiempoCrecimiento] = useState<number | "">("");
   const [fk_TiposEspecie, setfk_TiposEspecie] = useState<number | null>(null);
 
@@ -19,18 +18,23 @@ export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
   const { data: TiposEspecies, isLoading: isLoadingTiposEspecie } = useGetTiposEspecie();
 
   const handleSubmit = () => {
-    if (!nombre || !descripcion || !img || !tiempoCrecimiento || !fk_TiposEspecie) {
+    if (!nombre || !descripcion || !tiempoCrecimiento || !fk_TiposEspecie) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
+
     mutate(
-      { nombre, descripcion, img, tiempoCrecimiento: Number(tiempoCrecimiento), fk_TiposEspecie },
+      {
+        nombre,
+        descripcion,
+        tiempoCrecimiento: Number(tiempoCrecimiento),
+        fk_TiposEspecie,
+      },
       {
         onSuccess: () => {
           onClose();
           setNombre("");
           setDescripcion("");
-          setImg("");
           settiempoCrecimiento("");
           setfk_TiposEspecie(null);
         },
@@ -69,20 +73,11 @@ export const CrearEspecieModal = ({ onClose }: CrearEspecieModalProps) => {
       />
 
       <Input
-        label="Imagen"
-        type="text"
-        value={img}
-        onChange={(e) => setImg(e.target.value)}
-        required
-      />
-
-      <Input
         label="Tiempo de Crecimiento"
         type="number"
-        value={tiempoCrecimiento.toString()} // Convierte el número a string
-        onChange={(e) => settiempoCrecimiento(Number(e.target.value))} // Convierte de vuelta a número
+        value={tiempoCrecimiento.toString()}
+        onChange={(e) => settiempoCrecimiento(Number(e.target.value))}
       />
-
 
       {isLoadingTiposEspecie ? (
         <p>Cargando tipos de especie...</p>

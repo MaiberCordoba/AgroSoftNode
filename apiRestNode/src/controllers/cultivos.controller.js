@@ -18,9 +18,9 @@ export const postCultivo = async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
     }
 
-    await pool.cultivo.create({
+    await pool.cultivos.create({
       data: {
-        fk_Especies: parseInt(fk_Especies),
+        fkEspecies: parseInt(fk_Especies),
         nombre,
         unidades: parseInt(unidades),
         activo: Boolean(activo),
@@ -51,7 +51,7 @@ export const patchCultivo = async (req, res) => {
       return res.status(400).json({ message: "No se proporcionaron campos para actualizar" });
     }
 
-    const updatedCultivo = await pool.cultivo.update({
+    const updatedCultivo = await pool.cultivos.update({
       where: { id },
       data,
     });
@@ -70,7 +70,7 @@ export const deleteCultivo = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    await pool.cultivo.delete({
+    await pool.cultivos.delete({
       where: { id },
     });
 
@@ -88,7 +88,7 @@ export const getCultivoPorId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const cultivo = await pool.cultivo.findUnique({
+    const cultivo = await pool.cultivos.findUnique({
       where: { id },
     });
 
@@ -107,7 +107,7 @@ export const getCultivosPorEspecie = async (req, res) => {
   try {
     const fk_Especies = parseInt(req.params.fk_Especies);
 
-    const cultivos = await pool.cultivo.findMany({
+    const cultivos = await pool.cultivos.findMany({
       where: { fk_Especies },
     });
 
@@ -126,7 +126,7 @@ export const getCultivosPorSiembra = async (req, res) => {
       return res.status(400).json({ message: "Debe proporcionar una fecha de siembra" });
     }
 
-    const cultivos = await pool.cultivo.findMany({
+    const cultivos = await pool.cultivos.findMany({
       where: { fechaSiembra: new Date(fechaSiembra) },
     });
 
@@ -149,7 +149,7 @@ export const getCultivosPorSiembra = async (req, res) => {
 
 export const getReporteCultivosActivos = async (req, res) => {
   try {
-    const result = await pool.cultivo.groupBy({
+    const result = await pool.cultivos.groupBy({
       by: ["nombre"],
       where: { activo: true },
       _count: { nombre: true },

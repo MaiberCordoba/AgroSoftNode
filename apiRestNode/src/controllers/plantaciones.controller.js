@@ -20,8 +20,8 @@ export const createPlantacion = async (req, res) => {
 
     const nuevaPlantacion = await pool.plantaciones.create({
       data: {
-        fk_Cultivos: parseInt(fk_Cultivos),
-        fk_Eras: parseInt(fk_Eras),
+        fkCultivos: parseInt(fk_Cultivos),
+        fkEras: parseInt(fk_Eras),
       },
     });
 

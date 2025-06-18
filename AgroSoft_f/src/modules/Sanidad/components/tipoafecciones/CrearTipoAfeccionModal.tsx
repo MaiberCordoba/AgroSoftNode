@@ -7,26 +7,26 @@ interface CrearTipoAfeccionModalProps {
   onClose: () => void;
 }
 
-export const CrearTipoAfeccionModal = ({ onClose }: CrearTipoAfeccionModalProps) => {
+export const CrearTipoAfeccionModal = ({
+  onClose,
+}: CrearTipoAfeccionModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [img, setImagen] = useState("");
 
   const { mutate, isPending } = usePostTipoAfeccion();
 
   const handleSubmit = () => {
-    if (!nombre || !descripcion ) {
+    if (!nombre || !descripcion) {
       console.log("Por favor, completa todos los campos.");
       return;
     }
     mutate(
-      { nombre, descripcion, img },
+      { nombre, descripcion },
       {
         onSuccess: () => {
           onClose();
           setNombre("");
           setDescripcion("");
-          setImagen("");
         },
       }
     );
@@ -41,8 +41,8 @@ export const CrearTipoAfeccionModal = ({ onClose }: CrearTipoAfeccionModalProps)
         {
           label: isPending ? "Guardando..." : "Guardar",
           color: "success",
-          variant:"light",
-          onClick: handleSubmit
+          variant: "light",
+          onClick: handleSubmit,
         },
       ]}
     >
@@ -61,14 +61,6 @@ export const CrearTipoAfeccionModal = ({ onClose }: CrearTipoAfeccionModalProps)
         onChange={(e) => setDescripcion(e.target.value)}
         required
       />
-       <Input
-        label="Imagen"
-        type="text"
-        value={img}
-        onChange={(e) => setImagen(e.target.value)}
-        required
-      />
-
     </ModalComponent>
   );
 };

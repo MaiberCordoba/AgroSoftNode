@@ -63,12 +63,6 @@ const EditarTiposEspecieModal: React.FC<EditarTiposEspecieModalProps> = ({ espec
         type="text"
         onChange={(e) => setDescripcion(e.target.value)}
       />
-      <Input
-        value={img}
-        label="Imagen (URL)"
-        type="text"
-        onChange={(e) => setImg(e.target.value)}
-      />
     </ModalComponent>
   );
 };

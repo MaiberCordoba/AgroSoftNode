@@ -1,9 +1,8 @@
 import pool from "../db.js";
 
-// ✅ LISTAR
 export const listarTipoPlaga = async (req, resp) => {
   try {
-    const tiposPlaga = await pool.tipoPlaga.findMany();
+    const tiposPlaga = await pool.tiposPlaga.findMany();
     return resp.status(200).json(tiposPlaga);
   } catch (error) {
     console.error(error);
@@ -11,12 +10,11 @@ export const listarTipoPlaga = async (req, resp) => {
   }
 };
 
-// ✅ REGISTRAR
 export const registrarTipoPlaga = async (req, resp) => {
   try {
     const { nombre, descripcion, img } = req.body;
 
-    await pool.tipoPlaga.create({
+    await pool.tiposPlaga.create({
       data: { nombre, descripcion, img },
     });
 
@@ -27,13 +25,12 @@ export const registrarTipoPlaga = async (req, resp) => {
   }
 };
 
-// ✅ ACTUALIZAR
 export const actualizarTipoPlaga = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
     const { nombre, descripcion, img } = req.body;
 
-    await pool.tipoPlaga.update({
+    await pool.tiposPlaga.update({
       where: { id },
       data: { nombre, descripcion, img },
     });
@@ -45,12 +42,11 @@ export const actualizarTipoPlaga = async (req, resp) => {
   }
 };
 
-// ✅ ELIMINAR
 export const eliminarTipoPlaga = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    await pool.tipoPlaga.delete({
+    await pool.tiposPlaga.delete({
       where: { id },
     });
 
@@ -61,12 +57,11 @@ export const eliminarTipoPlaga = async (req, resp) => {
   }
 };
 
-// ✅ BUSCAR
 export const buscarTipoPlaga = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    const tipoPlaga = await pool.tipoPlaga.findUnique({
+    const tipoPlaga = await pool.tiposPlaga.findUnique({
       where: { id },
     });
 

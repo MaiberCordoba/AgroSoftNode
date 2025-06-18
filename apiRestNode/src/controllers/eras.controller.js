@@ -42,7 +42,7 @@ export const createEra = async (req, res) => {
 
     const nuevaEra = await pool.eras.create({
       data: {
-        fk_Lotes: parseInt(fk_Lotes),
+        fkLotes: parseInt(fk_Lotes),
         tamX: parseFloat(tamX),
         tamY: parseFloat(tamY),
         posX: parseFloat(posX),

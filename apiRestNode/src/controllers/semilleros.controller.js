@@ -16,7 +16,7 @@ export const createSemilleros = async (req, res) => {
 
     const nuevoSemillero = await pool.semilleros.create({
       data: {
-        fk_Especies: parseInt(fk_Especies),
+        fkEspecies: parseInt(fk_Especies),
         unidades: parseInt(unidades),
         fechaSiembra: new Date(fechaSiembra),
         fechaEstimada: new Date(fechaEstimada),

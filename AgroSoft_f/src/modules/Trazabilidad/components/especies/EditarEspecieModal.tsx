@@ -13,7 +13,6 @@ interface EditarEspecieModalProps {
 const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClose }) => {
   const [nombre, setNombre] = useState<string>(especie.nombre);
   const [descripcion, setDescripcion] = useState<string>(especie.descripcion);
-  const [img, setImg] = useState("");
   const [tiempoCrecimiento, settiempocrecimiento] = useState(especie.tiempoCrecimiento);
   const [fk_TiposEspecie, setFk_TiposEspecie] = useState(0);
 
@@ -21,24 +20,26 @@ const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClos
   const { data: tiposEspecie, isLoading: isLoadingTiposEspecie } = useGetTiposEspecie();
 
   const handleSubmit = () => {
-    mutate(
-      {
-        id: especie.id,
-        data: {
-          nombre,
-          descripcion,
-          img,
-          tiempoCrecimiento,
-          fk_TiposEspecie,
+  mutate(
+    {
+      id: especie.id,
+      data: {
+        nombre,
+        descripcion,
+        tiempoCrecimiento,
+        tiposEspecie: {
+          connect: { id: fk_TiposEspecie },
         },
       },
-      {
-        onSuccess: () => {
-          onClose();
-        },
-      }
-    );
-  };
+    },
+    {
+      onSuccess: () => {
+        onClose();
+      },
+    }
+  );
+};
+
 
   return (
     <ModalComponent
@@ -60,24 +61,19 @@ const EditarEspecieModal: React.FC<EditarEspecieModalProps> = ({ especie, onClos
         type="text"
         onChange={(e) => setNombre(e.target.value)}
       />
+
       <Textarea
         value={descripcion}
         label="Descripción"
         onChange={(e) => setDescripcion(e.target.value)}
       />
-      <Input
-        value={img}
-        label="Imagen (URL)"
-        type="text"
-        onChange={(e) => setImg(e.target.value)}
-      />
+
       <Input
         label="Tiempo de Crecimiento"
         type="number"
-        value={tiempoCrecimiento.toString()} // Convierte el número a string
-        onChange={(e) => settiempocrecimiento(Number(e.target.value))} // Convierte de vuelta a número
+        value={tiempoCrecimiento.toString()}
+        onChange={(e) => settiempocrecimiento(Number(e.target.value))}
       />
-
 
       {isLoadingTiposEspecie ? (
         <p>Cargando tipos de especie...</p>

@@ -3,17 +3,14 @@ import pool from "../db.js";
 // Obtener todos los tipos de especie
 export const getAllTiposEspecie = async (req, res) => {
   try {
-    const tiposEspecie = await pool.tipoEspecie.findMany();
-    if (tiposEspecie.length > 0) {
-      return res.status(200).json(tiposEspecie);
-    } else {
-      return res.status(404).json({ msg: "No se encontraron tipos de especies registrados" });
-    }
+    const tiposEspecie = await pool.tiposEspecie.findMany();
+    return res.status(200).json(tiposEspecie);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "Internal server error" });
   }
 };
+
 
 // Crear un nuevo tipo de especie
 export const createTiposEspecie = async (req, res) => {

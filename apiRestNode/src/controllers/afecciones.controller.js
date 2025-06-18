@@ -5,22 +5,22 @@ export const listarAfecciones = async (req, resp) => {
   try {
     const afecciones = await prisma.afecciones.findMany({
       include: {
-        plaga: {
+        plagas: {
           include: {
-            tipoPlaga: true
-          }
+            tiposPlaga: true,
+          },
         },
-        plantacion: {
+        plantaciones: {
           include: {
-            cultivo: true,
-            era: {
+            cultivos: true,
+            eras: {
               include: {
-                lote: true
-              }
-            }
-          }
-        }
-      }
+                lotes: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const resultado = afecciones.map((a) => ({
@@ -28,24 +28,24 @@ export const listarAfecciones = async (req, resp) => {
       fechaEncuentro: a.fechaEncuentro,
       estado: a.estado,
       fk_Plagas: {
-        idPlaga: a.plaga.id,
-        nombre: a.plaga.nombre,
+        idPlaga: a.plagas.id,
+        nombre: a.plagas.nombre,
       },
       fk_Plantaciones: {
-        id: a.plantacion.id,
+        id: a.plantaciones.id,
         fk_cultivo: {
-          id_cultivo: a.plantacion.cultivo.id,
-          nombre: a.plantacion.cultivo.nombre,
-          unidades: a.plantacion.cultivo.unidades,
+          id_cultivo: a.plantaciones.cultivo.id,
+          nombre: a.plantaciones.cultivo.nombre,
+          unidades: a.plantaciones.cultivo.unidades,
         },
         fk_era: {
-          id: a.plantacion.era.id,
-          posX: a.plantacion.era.posX,
-          posY: a.plantacion.era.posY,
+          id: a.plantaciones.eras.id,
+          posX: a.plantaciones.eras.posX,
+          posY: a.plantaciones.eras.posY,
           fk_lote: {
-            id: a.plantacion.era.lote.id,
-            posX: a.plantacion.era.lote.posX,
-            posY: a.plantacion.era.lote.posY,
+            id: a.plantaciones.eras.lote.id,
+            posX: a.plantaciones.eras.lote.posX,
+            posY: a.plantaciones.eras.lote.posY,
           },
         },
       },
@@ -63,17 +63,17 @@ export const registrarAfecciones = async (req, resp) => {
   try {
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
 
-    await prisma.afeccion.create({
+    await prisma.afecciones.create({
       data: {
         fechaEncuentro,
         estado,
-        plaga: {
-          connect: { id: fk_Plagas }
+        plagas: {
+          connect: { id: fk_Plagas },
         },
-        plantacion: {
-          connect: { id: fk_Plantaciones }
-        }
-      }
+        plantaciones: {
+          connect: { id: fk_Plantaciones },
+        },
+      },
     });
 
     return resp.status(200).json({ message: "afección registrada" });
@@ -94,13 +94,13 @@ export const actualizarAfecciones = async (req, resp) => {
       data: {
         fechaEncuentro,
         estado,
-        plaga: {
-          connect: { id: fk_Plagas }
+        plagas: {
+          connect: { id: fk_Plagas },
         },
-        plantacion: {
-          connect: { id: fk_Plantaciones }
-        }
-      }
+        plantaciones: {
+          connect: { id: fk_Plantaciones },
+        },
+      },
     });
 
     return resp.status(200).json({ message: "afección actualizada" });
@@ -116,7 +116,7 @@ export const eliminarAfecciones = async (req, resp) => {
     const id = parseInt(req.params.id);
 
     await prisma.afecciones.delete({
-      where: { id }
+      where: { id },
     });
 
     return resp.status(200).json({ message: "afección eliminada" });
@@ -134,22 +134,22 @@ export const buscarAfecciones = async (req, resp) => {
     const a = await prisma.afecciones.findUnique({
       where: { id },
       include: {
-        plaga: {
+        plagas: {
           include: {
-            tipoPlaga: true
-          }
+            tipoPlaga: true,
+          },
         },
-        plantacion: {
+        plantaciones: {
           include: {
-            cultivo: true,
-            era: {
+            cultivos: true,
+            eras: {
               include: {
-                lote: true
-              }
-            }
-          }
-        }
-      }
+                lotes: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!a) return resp.status(404).json({ message: "afección no encontrada" });

@@ -15,15 +15,13 @@ const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({
   onClose,
 }) => {
   const [nombre, setNombre] = useState<string>(afeccion.nombre);
-  const [descripcion, setDescripcion] = useState<string>(
-    afeccion.descripcion
-  );
-  const [img, setImg] = useState<string>(afeccion.img);
+  const [descripcion, setDescripcion] = useState<string>(afeccion.descripcion);
   const [tipoPlagaId, setTipoPlagaId] = useState<number>(
-    afeccion.tipoPlaga?.id || 0
+    afeccion.tiposPlaga?.id || 0
   );
 
-  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } = useGetTipoAfecciones();
+  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } =
+    useGetTipoAfecciones();
   const { mutate, isPending } = usePatchAfecciones();
 
   const handleSubmit = () => {
@@ -36,9 +34,8 @@ const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({
         id: afeccion.id,
         data: {
           nombre,
-         descripcion,
-          img,
-          fk_TiposPlaga: tipoPlagaId,
+          descripcion,
+          fk_Tipo: tipoPlagaId,
         },
       },
       {
@@ -78,13 +75,6 @@ const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({
         required
       />
 
-      <Input
-        label="Imagen (URL)"
-        type="text"
-        value={img}
-        onChange={(e) => setImg(e.target.value)}
-      />
-
       {isLoadingTiposPlaga ? (
         <p>Cargando tipos de plaga...</p>
       ) : (
@@ -98,13 +88,10 @@ const EditarAfeccionModal: React.FC<EditarAfeccionModalProps> = ({
           }}
         >
           {(tiposPlaga || []).map((tipo) => (
-            <SelectItem key={tipo.id.toString()}>
-              {tipo.nombre}
-            </SelectItem>
+            <SelectItem key={tipo.id.toString()}>{tipo.nombre}</SelectItem>
           ))}
         </Select>
       )}
-
     </ModalComponent>
   );
 };

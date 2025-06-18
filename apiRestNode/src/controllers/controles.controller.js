@@ -1,24 +1,23 @@
 import pool from "../db.js";
 
-// ✅ LISTAR CONTROLES
 export const listarControles = async (req, resp) => {
   try {
     const controles = await pool.controles.findMany({
       include: {
-        tipoControl: true,
-        afeccion: {
+        tiposControl: true,
+        afecciones: {
           include: {
-            plaga: {
+            plagas: {
               include: {
-                tipoPlaga: true,
+                tiposPlaga: true,
               },
             },
-            plantacion: {
+            plantaciones: {
               include: {
-                cultivo: true,
-                era: {
+                cultivos: true,
+                eras: {
                   include: {
-                    lote: true,
+                    lotes: true,
                   },
                 },
               },
@@ -27,57 +26,12 @@ export const listarControles = async (req, resp) => {
         },
       },
     });
-
-    const resultado = controles.map((control) => ({
-      id: control.id,
-      descripcion: control.descripcion,
-      fechaControl: control.fechaControl,
-      fk_TipoControl: {
-        id: control.tipoControl.id,
-        nombre: control.tipoControl.nombre,
-        descripcion: control.tipoControl.descripcion,
-      },
-      fk_Afecciones: {
-        id: control.afeccion.id,
-        fechaEncuentro: control.afeccion.fechaEncuentro,
-        estado: control.afeccion.estado,
-        fk_Plagas: {
-          id: control.afeccion.plaga.id,
-          nombre: control.afeccion.plaga.nombre,
-          tipo: {
-            id: control.afeccion.plaga.tipoPlaga.id,
-            nombre: control.afeccion.plaga.tipoPlaga.nombre,
-          },
-        },
-        fk_Plantaciones: {
-          id: control.afeccion.plantacion.id,
-          fk_cultivo: {
-            id: control.afeccion.plantacion.cultivo.id,
-            nombre: control.afeccion.plantacion.cultivo.nombre,
-            unidades: control.afeccion.plantacion.cultivo.unidades,
-          },
-          fk_era: {
-            id: control.afeccion.plantacion.era.id,
-            posX: control.afeccion.plantacion.era.posX,
-            posY: control.afeccion.plantacion.era.posY,
-            fk_lote: {
-              id: control.afeccion.plantacion.era.lote.id,
-              posX: control.afeccion.plantacion.era.lote.posX,
-              posY: control.afeccion.plantacion.era.lote.posY,
-            },
-          },
-        },
-      },
-    }));
-
-    return resp.status(200).json(resultado);
+    return resp.json(controles);
   } catch (error) {
-    console.error("🔥 Error al listar controles:", error);
-    return resp.status(500).json({ message: "Error en el sistema" });
+    return resp.status(500).json({ error: "Error al listar controles" });
   }
 };
 
-// ✅ REGISTRAR CONTROL
 export const registrarControles = async (req, resp) => {
   try {
     const { fk_Afeccion, fk_TipoControl, descripcion, fechaControl } = req.body;
@@ -98,7 +52,6 @@ export const registrarControles = async (req, resp) => {
   }
 };
 
-// ✅ ACTUALIZAR CONTROL
 export const actualizarControles = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
@@ -121,7 +74,6 @@ export const actualizarControles = async (req, resp) => {
   }
 };
 
-// ✅ ELIMINAR CONTROL
 export const eliminarControles = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);

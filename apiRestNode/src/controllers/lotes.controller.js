@@ -56,7 +56,7 @@ export const patchLote = async (req, res) => {
     const id = parseInt(req.params.id);
     const { nombre, descripcion, tamX, tamY, estado, posX, posY } = req.body;
 
-    const loteActual = await pool.lote.findUnique({ where: { id } });
+    const loteActual = await pool.lotes.findUnique({ where: { id } });
     if (!loteActual) {
       return res.status(404).json({ msg: "Lote no encontrado" });
     }

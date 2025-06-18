@@ -69,7 +69,7 @@ export function CultivosList() {
       case "nombre":
         return <span>{item.nombre}</span>;
       case "fk_especie":
-        const especie = especies?.find((e) => e.id === item.fk_Especies);
+        const especie = especies?.find((e) => e.id === item.fkEspecies);
         return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;

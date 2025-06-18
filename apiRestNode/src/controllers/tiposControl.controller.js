@@ -1,9 +1,8 @@
 import pool from "../db.js";
 
-// ✅ LISTAR
 export const listarTiposControl = async (req, resp) => {
   try {
-    const tiposControl = await pool.tipoControl.findMany(); // correcto
+    const tiposControl = await pool.tiposControl.findMany(); // correcto
     return resp.status(200).json(tiposControl);
   } catch (error) {
     console.error("🔥 Error al listar tipos de control:", error);
@@ -11,12 +10,11 @@ export const listarTiposControl = async (req, resp) => {
   }
 };
 
-// ✅ REGISTRAR
 export const registrarTipoControl = async (req, resp) => {
   try {
     const { nombre, descripcion } = req.body;
 
-    await pool.tipoControl.create({
+    await pool.tiposControl.create({
       data: { nombre, descripcion },
     });
 
@@ -27,13 +25,12 @@ export const registrarTipoControl = async (req, resp) => {
   }
 };
 
-// ✅ ACTUALIZAR
 export const actualizarTipoControl = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
     const { nombre, descripcion } = req.body;
 
-    await pool.tipoControl.update({
+    await pool.tiposControl.update({
       where: { id },
       data: { nombre, descripcion },
     });
@@ -45,12 +42,11 @@ export const actualizarTipoControl = async (req, resp) => {
   }
 };
 
-// ✅ ELIMINAR
 export const eliminarTipoControl = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    await pool.tipoControl.delete({
+    await pool.tiposControl.delete({
       where: { id },
     });
 
@@ -61,19 +57,20 @@ export const eliminarTipoControl = async (req, resp) => {
   }
 };
 
-// ✅ BUSCAR POR ID
 export const buscarTipoControl = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    const tipoControl = await pool.tipoControl.findUnique({
+    const tipoControl = await pool.tiposControl.findUnique({
       where: { id },
     });
 
     if (tipoControl) {
       return resp.status(200).json(tipoControl);
     } else {
-      return resp.status(404).json({ message: "Tipo de control no encontrado" });
+      return resp
+        .status(404)
+        .json({ message: "Tipo de control no encontrado" });
     }
   } catch (error) {
     console.error("🔥 Error al buscar tipo de control:", error);

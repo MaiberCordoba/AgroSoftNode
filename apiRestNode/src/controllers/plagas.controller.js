@@ -1,11 +1,10 @@
 import prisma from "../db.js";
 
-// ✅ LISTAR
 export const listarPlagas = async (req, res) => {
   try {
-    const plagas = await prisma.plaga.findMany({
+    const plagas = await prisma.plagas.findMany({
       include: {
-        tipoPlaga: true, // Relación con TipoPlaga
+        tiposPlaga: true, // Relación con TipoPlaga
       },
     });
 
@@ -14,11 +13,11 @@ export const listarPlagas = async (req, res) => {
       nombre: plaga.nombre,
       descripcion: plaga.descripcion,
       img: plaga.img,
-      tipoPlaga: {
-        id: plaga.tipoPlaga.id,
-        nombre: plaga.tipoPlaga.nombre,
-        descripcion: plaga.tipoPlaga.descripcion,
-        img: plaga.tipoPlaga.img,
+      tiposPlaga: {
+        id: plaga.tiposPlaga.id,
+        nombre: plaga.tiposPlaga.nombre,
+        descripcion: plaga.tiposPlaga.descripcion,
+        img: plaga.tiposPlaga.img,
       },
     }));
 
@@ -29,19 +28,16 @@ export const listarPlagas = async (req, res) => {
   }
 };
 
-// ✅ REGISTRAR
 export const registrarPlagas = async (req, res) => {
   try {
     const { fk_Tipo, nombre, descripcion, img } = req.body;
 
-    await prisma.plaga.create({
+    await prisma.plagas.create({
       data: {
         nombre,
         descripcion,
         img,
-        tipoPlaga: {
-          connect: { id: fk_Tipo },
-        },
+        fkTiposPlaga: fk_Tipo,
       },
     });
 
@@ -52,21 +48,18 @@ export const registrarPlagas = async (req, res) => {
   }
 };
 
-// ✅ ACTUALIZAR
 export const actualizarPlagas = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { fk_TiposPlaga, nombre, descripcion, img } = req.body;
+    const { fk_Tipo, nombre, descripcion, img } = req.body;
 
-    await prisma.plaga.update({
+    await prisma.plagas.update({
       where: { id },
       data: {
         nombre,
         descripcion,
         img,
-        tipoPlaga: {
-          connect: { id: fk_TiposPlaga },
-        },
+        fkTiposPlaga: fk_Tipo,
       },
     });
 
@@ -77,12 +70,11 @@ export const actualizarPlagas = async (req, res) => {
   }
 };
 
-// ✅ ELIMINAR
 export const eliminarPlagas = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    await prisma.plaga.delete({
+    await prisma.plagas.delete({
       where: { id },
     });
 
@@ -93,12 +85,11 @@ export const eliminarPlagas = async (req, res) => {
   }
 };
 
-// ✅ BUSCAR POR ID
 export const buscarPlaga = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const plaga = await prisma.plaga.findUnique({
+    const plaga = await prisma.plagas.findUnique({
       where: { id },
       include: {
         tipoPlaga: true,

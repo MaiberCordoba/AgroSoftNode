@@ -9,6 +9,7 @@ import verifyJWT from "../middlewares/verifyJWT.middleware.js";
 
 const tiposEspecie = Router();
 
+console.log("✅ tiposEspecie.router.js se ha cargado");
 tiposEspecie.get("/tiposEspecie", verifyJWT, getAllTiposEspecie);
 tiposEspecie.post("/tiposEspecie", verifyJWT, createTiposEspecie);
 tiposEspecie.patch("/tiposEspecie/:id", verifyJWT, updateTiposEspecie); 

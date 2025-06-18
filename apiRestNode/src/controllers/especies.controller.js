@@ -4,10 +4,8 @@ import pool from "../db.js";
 export const getAllEspecies = async (req, res) => {
   try {
     const especies = await pool.especies.findMany();
-    if (especies) {
+    if (especies.length > 0) {
       return res.status(200).json(especies);
-    } else {
-      return res.status(404).json({ msg: "No se encontraron datos de especies registradas." });
     }
   } catch (error) {
     console.error(error);
@@ -26,7 +24,7 @@ export const createEspecies = async (req, res) => {
         descripcion,
         img,
         tiempoCrecimiento: tiempoCrecimiento ? parseInt(tiempoCrecimiento) : null,
-        fk_TiposEspecie: parseInt(fk_TiposEspecie),
+        fkTiposEspecie: parseInt(fk_TiposEspecie),
       },
     });
 
