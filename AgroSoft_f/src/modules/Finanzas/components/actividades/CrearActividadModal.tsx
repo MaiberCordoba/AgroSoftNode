@@ -24,6 +24,7 @@ export const CrearActividadesModal = ({
   const { mutate, isPending } = usePostActividades();
 
   const handleSubmit = () => {
+    const fechaISO = new Date(fecha).toISOString();
     if (
       !fkCultivos ||
       !fkUsuarios ||
@@ -52,8 +53,6 @@ export const CrearActividadesModal = ({
     );
   };
 
-  // Convertir fecha a formato ISO
-  const fechaISO = new Date(fecha).toISOString();
 
   return (
     <ModalComponent
