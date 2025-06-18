@@ -3,24 +3,24 @@ import prisma from "../db.js";
 // ✅ LISTAR AFECCIONES
 export const listarAfecciones = async (req, resp) => {
   try {
-    const afecciones = await prisma.afeccion.findMany({
+    const afecciones = await prisma.afecciones.findMany({
       include: {
         plaga: {
           include: {
-            tipoPlaga: true
-          }
+            tipoPlaga: true,
+          },
         },
         plantacion: {
           include: {
             cultivo: true,
             era: {
               include: {
-                lote: true
-              }
-            }
-          }
-        }
-      }
+                lote: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const resultado = afecciones.map((a) => ({
@@ -63,17 +63,17 @@ export const registrarAfecciones = async (req, resp) => {
   try {
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
 
-    await prisma.afeccion.create({
+    await prisma.afecciones.create({
       data: {
         fechaEncuentro,
         estado,
         plaga: {
-          connect: { id: fk_Plagas }
+          connect: { id: fk_Plagas },
         },
         plantacion: {
-          connect: { id: fk_Plantaciones }
-        }
-      }
+          connect: { id: fk_Plantaciones },
+        },
+      },
     });
 
     return resp.status(200).json({ message: "afección registrada" });
@@ -89,18 +89,18 @@ export const actualizarAfecciones = async (req, resp) => {
     const id = parseInt(req.params.id);
     const { fk_Plantaciones, fk_Plagas, fechaEncuentro, estado } = req.body;
 
-    await prisma.afeccion.update({
+    await prisma.afecciones.update({
       where: { id },
       data: {
         fechaEncuentro,
         estado,
         plaga: {
-          connect: { id: fk_Plagas }
+          connect: { id: fk_Plagas },
         },
         plantacion: {
-          connect: { id: fk_Plantaciones }
-        }
-      }
+          connect: { id: fk_Plantaciones },
+        },
+      },
     });
 
     return resp.status(200).json({ message: "afección actualizada" });
@@ -115,8 +115,8 @@ export const eliminarAfecciones = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    await prisma.afeccion.delete({
-      where: { id }
+    await prisma.afecciones.delete({
+      where: { id },
     });
 
     return resp.status(200).json({ message: "afección eliminada" });
@@ -131,25 +131,25 @@ export const buscarAfecciones = async (req, resp) => {
   try {
     const id = parseInt(req.params.id);
 
-    const a = await prisma.afeccion.findUnique({
+    const a = await prisma.afecciones.findUnique({
       where: { id },
       include: {
         plaga: {
           include: {
-            tipoPlaga: true
-          }
+            tipoPlaga: true,
+          },
         },
         plantacion: {
           include: {
             cultivo: true,
             era: {
               include: {
-                lote: true
-              }
-            }
-          }
-        }
-      }
+                lote: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!a) return resp.status(404).json({ message: "afección no encontrada" });

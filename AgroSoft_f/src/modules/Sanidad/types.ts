@@ -2,19 +2,20 @@ export interface TiposAfecciones {
   id: number;
   nombre: string;
   descripcion: string;
-  img: string;
+  img?: string;
 }
 
 export interface Afecciones {
   id: number;
   nombre: string;
   descripcion: string;
-  img: string;
-  tipoPlaga: {
+  img?: string;
+  fk_Tipo: number;
+  tiposPlaga: {
     id: number;
     nombre: string;
     descripcion: string;
-    img: string;
+    img?: string;
   };
 }
 
@@ -47,13 +48,13 @@ export interface Controles {
   fechaControl: string;
   descripcion: string;
   fk_Afecciones: {
-    id: 20,
-    fechaEncuentro: "2025-04-08T05:00:00.000Z",
-    estado: "EnControl",
+    id: 20;
+    fechaEncuentro: "2025-04-08T05:00:00.000Z";
+    estado: "EnControl";
     fk_Plagas: {
-        idPlaga: 20,
-        nombre: "Mosca blanca"
-    },
+      idPlaga: 20;
+      nombre: "Mosca blanca";
+    };
   };
   fk_TipoControl: {
     id: number;
@@ -64,7 +65,7 @@ export interface Controles {
 export enum EstadoAfeccion {
   Detectado = "Detectado",
   EnTratamiento = "EnTratamiento",
-  Erradicado = "Erradicado"
+  Erradicado = "Erradicado",
 }
 
 export interface AfeccionesCultivo {
@@ -74,4 +75,3 @@ export interface AfeccionesCultivo {
   fechaEncuentro: string;
   estado: EstadoAfeccion;
 }
-

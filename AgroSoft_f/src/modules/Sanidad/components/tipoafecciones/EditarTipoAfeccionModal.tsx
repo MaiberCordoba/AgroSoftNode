@@ -9,11 +9,14 @@ interface EditarTipoAfeccionesModalProps {
   onClose: () => void;
 }
 
-
-const EditarTipoAfeccionModal: React.FC<EditarTipoAfeccionesModalProps> = ({ tipoAfeccion, onClose }) => {
+const EditarTipoAfeccionModal: React.FC<EditarTipoAfeccionesModalProps> = ({
+  tipoAfeccion,
+  onClose,
+}) => {
   const [nombre, setNombre] = useState<string>(tipoAfeccion.nombre);
-  const [descripcion, setDescripcion] = useState<string>(tipoAfeccion.descripcion);
-  const [imagen, setImagen] = useState<string>(tipoAfeccion.img);
+  const [descripcion, setDescripcion] = useState<string>(
+    tipoAfeccion.descripcion
+  );
 
   const { mutate, isPending } = usePatchTipoAfecciones();
 
@@ -24,8 +27,6 @@ const EditarTipoAfeccionModal: React.FC<EditarTipoAfeccionesModalProps> = ({ tip
         data: {
           nombre,
           descripcion,
-          img: imagen, 
-          
         },
       },
       {
@@ -50,9 +51,17 @@ const EditarTipoAfeccionModal: React.FC<EditarTipoAfeccionesModalProps> = ({ tip
         },
       ]}
     >
-      <Input label="Nombre" type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-      <Textarea label="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-      <Input label="Imagen" type="text" value={imagen} onChange={(e) => setImagen(e.target.value)} />
+      <Input
+        label="Nombre"
+        type="text"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+      />
+      <Textarea
+        label="Descripción"
+        value={descripcion}
+        onChange={(e) => setDescripcion(e.target.value)}
+      />
     </ModalComponent>
   );
 };

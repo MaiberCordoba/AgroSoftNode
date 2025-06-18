@@ -13,27 +13,26 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ReportePdfAfecciones } from "./ReportePdfAfecciones";
 import { Download } from "lucide-react";
 
-
 export function AfeccionesList() {
   const { data, isLoading, error } = useGetAfecciones();
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    afeccionEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    afeccionEditada,
+    handleEditar,
   } = useEditarAfeccion();
-  
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear,
   } = useCrearAfeccion();
-  
+
   const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     afeccionEliminada,
-    handleEliminar
+    handleEliminar,
   } = useEliminarAfeccion();
 
   const handleCrearNuevo = () => {
@@ -56,14 +55,9 @@ export function AfeccionesList() {
       case "descripcion":
         return <span>{item.descripcion}</span>;
       case "tipoPlaga":
-        return <span>{item.tipoPlaga?.nombre || "No definido"}</span>;
+        return <span>{item.tiposPlaga?.nombre || "No definido"}</span>;
       case "acciones":
-        return (
-          <AccionesTabla
-            onEditar={() => handleEditar(item)}
-            
-          />
-        );
+        return <AccionesTabla onEditar={() => handleEditar(item)} />;
       default:
         return <span>{String(item[columnKey as keyof Afecciones])}</span>;
     }
@@ -82,14 +76,13 @@ export function AfeccionesList() {
         placeholderBusqueda="Buscar por nombre"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
-
         renderReporteAction={(afeccionesData) => {
           const datosPDF = afeccionesData.map((item: Afecciones) => ({
             nombre: item.nombre,
             descripcion: item.descripcion,
             tipo: item.tipoPlaga?.nombre || "No definido",
           }));
-      
+
           return (
             <PDFDownloadLink
               document={<ReportePdfAfecciones data={datosPDF} />}
@@ -120,11 +113,7 @@ export function AfeccionesList() {
         />
       )}
 
-      {isCreateModalOpen && (
-        <CrearAfeccionModal
-          onClose={closeCreateModal}
-        />
-      )}
+      {isCreateModalOpen && <CrearAfeccionModal onClose={closeCreateModal} />}
 
       {isDeleteModalOpen && afeccionEliminada && (
         <EliminarAfeccionModal

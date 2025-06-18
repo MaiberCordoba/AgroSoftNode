@@ -11,10 +11,10 @@ interface CrearAfeccionModalProps {
 export const CrearAfeccionModal = ({ onClose }: CrearAfeccionModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [fk_Tipo, setFk_Tipo] = useState<number | null>(null); 
-  const [img, setImg] = useState("")
+  const [fk_Tipo, setFk_Tipo] = useState<number | null>(null);
 
-  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } = useGetTipoAfecciones(); // Obtener los tipos de plaga
+  const { data: tiposPlaga, isLoading: isLoadingTiposPlaga } =
+    useGetTipoAfecciones(); // Obtener los tipos de plaga
   const { mutate, isPending } = usePostAfeccion();
 
   const handleSubmit = () => {
@@ -23,16 +23,14 @@ export const CrearAfeccionModal = ({ onClose }: CrearAfeccionModalProps) => {
       return;
     }
     mutate(
-      {nombre, descripcion, fk_Tipo, img }, // Envía el ID del tipo de plaga
+      { nombre, descripcion, fk_Tipo }, // Envía el ID del tipo de plaga
       {
         onSuccess: () => {
           onClose();
           setNombre("");
           setDescripcion("");
-          setImg("");
           setFk_Tipo(null); // Limpiar el selector
         },
-        
       }
     );
   };
@@ -46,8 +44,8 @@ export const CrearAfeccionModal = ({ onClose }: CrearAfeccionModalProps) => {
         {
           label: isPending ? "Guardando..." : "Guardar",
           color: "success",
-          variant:"light",
-          onClick: handleSubmit
+          variant: "light",
+          onClick: handleSubmit,
         },
       ]}
     >
@@ -66,13 +64,6 @@ export const CrearAfeccionModal = ({ onClose }: CrearAfeccionModalProps) => {
         onChange={(e) => setDescripcion(e.target.value)}
         required
       />
-       <Input
-        label="Imagen"
-        type="text"
-        value={img}
-        onChange={(e) => setImg(e.target.value)}
-        required
-      />
 
       {/* Selector de tipos de plaga con HeroUI */}
       {isLoadingTiposPlaga ? (
@@ -88,9 +79,7 @@ export const CrearAfeccionModal = ({ onClose }: CrearAfeccionModalProps) => {
           }}
         >
           {(tiposPlaga || []).map((tipo) => (
-            <SelectItem key={tipo.id.toString()}>
-              {tipo.nombre}
-            </SelectItem>
+            <SelectItem key={tipo.id.toString()}>{tipo.nombre}</SelectItem>
           ))}
         </Select>
       )}
