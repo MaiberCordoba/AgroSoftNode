@@ -8,25 +8,34 @@ import { CrearActividadesModal } from "./CrearActividadModal";
 import { Actividades } from "../../types";
 import { useGetUsers } from "@/modules/Users/hooks/useGetUsers";
 import { useGetCultivos } from "@/modules/Trazabilidad/hooks/cultivos/useGetCultivos";
+import { useVerDetalleActividad } from "../../hooks/actividades/useVerDetalleActividad";
+import DetalleActividadModal from "./DetalleActividadModal";
 
 export function ActividadesList() {
   const { data, isLoading, error } = useGetActividades();
   const { data: users, isLoading: loadingUser } = useGetUsers(); // Corregido
-  const { data : cultivo, isLoading: loadingCultivo } = useGetCultivos()
+  const { data: cultivo, isLoading: loadingCultivo } = useGetCultivos()
 
-  const { 
-    isOpen: isEditModalOpen, 
-    closeModal: closeEditModal, 
-    actividadEditada, 
-    handleEditar 
+  const {
+    isOpen: isEditModalOpen,
+    closeModal: closeEditModal,
+    actividadEditada,
+    handleEditar
   } = useEditarActividad();
-  
-  const { 
-    isOpen: isCreateModalOpen, 
-    closeModal: closeCreateModal, 
-    handleCrear 
+
+  const {
+    isOpen,
+    closeModal: handleCloseDetalle,
+    actividadSeleccionada,
+    handleVerDetalle
+  } = useVerDetalleActividad();
+
+  const {
+    isOpen: isCreateModalOpen,
+    closeModal: closeCreateModal,
+    handleCrear
   } = useCrearActividad();
-  
+
   const handleCrearNuevo = () => {
     handleCrear({ id: 0, fkCultivos: 0, fkUsuarios: 0, titulo: "", descripcion: "", fecha: "", estado: "Asignada" });
   };
@@ -63,6 +72,7 @@ export function ActividadesList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
+            onVerDetalles={() => handleVerDetalle(item)}
           />
         );
       default:
@@ -91,6 +101,13 @@ export function ActividadesList() {
       )}
 
       {isCreateModalOpen && <CrearActividadesModal onClose={closeCreateModal} />}
+
+      {isOpen && actividadSeleccionada && (
+        <DetalleActividadModal
+          actividad={actividadSeleccionada}
+          onClose={handleCloseDetalle}
+        />
+      )}
     </div>
   );
 }
