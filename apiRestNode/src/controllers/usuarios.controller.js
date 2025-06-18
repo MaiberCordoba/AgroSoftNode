@@ -169,7 +169,7 @@ export const getTotalUsers = async (req, res) => {
   try {
     const total = await pool.usuarios.count();
     const activos = await pool.usuarios.count({ where: { estado: "activo" } });
-    const inactivos = total - activos;
+    const inactivos = await pool.usuarios.count({ where: { estado: "inactivo" } });
 
     res.status(200).json({
       total_usuarios: total,
@@ -181,3 +181,4 @@ export const getTotalUsers = async (req, res) => {
     res.status(500).json({ msg: "Error al contar usuarios" });
   }
 };
+
