@@ -4,9 +4,7 @@ import pool from "../db.js";
 export const getAllEspecies = async (req, res) => {
   try {
     const especies = await pool.especies.findMany();
-    if (especies.length > 0) {
-      return res.status(200).json(especies);
-    }
+    return res.status(200).json(especies);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ msg: "Internal server error" });
@@ -16,20 +14,25 @@ export const getAllEspecies = async (req, res) => {
 // Crear una nueva especie
 export const createEspecies = async (req, res) => {
   try {
-    const { nombre, descripcion, img, tiempoCrecimiento, fk_TiposEspecie } = req.body;
+    const { nombre, descripcion, img, tiempoCrecimiento, fk_TiposEspecie } =
+      req.body;
 
     const nuevaEspecie = await pool.especies.create({
       data: {
         nombre,
         descripcion,
         img,
-        tiempoCrecimiento: tiempoCrecimiento ? parseInt(tiempoCrecimiento) : null,
+        tiempoCrecimiento: tiempoCrecimiento
+          ? parseInt(tiempoCrecimiento)
+          : null,
         fkTiposEspecie: parseInt(fk_TiposEspecie),
       },
     });
 
     if (nuevaEspecie) {
-      return res.status(200).json({ msg: "La especie fue registrada exitosamente" });
+      return res
+        .status(200)
+        .json({ msg: "La especie fue registrada exitosamente" });
     } else {
       return res.status(400).json({ msg: "Error al registrar la especie" });
     }
@@ -63,14 +66,20 @@ export const patchEspecies = async (req, res) => {
     });
 
     if (updatedEspecie) {
-      return res.status(200).json({ msg: "La especie fue actualizada exitosamente" });
+      return res
+        .status(200)
+        .json({ msg: "La especie fue actualizada exitosamente" });
     } else {
-      return res.status(404).json({ msg: "No se encontró la especie a actualizar" });
+      return res
+        .status(404)
+        .json({ msg: "No se encontró la especie a actualizar" });
     }
   } catch (error) {
     console.error(error);
     if (error.code === "P2025") {
-      return res.status(404).json({ msg: "No se encontró la especie a actualizar" });
+      return res
+        .status(404)
+        .json({ msg: "No se encontró la especie a actualizar" });
     }
     return res.status(500).json({ msg: "Internal server error" });
   }
@@ -86,14 +95,20 @@ export const deleteEspecies = async (req, res) => {
     });
 
     if (deletedEspecie) {
-      return res.status(200).json({ msg: "La especie fue eliminada exitosamente" });
+      return res
+        .status(200)
+        .json({ msg: "La especie fue eliminada exitosamente" });
     } else {
-      return res.status(404).json({ msg: "No se encontró la especie a eliminar" });
+      return res
+        .status(404)
+        .json({ msg: "No se encontró la especie a eliminar" });
     }
   } catch (error) {
     console.error(error);
     if (error.code === "P2025") {
-      return res.status(404).json({ msg: "No se encontró la especie a eliminar" });
+      return res
+        .status(404)
+        .json({ msg: "No se encontró la especie a eliminar" });
     }
     return res.status(500).json({ msg: "Internal server error" });
   }
