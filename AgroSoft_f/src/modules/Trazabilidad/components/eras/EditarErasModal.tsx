@@ -37,7 +37,7 @@ const EditarEraModal: React.FC<EditarEraModalProps> = ({ era, onClose }) => {
       {
         id: era.id ?? 0,
         data: {
-          fk_Lotes,
+          lotes: { connect: { id: fk_Lotes } }, // ✅ Corrección aquí
           estado,
           tamX,
           tamY,

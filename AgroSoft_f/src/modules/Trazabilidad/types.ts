@@ -2,7 +2,7 @@ export interface TiposEspecie{
   id: number;
   nombre: string;
   descripcion: string;
-  img: string;
+  img: string | null;
 }
 
 export interface Especies{

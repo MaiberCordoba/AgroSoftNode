@@ -65,7 +65,7 @@ export function SemilleroList() {
       case "id":
         return <span>{item.id}</span>;
       case "fk_Especie":
-        const especie = especies?.find((e) => e.id === item.fk_Especies);
+        const especie = especies?.find((e) => e.id === item.fkEspecies);
         return <span>{especie ? especie.nombre : "Cargando..."}</span>;
       case "unidades":
         return <span>{item.unidades}</span>;

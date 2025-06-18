@@ -27,7 +27,9 @@ const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, 
           unidades,
           fechaSiembra,
           fechaEstimada,
-          fk_Especies,
+          especies: {
+    connect: { id: 2 },
+  },
         },
       },
       {
@@ -78,22 +80,23 @@ const EditarSemilleroModal: React.FC<EditarSemilleroModalProps> = ({ semillero, 
       />
 
       {isLoadingEspecies ? (
-        <p>Cargando especies...</p>
-      ) : (
-        <Select
-          label="Especie"
-          placeholder="Selecciona una especie"
-          selectedKeys={[fk_Especies.toString()]}
-          onSelectionChange={(keys) => {
-            const selected = Array.from(keys)[0];
-            setFk_Especie(Number(selected));
-          }}
-        >
-          {(especies || []).map((especie) => (
-            <SelectItem key={especie.id.toString()}>{especie.nombre}</SelectItem>
-          ))}
-        </Select>
-      )}
+  <p>Cargando especies...</p>
+) : (
+  <Select
+    label="Especie"
+    placeholder="Selecciona una especie"
+    selectedKeys={fk_Especies ? [fk_Especies.toString()] : []}
+    onSelectionChange={(keys) => {
+      const selected = Array.from(keys)[0];
+      setFk_Especie(Number(selected));
+    }}
+  >
+    {(especies || []).map((especie) => (
+      <SelectItem key={especie.id.toString()}>{especie.nombre}</SelectItem>
+    ))}
+  </Select>
+)}
+
     </ModalComponent>
   );
 };

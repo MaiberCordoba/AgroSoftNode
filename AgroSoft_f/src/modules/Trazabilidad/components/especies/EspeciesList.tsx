@@ -77,7 +77,7 @@ export function EspecieList() {
         return (
           <span>
             {item.TiposEspecie?.nombre ||
-              (item.fk_TiposEspecie && tipoEspecieMap[item.fk_TiposEspecie]) ||
+              (item.fkTiposEspecie && tipoEspecieMap[item.fkTiposEspecie]) ||
               "Sin Tipo"}
           </span>
         );

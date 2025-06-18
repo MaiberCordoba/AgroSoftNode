@@ -3,11 +3,9 @@ import pool from "../db.js";
 // Obtener todas las especies
 export const getAllEspecies = async (req, res) => {
   try {
-    const especies = await pool.especie.findMany();
+    const especies = await pool.especies.findMany();
     if (especies.length > 0) {
       return res.status(200).json(especies);
-    } else {
-      return res.status(404).json({ msg: "No se encontraron datos de especies registradas." });
     }
   } catch (error) {
     console.error(error);
@@ -20,13 +18,13 @@ export const createEspecies = async (req, res) => {
   try {
     const { nombre, descripcion, img, tiempoCrecimiento, fk_TiposEspecie } = req.body;
 
-    const nuevaEspecie = await pool.especie.create({
+    const nuevaEspecie = await pool.especies.create({
       data: {
         nombre,
         descripcion,
         img,
         tiempoCrecimiento: tiempoCrecimiento ? parseInt(tiempoCrecimiento) : null,
-        fk_TiposEspecie: parseInt(fk_TiposEspecie),
+        fkTiposEspecie: parseInt(fk_TiposEspecie),
       },
     });
 
@@ -59,7 +57,7 @@ export const patchEspecies = async (req, res) => {
       campos.fk_TiposEspecie = parseInt(campos.fk_TiposEspecie);
     }
 
-    const updatedEspecie = await pool.especie.update({
+    const updatedEspecie = await pool.especies.update({
       where: { id },
       data: campos,
     });
@@ -83,7 +81,7 @@ export const deleteEspecies = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const deletedEspecie = await pool.especie.delete({
+    const deletedEspecie = await pool.especies.delete({
       where: { id },
     });
 

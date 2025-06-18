@@ -10,23 +10,22 @@ interface CrearTiposEspecieModalProps {
 export const CrearTiposEspecieModal = ({ onClose }: CrearTiposEspecieModalProps) => {
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [img, setImg] = useState("");
 
   const { mutate, isPending } = usePostTiposEspecie();
 
   const handleSubmit = () => {
-    if (!nombre || !descripcion || !img) {
-      console.log("Por favor, completa todos los campos.");
+    if (!nombre || !descripcion) {
+      console.log("Por favor, completa todos los campos obligatorios.");
       return;
     }
+
     mutate(
-      { nombre, descripcion, img },
+      { nombre, descripcion }, // Ya no enviamos img
       {
         onSuccess: () => {
           onClose();
           setNombre("");
           setDescripcion("");
-          setImg("");
         },
       }
     );
@@ -59,14 +58,6 @@ export const CrearTiposEspecieModal = ({ onClose }: CrearTiposEspecieModalProps)
         type="text"
         value={descripcion}
         onChange={(e) => setDescripcion(e.target.value)}
-        required
-      />
-
-      <Input
-        label="Imagen"
-        type="text"
-        value={img}
-        onChange={(e) => setImg(e.target.value)}
         required
       />
     </ModalComponent>
