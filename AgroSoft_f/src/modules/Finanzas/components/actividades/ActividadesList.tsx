@@ -28,7 +28,7 @@ export function ActividadesList() {
   } = useCrearActividad();
   
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Cultivos: 0, fk_Usuarios: 0, titulo: "", descripcion: "", fecha: "", estado: "Asignada" });
+    handleCrear({ id: 0, fkCultivos: 0, fkUsuarios: 0, titulo: "", descripcion: "", fecha: "", estado: "Asignada" });
   };
 
   // Definición de columnas
@@ -46,10 +46,10 @@ export function ActividadesList() {
   const renderCell = (item: Actividades, columnKey: React.Key) => {
     switch (columnKey) {
       case "cultivo":
-        const cultivos = cultivo?.find((c) => c.id === item.fk_Cultivos);
+        const cultivos = cultivo?.find((c) => c.id === item.fkCultivos);
         return <span>{cultivos ? cultivos.nombre : "No definido"}</span>;
       case "usuario":
-        const usuario = users?.find((c) => c.identificacion === item.fk_Usuarios);
+        const usuario = users?.find((c) => c.identificacion === item.fkUsuarios);
         return <span>{usuario ? usuario.nombre : "No definido"}</span>;
       case "titulo":
         return <span>{item.titulo}</span>;

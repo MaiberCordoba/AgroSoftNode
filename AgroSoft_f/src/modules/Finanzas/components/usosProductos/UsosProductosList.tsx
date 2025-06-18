@@ -1,16 +1,19 @@
 import { useGetUsosProductos } from "../../hooks/usosProductos/useGetUsosProductos";
 import { useEditarUsoProducto } from "../../hooks/usosProductos/useEditarUsosProductos";
 import { useCrearUsosProducto } from "../../hooks/usosProductos/useCrearUsosProductos";
-import { useEliminarUsoProducto } from "../../hooks/usosProductos/useEliminarUsosProductos";
 import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarUsosProductosModal from "./EditarUsosProductosModal";
 import { CrearUsosProductosModal } from "./CrearUsosProductosModal";
-import EliminarUsoProductoModal from "./EliminarUsosProductos";
 import { UsosProductos } from "../../types";
+import { useGetActividades } from "../../hooks/actividades/useGetActividades";
+import { usegetInsumos } from "../../hooks/insumos/useGetInsumos";
 
 export function UsosProductosList() {
   const { data, isLoading, error } = useGetUsosProductos();
+  const { data : actividades, isLoading : loadingActividades } = useGetActividades();
+  const { data : insumos, isLoading : loadingInsumos } = usegetInsumos();
+  
   const { 
     isOpen: isEditModalOpen, 
     closeModal: closeEditModal, 
@@ -23,13 +26,6 @@ export function UsosProductosList() {
     closeModal: closeCreateModal, 
     handleCrear 
   } = useCrearUsosProducto();
-  
-  const {
-    isOpen: isDeleteModalOpen,
-    closeModal: closeDeleteModal,
-    usoProductoEliminado,
-    handleEliminar
-  } = useEliminarUsoProducto();
 
   const handleCrearNuevo = () => {
     handleCrear({ id: 0, fkInsumos: 0, fkActividades: 0, cantidadProducto: 0 });
@@ -47,16 +43,17 @@ export function UsosProductosList() {
   const renderCell = (item: UsosProductos, columnKey: React.Key) => {
     switch (columnKey) {
       case "insumo":
-        return <span>{item.insumo?.nombre || "No definido"}</span>;
+        const insumo = insumos?.find((c) => c.id === item.fkInsumos);
+        return <span>{insumo ? insumo.nombre : "No definido"}</span>;
       case "actividad":
-        return <span>{item.actividad?.titulo || "No definida"}</span>;
+        const actividad = actividades?.find((c) => c.id === item.fkActividades);
+        return <span>{actividad ? actividad.titulo : "No definido"}</span>;
       case "cantidadProducto":
         return <span>{item.cantidadProducto}</span>;
       case "acciones":
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
-            onEliminar={() => handleEliminar(item)}
           />
         );
       default:
@@ -64,7 +61,7 @@ export function UsosProductosList() {
     }
   };
 
-  if (isLoading) return <p>Cargando...</p>;
+  if (isLoading || loadingActividades || loadingInsumos) return <p>Cargando...</p>;
   if (error) return <p>Error al cargar los Usos de Productos</p>;
 
   return (
@@ -93,13 +90,6 @@ export function UsosProductosList() {
         />
       )}
 
-      {isDeleteModalOpen && usoProductoEliminado && (
-        <EliminarUsoProductoModal
-          usoProducto={usoProductoEliminado}
-          isOpen={isDeleteModalOpen}
-          onClose={closeDeleteModal}
-        />
-      )}
     </div>
   );
 }

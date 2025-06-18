@@ -81,12 +81,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
 
   const baseMenuItems = [
     {
-      title: "IoT",
-      icon: Monitor,
-      color: "text-[#254030]",
-      submenus: ["iot"],
-    },
-    {
       title: "Cultivos",
       icon: Leaf,
       color: "text-[#254030]",
@@ -121,8 +115,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       restricted: ["visitante", "aprendiz"],
     },
     //{
-    //  title: "Inventario",
-    //  icon: ClipboardList,
+      //  title: "Inventario",
+      //  icon: ClipboardList,
     //  color: "text-[#254030]",
     //  submenus: [
     //    "Bodega",
@@ -143,6 +137,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
         "Tipos de control",
         "Controles",
       ],
+    },
+    {
+      title: "IoT",
+      icon: Monitor,
+      color: "text-[#254030]",
+      submenus: ["iot"],
     },
   ];
 
