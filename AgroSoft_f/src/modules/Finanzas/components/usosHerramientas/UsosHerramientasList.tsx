@@ -5,7 +5,6 @@ import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import EditarUsosHerramientasModal from "./EditarUsosHerramientasModal";
 import { CrearUsoHerramientaModal } from "./CrearUsosHerramientasModal";
-import EliminarUsosHerramientasModal from "./EliminarUsosHerramientas";
 import { UsosHerramientas } from "../../types";
 import { useGetHerramientas } from "../../hooks/herramientas/useGetHerramientas";
 import { useGetActividades } from "../../hooks/actividades/useGetActividades";
@@ -28,7 +27,7 @@ export function UsosHerramientasList() {
   } = useCrearUsosHerramienta();
 
   const handleCrearNuevo = () => {
-    handleCrear({ id: 0, fk_Herramientas: 0, fk_Actividades: 0 });
+    handleCrear({ id: 0, fkHerramientas: 0, fkActividades: 0 });
   };
 
   // Definición de columnas
@@ -42,10 +41,10 @@ export function UsosHerramientasList() {
   const renderCell = (item: UsosHerramientas, columnKey: React.Key) => {
     switch (columnKey) {
       case "herramienta":
-        const herramienta = herramientas?.find((c) => c.id === item.fk_Herramientas);
+        const herramienta = herramientas?.find((c) => c.id === item.fkHerramientas);
         return <span>{herramienta ? herramienta.nombre : "No definido"}</span>;
       case "actividad":
-        const actividad = actividades?.find((c) => c.id === item.fk_Actividades);
+        const actividad = actividades?.find((c) => c.id === item.fkActividades);
         return <span>{actividad ? actividad.titulo : "No definido"}</span>;
       case "acciones":
         return (
