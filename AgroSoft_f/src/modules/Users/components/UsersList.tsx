@@ -2,7 +2,6 @@ import { TablaReutilizable } from "@/components/ui/table/TablaReutilizable";
 import { AccionesTabla } from "@/components/ui/table/AccionesTabla";
 import { useGetUsers } from "../hooks/useGetUsers";
 import { useEditarUsers } from "../hooks/useEditarUsers";
-import { useCrearUsers } from "../hooks/useCrearUsers";
 import { useEliminarUsers } from "../hooks/useEliminarUsers";
 import { User } from "../types";
 import EditarUserModal from "./EditarUsersModal";
@@ -14,6 +13,7 @@ import { ReportePdfUsuarios } from "./ReportePdfUsuarios";
 import { Download } from "lucide-react";
 import { getTotalUsers } from "../api/usersApi";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export function UsersList() {
   const { data, isLoading, error } = useGetUsers();
@@ -30,28 +30,25 @@ export function UsersList() {
   });
 
   const {
-    isOpen: isCreateModalOpen,
-    closeModal: closeCreateModal,
-    handleCrear,
-  } = useCrearUsers();
-
-  const {
     isOpen: isDeleteModalOpen,
     closeModal: closeDeleteModal,
     UsersEliminada,
   } = useEliminarUsers();
 
+  // Estado para controlar el modal (como en Login)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Funciones para abrir y cerrar el modal (como en Login)
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   const handleCrearNuevo = () => {
-    handleCrear({
-      identificacion: 0,
-      nombre: "",
-      apellidos: "",
-      fechaNacimiento: "",
-      telefono: "",
-      correoElectronico: "",
-      estado: "",
-      rol: "visitante",
-    });
+    openModal(); // Solo abrir el modal, como en Login
   };
 
   const columnas = [
@@ -80,7 +77,7 @@ export function UsersList() {
       case "rol":
         return (
           <span
-            className={`px-2 py-1 rounded-full text-xs  || "bg-gray-100 text-gray-800"}`}
+            className={`px-2 py-1 rounded-full text-xs || "bg-gray-100 text-gray-800"}`}
           >
             {item.rol.charAt(0).toUpperCase() + item.rol.slice(1)}
           </span>
@@ -141,7 +138,8 @@ export function UsersList() {
         <EditarUserModal user={UsersEditada} onClose={closeEditModal} />
       )}
 
-      {isCreateModalOpen && <CrearUsersModal onClose={closeCreateModal} />}
+      {/* Renderizar el modal como en Login */}
+      <CrearUsersModal isOpen={isModalOpen} onClose={closeModal} />
 
       {isDeleteModalOpen && UsersEliminada && (
         <EliminarUserModal
