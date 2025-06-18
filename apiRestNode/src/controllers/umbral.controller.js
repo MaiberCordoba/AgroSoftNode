@@ -35,30 +35,11 @@ export const RegistrarUmbral = async (req, res) => {
 
 export const ListarUmbrales = async (req, res) => {
     try {
-        const umbrales = await pool.umbrales.findMany({
-            include: {
-                sensor: {
-                    select: {
-                        id: true,
-                        tipoSensor: true
-                    }
-                }
-            }
-        });
-
-        // Mapear para dar formato similar al original
-        const resultado = umbrales.map(umbral => ({
-            id: umbral.id,
-            sensorId: umbral.sensorId,
-            tipoSensor: umbral.sensores.tipoSensor,
-            valorMinimo: umbral.valorMinimo,
-            valorMaximo: umbral.valorMaximo
-        }));
-
-        return res.status(200).json(resultado);
+        const umbrales = await pool.umbrales.findMany();
+        return res.status(200).json(umbrales);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error al listar los umbrales" });
+        return res.status(500).json({ "message": "Error al listar los umbrales" });
     }
 }
 
