@@ -4,8 +4,8 @@ export const RegistrarUmbral = async (req, res) => {
     try {
         const { sensorId, valorMinimo, valorMaximo } = req.body;
 
-        // Verificar si el sensor existe
-        const sensor = await pool.umbrales.findUnique({
+        // 1. Verificar si el SENSOR existe (no el umbral)
+        const sensor = await pool.sensores.findUnique({
             where: { id: parseInt(sensorId) }
         });
 
@@ -13,7 +13,17 @@ export const RegistrarUmbral = async (req, res) => {
             return res.status(404).json({ message: "El sensor no existe." });
         }
 
-        // Crear el nuevo umbral
+        // 2. Validar los valores numéricos
+        if (isNaN(parseFloat(valorMinimo)) || isNaN(parseFloat(valorMaximo))) {
+            return res.status(400).json({ message: "Los valores deben ser números válidos." });
+        }
+
+        // 3. Validar que el mínimo sea menor que el máximo
+        if (parseFloat(valorMinimo) >= parseFloat(valorMaximo)) {
+            return res.status(400).json({ message: "El valor mínimo debe ser menor que el valor máximo." });
+        }
+
+        // 4. Crear el nuevo umbral
         const nuevoUmbral = await pool.umbrales.create({
             data: {
                 sensorId: parseInt(sensorId),
@@ -29,10 +39,12 @@ export const RegistrarUmbral = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Error al registrar el umbral" });
+        return res.status(500).json({ 
+            message: "Error al registrar el umbral",
+            error: error.message  // Agregar mensaje de error para diagnóstico
+        });
     }
 }
-
 export const ListarUmbrales = async (req, res) => {
     try {
         const umbrales = await pool.umbrales.findMany();

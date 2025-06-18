@@ -15,15 +15,15 @@ export const RegistrarSensor = async (req, res) => {
     try {
         const { tipoSensor, datosSensor, fecha, eraId, loteId } = req.body;
 
-        // Mapeo de tipos de sensor a enum de Prisma
+        // Mapeo corregido
         const tipoSensorMap = {
-            'Temperatura': 'TEMPERATURA',
-            'Iluminación': 'ILUMINACION',
-            'Humedad Ambiental': 'HUMEDAD_AMBIENTAL',
-            'Humedad del Terreno': 'HUMEDAD_TERRENO',
-            'Nivel de PH': 'PH',
-            'Viento': 'VIENTO',
-            'Lluvia': 'LLUVIA'
+            'Temperatura': 'Temperatura',
+            'Iluminación': 'Iluminación',
+            'Humedad Ambiental': 'Humedad_Ambiental',
+            'Humedad del Terreno': 'Humedad_del_Terreno',
+            'Nivel de PH': 'Nivel_de_PH',
+            'Viento': 'Viento',
+            'Lluvia': 'Lluvia'
         };
 
         const tipoSensorEnum = tipoSensorMap[tipoSensor];
@@ -31,33 +31,23 @@ export const RegistrarSensor = async (req, res) => {
             return res.status(400).json({ message: "Tipo de sensor inválido." });
         }
 
-        let unidad = '';
-        switch (tipoSensor) {
-            case 'Temperatura': unidad = '°C'; break;
-            case 'Iluminación': unidad = 'lux'; break;
-            case 'Humedad Ambiental':
-            case 'Humedad del Terreno': unidad = '%'; break;
-            case 'Nivel de PH': unidad = 'pH'; break;
-            case 'Viento': unidad = 'km/h'; break;
-            case 'Lluvia': unidad = 'mm'; break;
-            default: return res.status(400).json({ message: "Tipo de sensor inválido." });
-        }
-
+        // Validación de ubicación
         const sensoresLote = ['Temperatura', 'Iluminación', 'Humedad Ambiental', 'Viento', 'Lluvia'];
         const sensoresEra  = ['Humedad del Terreno', 'Nivel de PH'];
         
         if (sensoresLote.includes(tipoSensor) && !loteId) {
-            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' debe registrarse en un lote.` });
+            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' requiere un loteId` });
         }
 
         if (sensoresEra.includes(tipoSensor) && !eraId) {
-            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' debe registrarse en una era.` });
+            return res.status(400).json({ message: `El sensor tipo '${tipoSensor}' requiere un eraId` });
         }
 
+        // USAR NOMBRES CAMEL CASE COMO EN EL MODELO PRISMA
         const sensor = await pool.sensores.create({
             data: {
-                tipoSensor: tipoSensorEnum,
-                datosSensor: datosSensor,
+                tipoSensor: tipoSensorEnum,  // camelCase
+                datosSensor: datosSensor,     // camelCase
                 fecha: fecha ? new Date(fecha) : new Date(),
                 eraId: eraId || null,
                 loteId: loteId || null
@@ -66,13 +56,15 @@ export const RegistrarSensor = async (req, res) => {
 
         return res.status(201).json({ 
             message: "Sensor registrado correctamente",
-            unidad: unidad,
             sensor: sensor
         });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Error al registrar el sensor" });
+        console.error("Error detallado:", error);
+        return res.status(500).json({ 
+            message: "Error al registrar el sensor",
+            error: error.message
+        });
     }
 }
 
