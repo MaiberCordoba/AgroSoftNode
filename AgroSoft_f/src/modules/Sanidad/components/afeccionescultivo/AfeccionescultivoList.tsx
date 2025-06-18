@@ -75,7 +75,7 @@ export function AfeccionesCultivoList() {
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
-        claveBusqueda="fk_Plaga"
+        claveBusqueda="plagas"
         placeholderBusqueda="Buscar por plaga"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
