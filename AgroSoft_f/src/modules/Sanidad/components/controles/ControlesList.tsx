@@ -17,8 +17,6 @@ import { Download } from "lucide-react";
 
 export function ControlesList() {
   const { data, isLoading, error } = useGetControles();
-  const { data: afecciones } = useGetAfecciones();
-  const { data: tiposControl } = useGetTipoControl();
 
   const { isOpen: isEditModalOpen, closeModal: closeEditModal, controlEditado, handleEditar } = useEditarControl();
   const { isOpen: isCreateModalOpen, closeModal: closeCreateModal, handleCrear } = useCrearControl();
@@ -45,9 +43,9 @@ export function ControlesList() {
       case "descripcion":
         return <span>{item.descripcion}</span>;
       case "fk_Afeccion":
-        return <span>{item.fk_Afecciones?.fk_Plagas?.nombre || "No definido"}</span>;
+        return <span>{item.afecciones?.plagas?.nombre || "No definido"}</span>;
       case "fk_TipoControl":
-        return <span>{item.fk_TipoControl?.nombre || "No definido"}</span>;
+        return <span>{item.tiposControl?.nombre || "No definido"}</span>;
       case "acciones":
         return (
           <AccionesTabla
@@ -62,8 +60,8 @@ export function ControlesList() {
 
   const generarReporte = () => {
     const datos = (data || []).map((item: Controles) => {
-      const afeccion = afecciones?.find(a => a.id === item.fk_Afeccion)?.nombre || "No definido";
-      const tipoControl = item.fk_TipoControl?.nombre || "No definido";
+      const afeccion = item.afecciones?.plagas?.nombre || "No definido";
+      const tipoControl = item.tiposControl?.nombre || "No definido";
 
       return {
         fechaControl: item.fechaControl,

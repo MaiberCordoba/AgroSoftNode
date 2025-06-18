@@ -51,9 +51,9 @@ export function AfeccionesCultivoList() {
   const renderCell = (item: AfeccionesCultivo, columnKey: React.Key) => {
     switch (columnKey) {
       case "fk_Plantacion":
-        return <span>{item.fk_Plantaciones || "No definido"}</span>;
+        return <span>{item.plantaciones.cultivos?.nombre || "No definido"}</span>;
       case "fk_Plaga":
-        return <span>{item.fk_Plagas || "No definido"}</span>;
+        return <span>{item.plagas.nombre || "No definido"}</span>;
       case "fechaEncuentro":
         return <span>{item.fechaEncuentro}</span>;
       case "estado":
@@ -75,7 +75,7 @@ export function AfeccionesCultivoList() {
       <TablaReutilizable
         datos={data || []}
         columnas={columnas}
-        claveBusqueda="fk_Plaga"
+        claveBusqueda="plagas"
         placeholderBusqueda="Buscar por plaga"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}

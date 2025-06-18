@@ -1,3 +1,5 @@
+import { Plantaciones } from "../Trazabilidad/types";
+
 export interface TiposAfecciones {
   id: number;
   nombre: string;
@@ -47,6 +49,8 @@ export interface Controles {
   id: number;
   fechaControl: string;
   descripcion: string;
+  afecciones: AfeccionesCultivo;
+  fk_Afeccion: number
   fk_Afecciones: {
     id: 20;
     fechaEncuentro: "2025-04-08T05:00:00.000Z";
@@ -60,6 +64,7 @@ export interface Controles {
     id: number;
     nombre: string;
   };
+  tiposControl: TipoControl;
 }
 
 export enum EstadoAfeccion {
@@ -70,13 +75,10 @@ export enum EstadoAfeccion {
 
 export interface AfeccionesCultivo {
   id: number;
-  fk_Plantaciones: number;
-  plantaciones: {
-    cultivos: {
-      nombre: string;
-    };
-  };
-  fk_Plagas: number;
+  fkPlantaciones: number;
+  plagas: Afecciones;
+  plantaciones: Plantaciones;
+  fkPlagas: number;
   fechaEncuentro: string;
   estado: EstadoAfeccion;
 }

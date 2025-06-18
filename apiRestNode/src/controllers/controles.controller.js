@@ -38,8 +38,8 @@ export const registrarControles = async (req, resp) => {
 
     await pool.controles.create({
       data: {
-        fk_Afecciones: fk_Afeccion,
-        fk_TiposControl: fk_TipoControl,
+        fkAfecciones: fk_Afeccion,
+        fkTiposControl: fk_TipoControl,
         descripcion,
         fechaControl: new Date(fechaControl),
       },
