@@ -9,8 +9,7 @@ export const getUsers = async (): Promise<User[]> => {
 export const getTotalUsers = async (): Promise<TotalUsers> => {
   const response = await apiClient.get("usuarios/reporteUsuarios");
 
-  // Extrae el primer elemento del array
-  const [userStats] = response.data; // Destructuring del array
+  const userStats = response.data;
 
   return {
     total_usuarios: userStats.total_usuarios,
@@ -18,6 +17,8 @@ export const getTotalUsers = async (): Promise<TotalUsers> => {
     usuarios_inactivos: userStats.usuarios_inactivos,
   };
 };
+
+
 
 export const registerUser = async (userData: Partial<User>): Promise<User> => {
   const response = await apiClient.post("usuarios/", userData);
