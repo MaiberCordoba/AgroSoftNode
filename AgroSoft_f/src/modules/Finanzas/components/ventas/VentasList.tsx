@@ -76,23 +76,6 @@ const { data: ventasData } = useQuery<ReporteVentas[]>({
         placeholderBusqueda="Buscar por fecha de venta"
         renderCell={renderCell}
         onCrearNuevo={handleCrearNuevo}
-
-        renderReporteAction={() => (
-  <PDFDownloadLink
-  document={<ReportePdfVentas data={ventasData || []} />}
-    fileName="reporte_ventas.pdf"
-  >
-    {({ loading }) => (
-      <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-        {loading ? (
-          <Download className="h-4 w-4 animate-spin text-blue-500" />
-        ) : (
-          <Download className="h-5 w-5 text-green-600" />
-        )}
-      </button>
-    )}
-  </PDFDownloadLink>
-)}
       />
 
       {isEditModalOpen && ventaEditada && (
