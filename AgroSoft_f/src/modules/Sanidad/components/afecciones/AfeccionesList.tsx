@@ -80,7 +80,7 @@ export function AfeccionesList() {
           const datosPDF = afeccionesData.map((item: Afecciones) => ({
             nombre: item.nombre,
             descripcion: item.descripcion,
-            tipo: item.tipoPlaga?.nombre || "No definido",
+            tipo: item.tiposPlaga?.nombre || "No definido",
           }));
 
           return (

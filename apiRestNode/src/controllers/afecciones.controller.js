@@ -5,17 +5,17 @@ export const listarAfecciones = async (req, resp) => {
   try {
     const afecciones = await prisma.afecciones.findMany({
       include: {
-        plaga: {
+        plagas: {
           include: {
-            tipoPlaga: true,
+            tiposPlaga: true,
           },
         },
-        plantacion: {
+        plantaciones: {
           include: {
-            cultivo: true,
-            era: {
+            cultivos: true,
+            eras: {
               include: {
-                lote: true,
+                lotes: true,
               },
             },
           },
@@ -28,24 +28,24 @@ export const listarAfecciones = async (req, resp) => {
       fechaEncuentro: a.fechaEncuentro,
       estado: a.estado,
       fk_Plagas: {
-        idPlaga: a.plaga.id,
-        nombre: a.plaga.nombre,
+        idPlaga: a.plagas.id,
+        nombre: a.plagas.nombre,
       },
       fk_Plantaciones: {
-        id: a.plantacion.id,
+        id: a.plantaciones.id,
         fk_cultivo: {
-          id_cultivo: a.plantacion.cultivo.id,
-          nombre: a.plantacion.cultivo.nombre,
-          unidades: a.plantacion.cultivo.unidades,
+          id_cultivo: a.plantaciones.cultivo.id,
+          nombre: a.plantaciones.cultivo.nombre,
+          unidades: a.plantaciones.cultivo.unidades,
         },
         fk_era: {
-          id: a.plantacion.era.id,
-          posX: a.plantacion.era.posX,
-          posY: a.plantacion.era.posY,
+          id: a.plantaciones.eras.id,
+          posX: a.plantaciones.eras.posX,
+          posY: a.plantaciones.eras.posY,
           fk_lote: {
-            id: a.plantacion.era.lote.id,
-            posX: a.plantacion.era.lote.posX,
-            posY: a.plantacion.era.lote.posY,
+            id: a.plantaciones.eras.lote.id,
+            posX: a.plantaciones.eras.lote.posX,
+            posY: a.plantaciones.eras.lote.posY,
           },
         },
       },
@@ -67,10 +67,10 @@ export const registrarAfecciones = async (req, resp) => {
       data: {
         fechaEncuentro,
         estado,
-        plaga: {
+        plagas: {
           connect: { id: fk_Plagas },
         },
-        plantacion: {
+        plantaciones: {
           connect: { id: fk_Plantaciones },
         },
       },
@@ -94,10 +94,10 @@ export const actualizarAfecciones = async (req, resp) => {
       data: {
         fechaEncuentro,
         estado,
-        plaga: {
+        plagas: {
           connect: { id: fk_Plagas },
         },
-        plantacion: {
+        plantaciones: {
           connect: { id: fk_Plantaciones },
         },
       },
@@ -134,17 +134,17 @@ export const buscarAfecciones = async (req, resp) => {
     const a = await prisma.afecciones.findUnique({
       where: { id },
       include: {
-        plaga: {
+        plagas: {
           include: {
             tipoPlaga: true,
           },
         },
-        plantacion: {
+        plantaciones: {
           include: {
-            cultivo: true,
-            era: {
+            cultivos: true,
+            eras: {
               include: {
-                lote: true,
+                lotes: true,
               },
             },
           },
