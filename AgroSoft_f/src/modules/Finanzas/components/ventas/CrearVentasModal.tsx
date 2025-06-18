@@ -16,9 +16,8 @@ export const CrearVentasModal = ({ onClose }: CrearVentasModalProps) => {
   const { data: cosechas, isLoading: isLoadingCosechas } = useGetCosechas();
   const { mutate, isPending } = usePostVentas();
 
-  
+
   const handleSubmit = () => {
-    // Convertir fecha a formato ISO
     const fechaISO = new Date(fecha).toISOString();
     if (!fkCosechas || !precioUnitario || !fecha) {
       console.log("Por favor, completa todos los campos.");
