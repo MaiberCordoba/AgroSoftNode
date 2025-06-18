@@ -3,7 +3,7 @@ import pool from "../db.js";
 // Obtener todos los lotes
 export const getAllLotes = async (req, res) => {
   try {
-    const lotes = await pool.lote.findMany();
+    const lotes = await pool.lotes.findMany();
     return res.status(200).json(lotes);
   } catch (error) {
     console.error(error);
@@ -28,7 +28,7 @@ export const createLote = async (req, res) => {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
-    const nuevoLote = await pool.lote.create({
+    const nuevoLote = await pool.lotes.create({
       data: {
         nombre,
         descripcion,
@@ -56,7 +56,7 @@ export const patchLote = async (req, res) => {
     const id = parseInt(req.params.id);
     const { nombre, descripcion, tamX, tamY, estado, posX, posY } = req.body;
 
-    const loteActual = await pool.lote.findUnique({ where: { id } });
+    const loteActual = await pool.lotes.findUnique({ where: { id } });
     if (!loteActual) {
       return res.status(404).json({ msg: "Lote no encontrado" });
     }
@@ -71,7 +71,7 @@ export const patchLote = async (req, res) => {
       posY: posY != null ? parseFloat(posY) : loteActual.posY,
     };
 
-    await pool.lote.update({
+    await pool.lotes.update({
       where: { id },
       data: updatedLote,
     });
@@ -91,7 +91,7 @@ export const deleteLote = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const deletedLote = await pool.lote.delete({
+    const deletedLote = await pool.lotes.delete({
       where: { id },
     });
 
@@ -112,7 +112,7 @@ export const getLoteById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const lote = await pool.lote.findUnique({
+    const lote = await pool.lotes.findUnique({
       where: { id },
     });
 
@@ -136,7 +136,7 @@ export const getLotesByUbicacion = async (req, res) => {
       return res.status(400).json({ msg: "Posiciones inválidas" });
     }
 
-    const lotes = await pool.lote.findMany({
+    const lotes = await pool.lotes.findMany({
       where: {
         posX: parseFloat(posX),
         posY: parseFloat(posY),
@@ -163,7 +163,7 @@ export const getLotesByEstado = async (req, res) => {
       return res.status(400).json({ msg: "El estado debe ser 0 o 1" });
     }
 
-    const lotes = await pool.lote.findMany({
+    const lotes = await pool.lotes.findMany({
       where: { estado: Boolean(estado) },
     });
 
@@ -183,7 +183,7 @@ export const getLotesByDimensiones = async (req, res) => {
   try {
     const { tamX, tamY } = req.params;
 
-    const lotes = await pool.lote.findMany({
+    const lotes = await pool.lotes.findMany({
       where: {
         tamX: parseFloat(tamX),
         tamY: parseFloat(tamY),

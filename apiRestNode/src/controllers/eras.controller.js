@@ -3,7 +3,7 @@ import pool from "../db.js";
 // Listar todas las eras
 export const getAllEras = async (_req, res) => {
   try {
-    const eras = await pool.era.findMany();
+    const eras = await pool.eras.findMany();
     return res.status(200).json(eras);
   } catch (error) {
     console.error(error);
@@ -16,7 +16,7 @@ export const getEraById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const era = await pool.era.findUnique({
+    const era = await pool.eras.findUnique({
       where: { id },
     });
 
@@ -40,9 +40,9 @@ export const createEra = async (req, res) => {
       return res.status(400).json({ msg: "Todos los campos son obligatorios" });
     }
 
-    const nuevaEra = await pool.era.create({
+    const nuevaEra = await pool.eras.create({
       data: {
-        fk_Lotes: parseInt(fk_Lotes),
+        fkLotes: parseInt(fk_Lotes),
         tamX: parseFloat(tamX),
         tamY: parseFloat(tamY),
         posX: parseFloat(posX),
@@ -80,7 +80,7 @@ export const patchEra = async (req, res) => {
       return res.status(400).json({ msg: "No se proporcionaron campos para actualizar" });
     }
 
-    const updatedEra = await pool.era.update({
+    const updatedEra = await pool.eras.update({
       where: { id },
       data: updates,
     });
@@ -104,7 +104,7 @@ export const deleteEra = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const deletedEra = await pool.era.delete({
+    const deletedEra = await pool.eras.delete({
       where: { id },
     });
 
@@ -127,7 +127,7 @@ export const getErasByLoteId = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const eras = await pool.era.findMany({
+    const eras = await pool.eras.findMany({
       where: { fk_Lotes: id },
     });
 

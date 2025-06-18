@@ -67,7 +67,7 @@ export function EraList() {
       case "id":
         return <span>{item.id}</span>;
       case "fk_Lote":
-        const lote = lotes?.find((l) => l.id === item.fk_Lotes);
+        const lote = lotes?.find((l) => l.id === item.fkLotes);
         return <span>{lote ? lote.nombre : "Sin asignar"}</span>;
       case "estado":
         return <span>{item.estado ? "Disponible" : "Ocupado"}</span>;

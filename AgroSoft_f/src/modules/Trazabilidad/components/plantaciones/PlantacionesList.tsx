@@ -54,12 +54,12 @@ export function PlantacionesList() {
         return <span>{item.id}</span>;
 
       case "fk_Cultivo": {
-        const cultivo = cultivos?.find(c => c.id === item.fk_Cultivos);
+        const cultivo = cultivos?.find(c => c.id === item.fkCultivos);
         return <span>{cultivo ? cultivo.nombre : "Sin asignar"}</span>;
       }
 
       case "fk_Era": {
-        const era = eras?.find(e => e.id === item.fk_Eras);
+        const era = eras?.find(e => e.id === item.fkEras);
         return <span>{era ? `Era ${era.id}` : "Sin asignar"}</span>;
       }
 

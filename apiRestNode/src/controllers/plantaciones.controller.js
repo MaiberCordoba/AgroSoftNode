@@ -2,7 +2,7 @@ import pool from "../db.js";
 
 export const getAllPlantaciones = async (req, res) => {
   try {
-    const plantaciones = await pool.plantacion.findMany();
+    const plantaciones = await pool.plantaciones.findMany();
     return res.status(200).json(plantaciones);
   } catch (error) {
     console.error(error);
@@ -18,10 +18,10 @@ export const createPlantacion = async (req, res) => {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
     }
 
-    const nuevaPlantacion = await pool.plantacion.create({
+    const nuevaPlantacion = await pool.plantaciones.create({
       data: {
-        fk_Cultivos: parseInt(fk_Cultivos),
-        fk_Eras: parseInt(fk_Eras),
+        fkCultivos: parseInt(fk_Cultivos),
+        fkEras: parseInt(fk_Eras),
       },
     });
 
@@ -49,7 +49,7 @@ export const patchPlantacion = async (req, res) => {
     if (updates.fk_Cultivos !== undefined) data.fk_Cultivos = parseInt(updates.fk_Cultivos);
     if (updates.fk_Eras !== undefined) data.fk_Eras = parseInt(updates.fk_Eras);
 
-    const updatedPlantacion = await pool.plantacion.update({
+    const updatedPlantacion = await pool.plantaciones.update({
       where: { id },
       data,
     });
@@ -72,7 +72,7 @@ export const deletePlantacion = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const deletedPlantacion = await pool.plantacion.delete({
+    const deletedPlantacion = await pool.plantaciones.delete({
       where: { id },
     });
 
@@ -94,7 +94,7 @@ export const getPlantacionById = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
 
-    const plantacion = await pool.plantacion.findUnique({
+    const plantacion = await pool.plantaciones.findUnique({
       where: { id },
     });
 
@@ -114,7 +114,7 @@ export const getPlantacionesByEraAndCrop = async (req, res) => {
     const fk_Eras = parseInt(req.params.fk_Eras);
     const fk_Cultivos = parseInt(req.params.fk_Cultivos);
 
-    const plantaciones = await pool.plantacion.findMany({
+    const plantaciones = await pool.plantaciones.findMany({
       where: {
         fk_Eras,
         fk_Cultivos,
@@ -132,7 +132,7 @@ export const getPlantacionesByEra = async (req, res) => {
   try {
     const fk_Eras = parseInt(req.params.fk_Eras);
 
-    const plantaciones = await pool.plantacion.findMany({
+    const plantaciones = await pool.plantaciones.findMany({
       where: { fk_Eras },
     });
 
@@ -155,7 +155,7 @@ export const getPlantacionesByCrop = async (req, res) => {
   try {
     const fk_Cultivos = parseInt(req.params.fk_Cultivos);
 
-    const plantaciones = await pool.plantacion.findMany({
+    const plantaciones = await pool.plantaciones.findMany({
       where: { fk_Cultivos },
     });
 
@@ -171,7 +171,7 @@ export const getPlantacionesByCropAndEra = async (req, res) => {
     const fk_Cultivos = parseInt(req.params.fk_Cultivos);
     const fk_Eras = parseInt(req.params.fk_Eras);
 
-    const plantaciones = await pool.plantacion.findMany({
+    const plantaciones = await pool.plantaciones.findMany({
       where: {
         fk_Cultivos,
         fk_Eras,
