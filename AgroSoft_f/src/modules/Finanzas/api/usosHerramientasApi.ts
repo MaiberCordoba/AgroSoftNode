@@ -8,7 +8,7 @@ export const getUsosHerramientas = async (): Promise<UsosHerramientas[]> => {
 
 export const postUsoHerramienta = async (UsosHerramientasData: Partial<UsosHerramientas>): Promise<UsosHerramientas> => {
   const response = await apiClient.post("usosherramientas/", UsosHerramientasData);
-  return response.data;
+  return response.data ?? []
 };
 
 export const patchUsosHerramientas = async ( id: number, data: Partial<UsosHerramientas>): Promise<UsosHerramientas> => {

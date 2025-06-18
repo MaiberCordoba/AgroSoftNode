@@ -3,7 +3,7 @@ import { Insumos } from "../types";
 
 export const getInsumos = async (): Promise<Insumos[]> => {
   const response = await apiClient.get("insumos/")
-  return response.data.rows
+  return response.data ?? []
 }
 
 export const postInsumo = async (InsumosData: Partial<Insumos>): Promise<Insumos> => {
