@@ -169,22 +169,6 @@ export const CrearSensorModal = ({ onClose }: CrearSensorModalProps) => {
         },
       ]}
     >
-      <Input
-        label="Valor del Sensor"
-        type="number"
-        value={datosSensor !== null ? String(datosSensor) : ""}
-        onChange={(e) => setDatosSensor(e.target.value ? Number(e.target.value) : null)}
-        required
-      />
-
-      <Input
-        label="Fecha del Registro"
-        type="date"
-        value={fecha}
-        onChange={(e) => setFecha(e.target.value)}
-        required
-      />
-
       <Select
         label="Tipo de Sensor"
         placeholder="Selecciona un tipo de sensor"
@@ -235,6 +219,24 @@ export const CrearSensorModal = ({ onClose }: CrearSensorModalProps) => {
           ))}
         </Select>
       )}
+
+      <Input
+        label="Valor del Sensor (por defecto 0)"
+        type="number"
+        value={datosSensor !== null ? String(datosSensor) : ""}
+        onChange={(e) => setDatosSensor(e.target.value ? Number(e.target.value) : null)}
+        required
+      />
+
+      <Input
+        label="Fecha del Registro"
+        type="date"
+        value={fecha}
+        onChange={(e) => setFecha(e.target.value)}
+        required
+      />
+
+      
     </ModalComponent>
   );
 };

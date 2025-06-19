@@ -4,7 +4,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { get as getSensores, getHistorico } from "../../api/sensor"; 
-import { Sensor, SensorHistorico } from "../../types/sensorTypes";
+import { Sensor } from "../../types/sensorTypes";
 import html2canvas from "html2canvas";
 import Chart from "chart.js/auto";
 
@@ -17,7 +17,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
   const [fechaFin, setFechaFin] = useState<string>("");
   const [sensores, setSensores] = useState<Sensor[]>([]);
   const [sensoresSeleccionados, setSensoresSeleccionados] = useState<number[]>([]);
-  const [datosReporte, setDatosReporte] = useState<Record<number, SensorHistorico[]>>({});
+  const [datosReporte, setDatosReporte] = useState<Record<string, any[]>>({});
   const [cargando, setCargando] = useState<boolean>(false);
   const [generandoPDF, setGenerandoPDF] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -64,11 +64,11 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
     setPreviewVisible(false);
     
     try {
-      const datos: Record<number, SensorHistorico[]> = {};
+      const datos: Record<string, any[]> = {};
       
       // Obtener datos para cada sensor en paralelo
       const promesas = sensoresSeleccionados.map(async sensorId => {
-        const data = await getHistorico(sensorId, fechaInicio, fechaFin);
+        const data = await getHistorico(sensorId.toString(), fechaInicio, fechaFin);
         datos[sensorId] = data;
       });
       
@@ -111,8 +111,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
       
       // Para cada sensor
       for (const [sensorId, datos] of Object.entries(datosReporte)) {
-        const id = parseInt(sensorId);
-        const sensor = sensores.find(s => s.id === id);
+        const sensor = sensores.find(s => s.id === parseInt(sensorId));
         if (!sensor) continue;
         
         // Verificar espacio para el encabezado
@@ -123,7 +122,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
         
         // Encabezado del sensor
         doc.setFontSize(14);
-        doc.text(`Sensor: ${sensor.tipoSensor} (ID: ${id})`, margin, yPosition);
+        doc.text(`Sensor: ${sensor.tipoSensor} (ID: ${sensorId})`, margin, yPosition);
         yPosition += 10;
         
         // Crear gráfica temporal
@@ -150,7 +149,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
             labels: datos.map(d => new Date(d.fecha).toLocaleDateString()),
             datasets: [{
               label: "Valor",
-              data: datos.map(d => d.datosSensor),
+              data: datos.map(d => d.datos_sensor),
               borderColor: "#8884d8",
               backgroundColor: "rgba(136, 132, 216, 0.1)",
               tension: 0.4,
@@ -203,7 +202,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
         const tableData = datos.map((dato, index) => [
           index + 1,
           new Date(dato.fecha).toLocaleString(),
-          dato.datosSensor,
+          dato.datos_sensor,
           dato.unidad || ""
         ]);
         
@@ -300,12 +299,11 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
             <h3 className="text-lg font-semibold mb-3">Vista Previa</h3>
             <div className="space-y-8">
               {Object.entries(datosReporte).map(([sensorId, datos]) => {
-                const id = parseInt(sensorId);
-                const sensor = sensores.find(s => s.id === id);
+                const sensor = sensores.find(s => s.id === parseInt(sensorId));
                 return (
                   <div key={sensorId} className="bg-gray-50 p-4 rounded">
                     <h4 className="font-medium mb-2">
-                      {sensor?.tipoSensor} (ID: {id})
+                      {sensor?.tipoSensor} (ID: {sensorId})
                     </h4>
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
@@ -321,7 +319,7 @@ export default function ReporteModal({ onClose }: ReporteModalProps) {
                           />
                           <Line 
                             type="monotone" 
-                            dataKey="datosSensor" 
+                            dataKey="datos_sensor" 
                             stroke="#8884d8" 
                             activeDot={{ r: 8 }} 
                           />

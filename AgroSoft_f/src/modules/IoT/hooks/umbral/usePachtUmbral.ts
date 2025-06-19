@@ -15,12 +15,6 @@ export const usePatchUmbral = () => {
           umbral.id === variables.id ? { ...umbral, ...updatedUmbral } : umbral
         );
       });
-
-      addToast({
-        title: "Actualización exitosa",
-        description: "El umbral se actualizó correctamente",
-        color: "success",
-      });
     },
     onError: (error) => {
       console.error(error);

@@ -16,19 +16,20 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Umbral } from "../types/sensorTypes";
 import ReporteModal from "../components/sensor/ReporteModal";
+import "./IoTPages.css"
 
 export default function IoTPages() {
   const navigate = useNavigate();
   const [isReporteModalOpen, setIsReporteModalOpen] = useState(false);
 
   const [sensoresData, setSensoresData] = useState<Record<string, string>>({
-    viento: "Cargando...",
-    temperatura: "Cargando...",
-    Iluminación: "Cargando...",
-    humedad: "Cargando...",
-    humedadAmbiente: "Cargando...",
-    lluvia: "Cargando...",
-  });
+  viento: "Cargando...",
+  temperatura: "Cargando...",
+  iluminacion: "Cargando...",   // Cambiado de "Iluminación"
+  humedadsuelo: "Cargando...",  // Cambiado de "humedad"
+  humedadambiente: "Cargando...",// Cambiado de "humedadAmbiente"
+  lluvia: "Cargando...",
+});
 
   const [searchId, setSearchId] = useState("");
 
@@ -54,13 +55,13 @@ export default function IoTPages() {
     if (umbrales.length === 0) return;
 
     const sensores = [
-      "viento",
-      "temperatura",
-      "Iluminación",
-      "humedad",
-      "humedadAmbiente",
-      "lluvia",
-    ];
+    "viento",
+    "temperatura",
+    "iluminacion",    // Cambiado
+    "humedadsuelo",   // Cambiado
+    "humedadambiente",// Cambiado
+    "lluvia",
+  ];
     const websockets = new Map<string, WebSocket>();
 
     sensores.forEach((sensor) => {
@@ -115,9 +116,9 @@ export default function IoTPages() {
   const sensoresList = [
     { id: "viento", title: "Viento", icon: <WiStrongWind size={32} style={{ color: "#5DADE2" }}/> },
     { id: "temperatura", title: "Temperatura", icon: <WiThermometer size={32} style={{ color: "#E74C3C" }} /> },
-    { id: "Iluminación", title: "Luz Solar", icon: <WiDayCloudy size={32} style={{ color: "#F1C40F" }} /> },
-    { id: "humedad", title: "Humedad", icon: <WiRaindrop size={32} style={{ color: "#3498DB" }} /> },
-    { id: "humedadAmbiente", title: "H. Ambiente", icon: <WiHumidity size={32} style={{ color: "#76D7C4" }} /> },
+    { id: "iluminacion", title: "Luz Solar", icon: <WiDayCloudy size={32} style={{ color: "#F1C40F" }} /> },
+    { id: "humedadsuelo", title: "Humedad Suelo", icon: <WiRaindrop size={32} style={{ color: "#3498DB" }} /> },
+    { id: "humedadambiente", title: "H. Ambiente", icon: <WiHumidity size={32} style={{ color: "#76D7C4" }} /> },
     { id: "lluvia", title: "Lluvia", icon: <WiRain size={32} style={{ color: "#2980B9" }} /> },
   ];
 
