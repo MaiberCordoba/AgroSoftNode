@@ -48,7 +48,7 @@ export function UsersList() {
   };
 
   const handleCrearNuevo = () => {
-    openModal(); // Solo abrir el modal, como en Login
+    openModal();
   };
 
   const columnas = [

@@ -50,7 +50,7 @@ export interface Controles {
   fechaControl: string;
   descripcion: string;
   afecciones: AfeccionesCultivo;
-  fk_Afeccion: number
+  fk_Afeccion: number;
   fk_Afecciones: {
     id: 20;
     fechaEncuentro: "2025-04-08T05:00:00.000Z";
@@ -60,10 +60,7 @@ export interface Controles {
       nombre: "Mosca blanca";
     };
   };
-  fk_TipoControl: {
-    id: number;
-    nombre: string;
-  };
+  fk_TipoControl: number;
   tiposControl: TipoControl;
 }
 
