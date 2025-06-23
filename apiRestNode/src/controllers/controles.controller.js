@@ -88,3 +88,39 @@ export const eliminarControles = async (req, resp) => {
     return resp.status(500).json({ message: "Error en el sistema" });
   }
 };
+
+export const getByIdControles = async (req, resp) => {
+  try {
+    const id = parseInt(req.params.id);
+    const controles = await pool.controles.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        tiposControl: true,
+        afecciones: {
+          include: {
+            plagas: {
+              include: {
+                tiposPlaga: true,
+              },
+            },
+            plantaciones: {
+              include: {
+                cultivos: true,
+                eras: {
+                  include: {
+                    lotes: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    return resp.json(controles);
+  } catch (error) {
+    return resp.status(500).json({ error: "Error al listar controles" });
+  }
+};
