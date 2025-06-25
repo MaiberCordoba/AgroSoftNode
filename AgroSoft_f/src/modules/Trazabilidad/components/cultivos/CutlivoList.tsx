@@ -13,6 +13,11 @@ import { ReportePdfCultivos } from "./ReportePdfCultivos";
 import { Download } from "lucide-react";
 import { Cultivos } from "../../types";
 
+// 🟩 AÑADIDO
+import { useState } from "react";
+import VerDetallesCultivoModal from "./VerDetallesCultivoModal";
+// 🟥 FIN AÑADIDO
+
 function formatDate(fecha: string) {
   return new Date(fecha).toISOString().split("T")[0];
 }
@@ -41,6 +46,21 @@ export function CultivosList() {
     handleEliminar,
   } = useEliminarCultivos();
 
+  // 🟩 AÑADIDO
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [cultivoSeleccionado, setCultivoSeleccionado] = useState<Cultivos | null>(null);
+
+  const handleVerDetalles = (cultivo: Cultivos) => {
+    setCultivoSeleccionado(cultivo);
+    setIsViewModalOpen(true);
+  };
+
+  const closeViewModal = () => {
+    setCultivoSeleccionado(null);
+    setIsViewModalOpen(false);
+  };
+  // 🟥 FIN AÑADIDO
+
   const handleCrearNuevo = () => {
     handleCrear({
       id: 0,
@@ -49,6 +69,7 @@ export function CultivosList() {
       unidades: 0,
       fechaSiembra: "",
       activo: true,
+      descripcion: "",
     });
   };
 
@@ -60,6 +81,7 @@ export function CultivosList() {
     { name: "Fecha de Siembra", uid: "fechasiembra", sortable: true },
     { name: "Activo", uid: "activo", sortable: true },
     { name: "Acciones", uid: "acciones" },
+    { name: "Descripcion", uid: "descripcion", sortable: true},
   ];
 
   const renderCell = (item: Cultivos, columnKey: React.Key) => {
@@ -68,6 +90,8 @@ export function CultivosList() {
         return <span>{item.id}</span>;
       case "nombre":
         return <span>{item.nombre}</span>;
+      case "descipcion":
+        return <span>{item.descripcion}</span>
       case "fk_especie":
         const especie = especies?.find((e) => e.id === item.fkEspecies);
         return <span>{especie ? especie.nombre : "Cargando..."}</span>;
@@ -81,6 +105,9 @@ export function CultivosList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
+            // 🟩 AÑADIDO
+            onVerDetalles={() => handleVerDetalles(item)}
+            // 🟥 FIN AÑADIDO
           />
         );
       default:
@@ -147,6 +174,16 @@ export function CultivosList() {
           onClose={closeDeleteModal}
         />
       )}
+
+      {/* 🟩 AÑADIDO */}
+      {isViewModalOpen && cultivoSeleccionado && (
+        <VerDetallesCultivoModal
+          cultivo={cultivoSeleccionado}
+          isOpen={isViewModalOpen}
+          onClose={closeViewModal}
+        />
+      )}
+      {/* 🟥 FIN AÑADIDO */}
     </div>
   );
 }

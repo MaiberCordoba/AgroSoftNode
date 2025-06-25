@@ -84,6 +84,8 @@ model Cultivos {
   unidades     Int      @map("unidades")
   activo       Boolean  @map("activo") @default(true)
   fechaSiembra DateTime @map("fechaSiembra") @db.Date
+  descripcion  String?   @map("descripcion") @db.Text
+  
 
   especies      Especies      @relation(fields: [fkEspecies], references: [id])
   actividades   Actividades[]

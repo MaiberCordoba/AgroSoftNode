@@ -12,9 +12,9 @@ export const getCultivos = async (req, res) => {
 
 export const postCultivo = async (req, res) => {
   try {
-    const { fk_Especies, nombre, unidades, activo, fechaSiembra } = req.body;
+    const { fk_Especies, nombre, unidades, activo, fechaSiembra, descripcion } = req.body;
 
-    if (fk_Especies === undefined || !nombre || !unidades || activo === undefined || !fechaSiembra) {
+    if (fk_Especies === undefined || !nombre || !unidades || activo === undefined || !fechaSiembra || !descripcion) {
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
     }
 
@@ -25,6 +25,7 @@ export const postCultivo = async (req, res) => {
         unidades: parseInt(unidades),
         activo: Boolean(activo),
         fechaSiembra: new Date(fechaSiembra),
+        descripcion,
       },
     });
 
@@ -38,7 +39,7 @@ export const postCultivo = async (req, res) => {
 export const patchCultivo = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { fk_Especies, nombre, unidades, activo, fechaSiembra } = req.body;
+    const { fk_Especies, nombre, unidades, activo, fechaSiembra, descripcion } = req.body;
 
     const data = {};
     if (fk_Especies !== undefined) data.fk_Especies = parseInt(fk_Especies);
@@ -46,6 +47,7 @@ export const patchCultivo = async (req, res) => {
     if (unidades !== undefined) data.unidades = parseInt(unidades);
     if (activo !== undefined) data.activo = Boolean(activo);
     if (fechaSiembra !== undefined) data.fechaSiembra = new Date(fechaSiembra);
+    if (descripcion !== undefined) data.descripcion = descripcion;
 
     if (Object.keys(data).length === 0) {
       return res.status(400).json({ message: "No se proporcionaron campos para actualizar" });
