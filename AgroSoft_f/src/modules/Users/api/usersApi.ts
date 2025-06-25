@@ -18,7 +18,10 @@ export const getTotalUsers = async (): Promise<TotalUsers> => {
   };
 };
 
-
+export const getUsuariosById = async (id: number): Promise<User> => {
+  const response = await apiClient.get<User>(`usuarios/${id}/`);
+  return response.data;
+};  
 
 export const registerUser = async (userData: Partial<User>): Promise<User> => {
   const response = await apiClient.post("usuarios/", userData);

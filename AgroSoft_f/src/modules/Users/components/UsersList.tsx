@@ -14,6 +14,8 @@ import { Download } from "lucide-react";
 import { getTotalUsers } from "../api/usersApi";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { useVerDetalleUsuarios } from "../hooks/useVerDetalleUsarios";
+import DetalleUsuarioModal from "./DetalleUsuarioModal";
 
 export function UsersList() {
   const { data, isLoading, error } = useGetUsers();
@@ -34,6 +36,13 @@ export function UsersList() {
     closeModal: closeDeleteModal,
     UsersEliminada,
   } = useEliminarUsers();
+
+  const {
+    isOpen,
+    closeModal: handleCloseDetalle,
+    usuarioSeleccionado,
+    handleVerDetalle,
+  } = useVerDetalleUsuarios();
 
   // Estado para controlar el modal (como en Login)
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -94,7 +103,10 @@ export function UsersList() {
           </Chip>
         );
       case "acciones":
-        return <AccionesTabla onEditar={() => handleEditar(item)} />;
+        return <AccionesTabla 
+        onEditar={() => handleEditar(item)} 
+        onVerDetalles={() => handleVerDetalle(item)}
+        />;
       default:
         return <span>{String(item[columnKey as keyof User])}</span>;
     }
@@ -148,6 +160,14 @@ export function UsersList() {
           onClose={closeDeleteModal}
         />
       )}
+
+      {isOpen && usuarioSeleccionado && (
+        <DetalleUsuarioModal
+          Usuario={usuarioSeleccionado}
+          onClose={handleCloseDetalle}
+        />
+      )}
+
     </div>
   );
 }

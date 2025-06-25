@@ -165,6 +165,25 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
+export const getOneUsuarios = async (req, res) => {
+  try {
+    const id = req.params.identificacion
+    const sql = await pool.usuarios.findUnique({
+      where : {identificacion :parseInt(identificacion)}
+    })
+
+    if (sql) {
+      return res.status(200).json(sql)
+    }
+    else{
+      return res.status(404).json({msg: "No se encontro el id"})
+    }
+  }  catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Internal error"});
+  }
+};
+
 export const getTotalUsers = async (req, res) => {
   try {
     const total = await pool.usuarios.count();
