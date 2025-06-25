@@ -36,6 +36,7 @@ export interface Cultivos {
   fechaSiembra: string;
   Especies?: Especies;
   fk_Especies: number;
+  descripcion: string;
 }
 
 export interface Lotes {

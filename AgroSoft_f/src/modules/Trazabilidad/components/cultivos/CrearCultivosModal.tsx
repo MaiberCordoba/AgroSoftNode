@@ -14,12 +14,13 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
   const [fechaSiembra, setFechaSiembra] = useState<string>("");
   const [fk_Especies, setFk_Especie] = useState<number | null>(null);
   const [activo, setActivo] = useState<boolean>(true); // Por defecto activo
+  const [descripcion, setDescripcion] = useState<string>("");
 
   const { mutate, isPending } = usePostCultivos();
   const { data: especies, isLoading: isLoadingEspecies } = useGetEspecies();
 
   const handleSubmit = () => {
-    if (!nombre || !unidades || !fechaSiembra || !fk_Especies) {
+    if (!nombre || !unidades || !fechaSiembra || !fk_Especies || !descripcion) {
       console.log("Por favor, completa todos los campos obligatorios.");
       return;
     }
@@ -30,6 +31,7 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
         fechaSiembra,
         fk_Especies,
         activo,
+        descripcion,
       },
       {
         onSuccess: () => {
@@ -39,6 +41,7 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
           setFechaSiembra("");
           setFk_Especie(null);
           setActivo(true);
+          setDescripcion("");
         },
       }
     );
@@ -63,6 +66,14 @@ export const CrearCultivoModal = ({ onClose }: CrearCultivoModalProps) => {
         type="text"
         value={nombre}
         onChange={(e) => setNombre(e.target.value)}
+        required
+      />
+
+      <Input
+        label="Descripcion"
+        type="text"
+        value={descripcion}
+        onChange={(e) => setDescripcion(e.target.value)}
         required
       />
 
