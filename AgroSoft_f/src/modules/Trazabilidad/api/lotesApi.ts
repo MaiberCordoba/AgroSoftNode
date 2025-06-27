@@ -16,6 +16,10 @@ export const patchLotes = async ( id: number, data: Partial<Lotes>): Promise<Lot
     return response.data;
   };
 
+export const  getLoteById = async (id: number): Promise<Lotes | null> => {
+    const response = await apiClient.get(`lotes/${id}`);
+    return response.data ?? null;
+};
 
 export const deleteLotes = async (id: number): Promise<Lotes> => {
     const response = await apiClient.delete<Lotes>(`lotes/${id}/`);

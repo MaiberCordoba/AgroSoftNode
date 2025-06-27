@@ -16,13 +16,12 @@ const DetalleActividadModal = ({ actividad, onClose }: Props) => {
   const cultivo = cultivos?.find((c) => c.id === actividad.fkCultivos);
   return (
     <>
-      <ModalComponent isOpen={true} onClose={onClose} title="Detalle de Actividad">
-        <p><strong>Título:</strong> {actividad.titulo}</p>
-        <p><strong>Descripción:</strong> {actividad.descripcion}</p>
-        <p><strong>Fecha:</strong> {actividad.fecha}</p>
-        <p><strong>Estado:</strong> {actividad.estado}</p>
-        <p><strong>Cultivo:</strong> {cultivo?.nombre}</p>
+      <ModalComponent isOpen={true} onClose={onClose} title="Detalle de Usuario que realiza la actividad">
         <p><strong>Usuario:</strong> {usuario?.nombre} {usuario?.apellidos}</p>
+        <p><strong>Identificacion:</strong> {usuario?.identificacion}</p>
+        <p><strong>Estado:</strong> {usuario?.estado}</p>
+        <p><strong>Actividad que realiza:</strong> {actividad.titulo}</p>
+        <p><strong>Cultivo:</strong> {cultivo?.nombre}</p>
       </ModalComponent>
     </>
   );

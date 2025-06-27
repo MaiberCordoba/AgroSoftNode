@@ -8,7 +8,8 @@ import EditarLoteModal from "./EditarLotesModal";
 import { CrearLoteModal } from "./CrearLotesModal";
 import EliminarLoteModal from "./EliminarLotes";
 import { Lotes } from "../../types";
-
+import { useVerDetalleLotes } from "../../hooks/lotes/useVerDetallesLotes";
+import DetalleLotesModal from "./DetalleLoteModal";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ReportePdfLotes } from "./ReportePdfLotes";
 import { Download } from "lucide-react";
@@ -28,6 +29,13 @@ export function LoteList() {
     closeModal: closeCreateModal,
     handleCrear,
   } = useCrearLotes();
+
+  const {
+    isOpen,
+    closeModal: handleCloseDetalle,
+    loteSeleccionado,
+    handleVerDetalle
+  } = useVerDetalleLotes();
 
   const {
     isOpen: isDeleteModalOpen,
@@ -83,6 +91,7 @@ export function LoteList() {
         return (
           <AccionesTabla
             onEditar={() => handleEditar(item)}
+            onVerDetalles={()=> handleVerDetalle(item)}
           />
         );
       default:
@@ -136,6 +145,13 @@ export function LoteList() {
           onClose={closeDeleteModal}
         />
       )}
+
+      {isOpen && loteSeleccionado && (
+        <DetalleLotesModal
+          lote={loteSeleccionado}
+          onClose={handleCloseDetalle}
+        />
+      )}
     </div>
   );
 }
